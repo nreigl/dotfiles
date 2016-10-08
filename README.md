@@ -1,6 +1,15 @@
 My Dotfiles
 ========
 
-Basedo on [Dotbot][dotbot].
 
-Local Customization with template input from Anish Athalye
+*work in progress*
+
+Build with [Dotbot](https://git.io/dotbot) for bootstrapping, based on a template from Anish Athalye.
+
+
+### In the pipeline
+- improve zshrc folder structure
+- atom
+- sublime
+- old bash scripts
+- .osx
