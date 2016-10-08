@@ -1,0 +1,17 @@
+- defaults:
+    link:
+      create: true
+      relink: true
+
+- clean: ['~', '~/.config']
+
+- link:
+    ~/.dotfiles: ''
+    ~/.gitconfig: gitconfig
+    ~/.gitignore_global: gitignore_global
+    ~/.screenrc: screenrc
+    ~/.zsh: zsh
+    ~/.zshrc: zshrc
+
+- shell:
+  - git update-submodules # after linking ~/.gitconfig
