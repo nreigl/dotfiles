@@ -2,12 +2,12 @@ My Dotfiles
 ========
 
 
-*work in progress*
+*Really dirty early commit*
 
 Build with [Dotbot](https://git.io/dotbot) for bootstrapping, based on a template from Anish Athalye.
 
 
-### In the pipeline
+### Work in progress
 - improve zshrc folder structure
 - atom
 - sublime
