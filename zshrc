@@ -101,5 +101,8 @@ source $ZSH/oh-my-zsh.sh
 # Change iterm2 profile. Usage it2prof ProfileName (case sensitive)
 it2prof() { echo -e "\033]50;SetProfile=$1\a" }
 
+# Open in PathFinder from the Terminal
+pf () { open -a "Path Finder.app" $1; }
+
 # Syntax highlighting
-source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zshit
