@@ -49,60 +49,38 @@ ZSH_THEME="cobalt2" # agnoster or #fino-time
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(extract git brew osx sublime z matlab autoenv zsh-syntax-highlighting)
+plugins=(compleat extract git brew osx sublime z matlab autoenv zsh-syntax-highlighting)
 
 # User configuration
+# Settings
+source ~/.zsh/settings.zsh
 
-export PATH="/Users/nicolasreigl/anaconda3/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/Library/TeX/texbin"
-# export MANPATH="/usr/local/man:$MANPATH"
+# Bootstrap
+source ~/.zsh/bootstrap.zsh
 
-# Matlab
-export PATH=/Applications/MATLAB_R2016a.app/bin:$PATH
+
+# Aliases
+source ~/.zsh/aliases.zsh
+
+
+# Syntax highlighting
+source ~/.zsh/syntax.zsh
 
 source $ZSH/oh-my-zsh.sh
+# source $ZSH/z.sh
 
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
 
 
-
-
-
-
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
-
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
-
-# ssh
-# export SSH_KEY_PATH="~/.ssh/dsa_id"
-
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and thes. Aliases can be placed here, though oh-my-zsh
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
 # For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
 
-# alias ll=ls-l"
-# alias db = "cd ~/Dropbox/"
-# alias zs = "source ~/.zshrc"
-
-# Matlab alias
-# alias matlab='/usr/local/MATLAB/R2016a/bin/matlab -desktop'
-
-# Change iterm2 profile. Usage it2prof ProfileName (case sensitive)
-it2prof() { echo -e "\033]50;SetProfile=$1\a" }
-
-# Open in PathFinder from the Terminal
-pf () { open -a "Path Finder.app" $1; }
+# include Z, yo: does not work for me via oh-my-zsh plugins
+source /Users/nicolasreigl/dotfiles/zsh/plugins/z/z.sh
 
 # Syntax highlighting
 # source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zshit
+source /Users/nicolasreigl/dotfiles/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
