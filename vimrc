@@ -7,45 +7,49 @@ runtime bundle/vim-pathogen/autoload/pathogen.vim
 call pathogen#infect()
 call pathogen#helptags()
 
+
+"--------------
+" Load Vundle
+"--------------
+set nocompatible              " be iMproved, required
+filetype off                  " required
+
+" set the runtime path to include Vundle and initialize
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+" alternatively, pass a path where Vundle should install plugins
+"call vundle#begin('~/some/path/here')
+
+" let Vundle manage Vundle, required
+Plugin 'VundleVim/Vundle.vim'
+" The sparkup vim script is in a subdirectory of this repo called vim.
+" Pass the path to set the runtimepath properly.
+Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
+
+
+" VimLab for Matlab support"
+Bundle "ervandew/screen"
+Bundle "dajero/VimLab"
+"Optional, if you desire automatic code analysis
+Bundle "scrooloose/syntastic"
+
+
 "------------------
 " Syntax and indent
 "------------------
-syntax on " turn on syntax highlighting
-set showmatch " show matching braces when text indicator is over them
+set ruler
+set cursorline
+call pathogen#infect()
+syntax on
 
-" highlight current line, but only in active window
-augroup CursorLineOnlyInActiveWindow
-    autocmd!
-    autocmd VimEnter,WinEnter,BufWinEnter * setlocal cursorline
-    autocmd WinLeave * setlocal nocursorline
-augroup END
+filetype plugin indent on
 
-" vim can autodetect this based on $TERM (e.g. 'xterm-256color')
-" but it can be set to force 256 colors
-" set t_Co=256
-if &t_Co < 256
-    colorscheme default
-    set nocursorline " looks bad in this mode
-else
-    set background=dark
-    let g:solarized_termcolors=256 " instead of 16 color with mapping in terminal
-    colorscheme solarized
-    " customized colors
-    highlight SignColumn ctermbg=234
-    highlight StatusLine cterm=bold ctermfg=245 ctermbg=235
-    highlight StatusLineNC cterm=bold ctermfg=245 ctermbg=235
-    let g:NeatStatusLine_color_normal='ctermfg=64 ctermbg=235 cterm=bold'
-    let g:NeatStatusLine_color_insert='ctermfg=136 ctermbg=235 cterm=bold'
-    let g:NeatStatusLine_color_replace='ctermfg=160 ctermbg=235 cterm=bold'
-    let g:NeatStatusLine_color_visual='ctermfg=33 ctermbg=235 cterm=bold'
-    let g:NeatStatusLine_color_position='ctermfg=245 ctermbg=235 cterm=bold'
-    let g:NeatStatusLine_color_modified='ctermfg=166 ctermbg=235 cterm=bold'
-    let g:NeatStatusLine_color_line='ctermfg=61 ctermbg=235 cterm=bold'
-    let g:NeatStatusLine_color_filetype='ctermfg=37 ctermbg=235 cterm=bold'
-endif
+syntax enable
 
-filetype plugin indent on " enable file type detection
-set autoindent
+" Solarized stuff
+let g:solarized_termtrans = 1
+set background=dark
+colorscheme solarized
 
 "---------------------
 " Basic editing config

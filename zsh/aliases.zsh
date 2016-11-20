@@ -1,20 +1,14 @@
-## Alias ##
+    ## Alias ##
 ## Use colors in coreutils utilities output
-alias ls='ls --color=auto'
+alias ls='ls -G'
 alias grep='grep --color'
 
 # ls aliases
 alias ll='ls -lah'
 alias la='ls -A'
-alias l='ls'
-alias lh="ls -a | egrep "^\."" # alias dotfiles
+alias lh="ls -ld ~/.[^.]*" # alias dotfiles
 # List only directories
- alias lsd="ls -lF ${colorflag} | grep --color=never '^d'"
-
-# show only hidden files (dot files)
-# alias hidden='ls -a | grep "^\."'
-# show only hidden files with additional arguments
-# hidden() { ls -a "$@" | grep '^\.'; }
+alias lsd="ls -lF ${colorflag} | grep --color=never '^d'"
 
 # Get macOS Software Updates, and update installed Ruby gems, Homebrew, npm, and their installed packages
 alias update='sudo softwareupdate -i -a; brew update; brew upgrade --all; brew cleanup; npm install npm -g; npm update -g; sudo gem update --system; sudo gem update; sudo gem cleanup'
@@ -22,6 +16,13 @@ alias update='sudo softwareupdate -i -a; brew update; brew upgrade --all; brew c
 # Show/hide hidden files in Finder
 alias show="defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder"
 alias hide="defaults write com.apple.finder AppleShowAllFiles -bool false && killall Finder"
+
+# Get week number
+alias week='date +%V'
+
+# Merge PDF files
+# Usage: `mergepdf -o output.pdf input{1,2,3}.pdf`
+alias mergepdf='/System/Library/Automator/Combine\ PDF\ Pages.action/Contents/Resources/join.py'
 
 # Aliases to protect against overwriting
 alias cp='cp -i'
@@ -31,7 +32,6 @@ alias mv='mv -i'
 alias gag='git exec ag'
 # Remove git from a project
 alias ungit="find . -name '.git' -exec rm -rf {} \;"
-
 
 # alias Dropbox
 alias db="cd ~/Dropbox/"
@@ -56,7 +56,8 @@ alias cpwd='pwd|tr -d "\n"|pbcopy'
 # Get your current public IP
 alias ip="curl icanhazip.com"
 
-
+# Git pull over all subdirectories
+alias uprepos="ls | xargs -P10 -I{} git -C {} pull"
 
 
 ## Functions ##
@@ -79,6 +80,7 @@ function syspip3() {
 
 # Create a directory and cd into it
 function mcd() {
+
     mkdir "${1}" && cd "${1}"
 }
 
@@ -133,15 +135,6 @@ it2prof() { echo -e "\033]50;SetProfile=$1\a" }
 # Open in PathFinder from the Terminal
 pf () { open -a "Path Finder.app" $1; }
 
-ester() {
-    search=""
-    echo "Googling: $@"
-    for term in $@; do
-        search="$search%20$term"
-    done
-    opens "https://www.ester.ee/search?q=$search"
-}
-
 
 google() {
     search=""
@@ -153,8 +146,27 @@ google() {
 }
 
 
+## utilities
+
+# open with system default application
+alias o='open_command'
+alias o.='o .'
+
+# stdin to clipboard
+alias xclip='xclip -selection c'
+
+# enable advanced calculation in bc by default
+alias bc='bc -l'
+
+# default parameters for youtube-dl
+alias ytdl='youtube-dl --prefer-ffmpeg -o "%(title)s.%(ext)s"'
+
+
 ## Export path directions ##
 # path to anaconda3
 export PATH="/Users/nicolasreigl/anaconda3/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/Library/TeX/texbin"
 # open matlab from the terminal
 export PATH=/Applications/MATLAB_R2016a.app/bin:$PATH
+
+# git latex path:
+export PATH=usr/local/Cellar/git/2.10.2/libexec/git-core:$PATH

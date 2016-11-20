@@ -1,6 +1,8 @@
 # Initialize completion
 autoload -Uz compinit && compinit -i
 zstyle ':completion:*' menu select=20
+# complete . and .. directories
+zstyle ':completion:*' special-dirs true
 
 # Initialize editing command line
 autoload -U edit-command-line && zle -N edit-command-line
@@ -21,6 +23,20 @@ setopt extendedhistory
 
 # Time to wait for additional characters in a sequence
 KEYTIMEOUT=1 # corresponds to 10ms
+
+## More zsh options
+
+# correction of commands
+setopt correct
+
+# extended globbing (adds ^ and other symbols as wildcards)
+setopt extended_glob
+
+# automatic rehashing of commands...
+zstyle ':completion:*' rehash true
+# ...and checking if they're actually executable before adding them
+setopt hashexecutablesonly
+
 
 # Use vim as the editor
 export EDITOR=vim

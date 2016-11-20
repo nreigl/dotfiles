@@ -10,6 +10,13 @@
 	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
 	trustExitCode = true
 
+[difftool.latex]
+	cmd = latexdiff "$LOCAL" "$REMOTE"
+[difftool]
+	prompt = false
+[alias]
+	ldiff = difftool -t latex
+
 [alias]
 	exec = ! "exec"
 	st = status -sb
@@ -64,7 +71,6 @@
 	gral = log --graph --format=line --all # graph all line
 	grad = log --graph --format=detail --all # graph all in detail
 	ggp = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative # graph
-	
 	sf = show --format=fuller
 	sfw = show --format=fuller --color-words
 	sfs = show --format=fuller --stat
@@ -129,6 +135,7 @@
 
 [core]
 	excludesfile = ~/.gitignore_global
+	editor = atom --wait
 
 # Allow local customizations in the .gitconfig_local file
 [include]
