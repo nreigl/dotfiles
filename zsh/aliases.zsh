@@ -59,6 +59,8 @@ alias ip="curl icanhazip.com"
 # Git pull over all subdirectories
 alias uprepos="ls | xargs -P10 -I{} git -C {} pull"
 
+# Git desperation
+alias gcd=git commit -am $(apcom)
 
 ## Functions ##
 # Update dotfiles

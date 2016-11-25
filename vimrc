@@ -33,7 +33,6 @@ Bundle "dajero/VimLab"
 "Optional, if you desire automatic code analysis
 Bundle "scrooloose/syntastic"
 
-
 "------------------
 " Syntax and indent
 "------------------
@@ -50,6 +49,12 @@ syntax enable
 let g:solarized_termtrans = 1
 set background=dark
 colorscheme solarized
+
+"Powerline"
+
+set  rtp+=/Users/nicolasreigl/.local/lib/python3.5/site-packages/powerline/bindings/vim/
+set laststatus=2
+
 
 "---------------------
 " Basic editing config

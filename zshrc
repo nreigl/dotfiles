@@ -2,15 +2,28 @@
 export ZSH="$HOME/.oh-my-zsh"
 
 # Set name of the theme to load.
-ZSH_THEME="cobalt2" # agnoster or #fino-time
+ZSH_THEME="powerlevel9k/powerlevel9k" # agnoster or #fino-time # or cobalt2
+# configure powerline for powerlevel9k
+POWERLEVEL9K_MODE='awesome-patched'
+POWERLEVEL9K_SHORTEN_DIR_LENGTH=4
+POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir vcs)
+POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status virtualenv docker_machine)
+POWERLEVEL9K_STATUS_VERBOSE=false
+POWERLEVEL9K_SHORTEN_STRATEGY="truncate_middle"
+
+# POWERLEVEL9K_VCS_GIT_ICON=''
+POWERLEVEL9K_VCS_STAGED_ICON='\u00b1'
+POWERLEVEL9K_VCS_UNTRACKED_ICON='\u25CF'
+POWERLEVEL9K_VCS_UNSTAGED_ICON='\u00b1'
+POWERLEVEL9K_VCS_INCOMING_CHANGES_ICON='\u2193'
+POWERLEVEL9K_VCS_OUTGOING_CHANGES_ICON='\u2191'
+POWERLEVEL9K_VCS_MODIFIED_BACKGROUND='yellow'
+POWERLEVEL9K_VCS_UNTRACKED_BACKGROUND='yellow'
 
 # Ensure languages are set
 export LANG=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
-
-# Set name of the theme to load.
-ZSH_THEME="cobalt2" # agnoster or #fino-time
 
 # Uncomment the following line to enable command auto-correction.
 ENABLE_CORRECTION="true"
@@ -32,7 +45,7 @@ autoenv
 vi-mode
 zsh-pandoc-completion
 virtualenv
-virtualenvwrapper
+# virtualenvwrapper
 )
 
 # Uncomment this to disable bi-weekly auto-update checks
@@ -59,5 +72,10 @@ source ~/.zsh/syntax.zsh
 
 # external plugins
 source ~/.zsh/plugins/z/z.sh
+
 # Don't resolve symbolic links in z
 _Z_NO_RESOLVE_SYMLINKS="true"
+
+export PYTHONNOUSERSITE="$HOME/.local"
+
+# test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
