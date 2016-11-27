@@ -33,6 +33,9 @@ Bundle "dajero/VimLab"
 "Optional, if you desire automatic code analysis
 Bundle "scrooloose/syntastic"
 
+"Julia-vim"
+Plugin 'JuliaEditorSupport/julia-vim'
+
 "------------------
 " Syntax and indent
 "------------------
