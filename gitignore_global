@@ -13,6 +13,7 @@
 *.swp
 *~
 \#*\#
+*.cache
 
 # Logs and databases #
 ######################
