@@ -1,0 +1,54 @@
+function! s:set_first_line(str)
+    call setline(1, a:str)
+endfunction
+
+Describe '#user'
+    Describe #find_start()
+        It returns the column to start completion before '@'
+            Assert Equals(FindStart('user', ' aaa @bbb'), 5)
+            Assert Equals(FindStart('user', ' aa @bbb ccc', 'gg$Tb'), 4)
+            Assert Equals(FindStart('user', ' a @bbb)', 'gg$Tb'), 3)
+        End
+
+        It returns the column to start completion before github.com host
+            Assert Equals(FindStart('user', ' aaa https://github.com/rhy'), 24)
+            Assert Equals(FindStart('user', ' aa https://github.com/rhy bbb', 'gg$Ty'), 23)
+        End
+
+        It doesn't match except for other cases
+            Assert Equals(FindStart('user', ' aaa bbb'), -1)
+        End
+
+        It doesn't match when no character is specified
+            Assert Equals(FindStart('user', ' aaa @'), -1)
+        End
+    End
+
+    Describe #candidates()
+        It returns all matched '@' names
+            let cs = github_complete#user#candidates('@rhysd')
+            Assert IsList(cs)
+            Assert NotEmpty(cs)
+            Assert True(cs[0].word =~# '^@\w\+$')
+        End
+
+        It returns all matched names after github.com host
+            " Note: when github.com/foo is found, base will be 'foo'
+            let cs = github_complete#user#candidates('rhysd')
+            Assert IsList(cs)
+            Assert NotEmpty(cs)
+            Assert True(cs[0].word =~# '^\w\+$')
+        End
+
+        It caches previous candidates
+            call github_complete#api#reset_cache()
+            Assert Empty(github_complete#api#get_cache())
+
+            let cs = github_complete#user#candidates('@supermomonga')
+
+            Assert True(github_complete#api#is_cached('search/users', 'q=supermomonga+in:login'))
+            Assert Equals(cs, github_complete#user#candidates('@supermomonga'))
+        End
+
+    End
+End

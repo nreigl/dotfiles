@@ -184,6 +184,7 @@ sympy-plots-for-*.tex/
 # pythontex
 *.pytxcode
 pythontex-files-*/
+.python-version
 
 # thmtools
 *.loe

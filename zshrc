@@ -76,6 +76,20 @@ source ~/.zsh/plugins/z/z.sh
 # Don't resolve symbolic links in z
 _Z_NO_RESOLVE_SYMLINKS="true"
 
+# Julia path
+export PATH="/Users/nicolasreigl/github/repos/julia/usr/bin:$PATH"
+
+# Python path
 export PYTHONNOUSERSITE="$HOME/.local"
 
-# test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+# zathura path
+export PATH="/usr/local/Cellar/zathura/0.3.6/bin:$PATH"
+
+# added by Anaconda3 4.2.0 installer
+export PATH="/Users/nicolasreigl/anaconda3/bin:$PATH"
+
+# added by Anaconda2 4.2.0 installer
+export PATH="/Users/nicolasreigl/anaconda2/bin:$PATH"
+
+# added by Miniconda3 4.2.12 installer
+export PATH="/Users/nicolasreigl/miniconda3/bin:$PATH"
