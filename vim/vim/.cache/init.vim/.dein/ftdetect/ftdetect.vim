@@ -164,6 +164,9 @@ autocmd BufNewFile,BufRead *.ts setlocal filetype=typescript
 autocmd BufNewFile,BufRead *.json setlocal filetype=json
 autocmd BufNewFile,BufRead *.jsonp setlocal filetype=json
 autocmd BufNewFile,BufRead *.geojson setlocal filetype=json
+augroup rmarkdown
+    au! BufRead,BufNewFile *.Rmd  setfiletype rmarkdown
+augroup END
 autocmd BufNewFile,BufRead *.ts,*.tsx setlocal filetype=typescript
 " Detect syntax file.
 autocmd BufNewFile,BufRead *.snip,*.snippets set filetype=neosnippet

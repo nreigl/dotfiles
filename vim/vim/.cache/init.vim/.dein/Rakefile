@@ -1,21 +1,11 @@
-require 'fileutils'
-require 'pathname'
+require 'rspec/core/rake_task'
 
-files = Dir.glob('**/*.{vim,txt}').map {|f| Pathname(f) }
-name = 'unite-colorscheme'
-
-desc 'generate zip archive of the project, asking you the version'
-task :zip do
-  print "version: "
-  version = STDIN.gets.chomp
-  print "OK? "
-  exit unless STDIN.gets.chomp == 'y'
-
-  sh "mkdir -p #{name}-#{version}"
-  files.each do |f|
-    sh "mkdir -p #{name}-#{version}/#{f.dirname}"
-    sh "cp #{f} #{name}-#{version}/#{f}"
-  end
-  sh "zip -r #{name}-#{version}.zip #{name}-#{version}"
-  sh "rm -r #{name}-#{version}"
+RSpec::Core::RakeTask.new(:spec) do |t|
+  t.pattern = 'spec/multiple_cursors_spec.rb'
 end
+
+RSpec::Core::RakeTask.new(:benchmark) do |t|
+  t.pattern = 'spec/benchmark_spec.rb'
+end
+
+task :default => :spec

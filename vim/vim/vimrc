@@ -131,6 +131,9 @@
  " R
  call dein#add('jalvesaq/Nvim-R')
  call dein#add('mllg/vim-devtools-plugin')
+ call dein#add('vim-pandoc/vim-pandoc')
+ call dein#add('vim-pandoc/vim-pandoc-syntax')
+ call dein#add('vim-pandoc/vim-rmarkdown')
  " stan
  call dein#add('maverickg/stan.vim')
  " REPL
@@ -290,7 +293,6 @@ autocmd BufRead,BufNewFile *.md hi SpellBad guibg=#ff2929 guifg=#ffffff" ctermbg
 let g:instant_markdown_autostart = 0
 "}}}
 
-
 " MarkDown ------------------------------------------------------------------{{{
 " no need to fold things in markdown all the time
   let g:vim_markdown_folding_disabled = 1
@@ -302,7 +304,6 @@ let g:instant_markdown_autostart = 0
   let g:vim_markdown_conceal = 0
 
 "}}}
-
 
 " Julia  ------------------------------------------------------------------{{{
 " no need to fold things in markdown all the time
@@ -359,7 +360,6 @@ let g:NERDCustomDelimiters = { 'julia' : { 'left' : '#', 'right' : '' } }
 
 " }}}
 
-
 " vim-latex-live-preview Settings --------------------------------------------------------------------{{{
 
 autocmd Filetype tex setl updatetime=1
@@ -367,7 +367,6 @@ autocmd Filetype tex setl updatetime=1
 " https://www.scislab.com/en/blog/yong-vimlai-xie-latexwen-dang/"
 let g:livepreview_previewer = 'open -a texshop'
 " }}}
-
 
 " vimtex-skim Settings --------------------------------------------------------------------{{{
 
@@ -406,10 +405,6 @@ let g:vimtex_view_general_options = '-r @line @pdf @tex'
 
 " }}}
 
-
-
-
-
 " vim-latex-math mode conceal of unicode glyp --------------------------------------------------------------------{{{
 
 let g:tex_conceal= 'adgm'
@@ -420,7 +415,6 @@ au FileType tex setlocal nocursorline
 
 
 " }}}
-
 
 " vim-bibtex (maybe about the be depreciated when citations plugin in set up) --------------------------------------------------------------------{{{
 let g:unite_bibtex_bib_files=["/Users/nicolasreigl/Documents/zotero_bib/zotero_library.bib"]
@@ -545,7 +539,6 @@ nnoremap <silent><leader>cf :<C-u>Unite -input=<C-R><C-W> -default-action=file -
   tmap <C-h> <C-\><C-n>:TmuxNavigateLeft<CR>
   tmap <C-;> <C-\><C-n>:TmuxNavigatePrevious<cr>
 "}}}
-
 
 " NERDTree ------------------------------------------------------------------{{{
 
