@@ -212,5 +212,10 @@ export PATH=/Applications/MATLAB_R2016a.app/bin:$PATH
 # start terminal stata session
 alias stata="/usr/bin/stata-mp"
 
+# Julia environments
+alias julia7="/Users/nicolasreigl/github/repos/julia/usr/bin/julia" #  Julia Dev (git)
+alias julia5="/usr/local/opt/julia/bin/julia" #  Julia Stable (homebrew)
+
+
 # git latex path:
 export PATH=usr/local/Cellar/git/2.10.2/libexec/git-core:$PATH

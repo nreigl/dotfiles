@@ -1,25 +1,32 @@
 require 'vimrunner'
 require 'vimrunner/rspec'
+require_relative 'support/vim'
 
 Vimrunner::RSpec.configure do |config|
+  config.reuse_server = true
 
-  # Use a single Vim instance for the test suite. Set to false to use an
-  # instance per test (slower, but can be easier to manage).
-  config.reuse_server = false
+  plugin_path = File.expand_path('.')
 
-  # Decide how to start a Vim instance. In this block, an instance should be
-  # spawned and set up with anything project-specific.
   config.start_vim do
-    # vim = Vimrunner.start
-
-    # Or, start a GUI instance:
     vim = Vimrunner.start_gvim
+    vim.add_plugin(plugin_path, 'plugin/switch.vim')
 
-    # Setup your plugin in the Vim instance
-    plugin_path = File.expand_path('../..', __FILE__)
-    vim.add_plugin(plugin_path, 'plugin/multiple_cursors.vim')
+    def vim.switch
+      command 'Switch'
+      write
+      self
+    end
 
-    # The returned value is the Client available in the tests.
+    def vim.switch_reverse
+      command 'SwitchReverse'
+      write
+      self
+    end
+
     vim
   end
+end
+
+RSpec.configure do |config|
+  config.include Support::Vim
 end

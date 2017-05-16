@@ -1,10 +1,15 @@
-" Vim plugin file
-" Language:    
-" Maintainer:  othree <othree@gmail.com>
-" Last Change: 2013/08/26
-" Version:     0.4.1
-" URL:         https://github.com/othree/javascript-libraries-syntax.vim
+" Language:     Colorful CSS Color Preview
+" Author:       Aristotle Pagaltzis <pagaltzis@gmx.de>
+" Author:       Greg Werbin <ourobourbon@gmail.com>
 
-if b:current_syntax == 'javascript'
-  call jslibsyntax#load()
-endif
+" ft=coffee includes javascript, but mostly sets up own syntax groups
+" so until it has specific support there's no point in loading anyway
+" and for some reason the W3C syntax color keywords break its highlighting
+" (this refers to the https://github.com/kchmck/vim-coffee-script plugin)
+if &syntax =~# '\(^\|\.\)coffee\($\|\.\)' | finish | endif
+
+" javaScriptX = default Vim syntax, jsX = https://github.com/pangloss/vim-javascript
+call css_color#init('hex', 'extended'
+	\, 'javaScriptComment,javaScriptLineComment,javaScriptStringS,javaScriptStringD'
+	\. 'jsComment,jsString,jsTemplateString,jsObjectKeyString,jsObjectStringKey,jsClassStringKey'
+	\)

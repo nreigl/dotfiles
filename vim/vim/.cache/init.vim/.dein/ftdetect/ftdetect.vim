@@ -160,6 +160,14 @@ end
 autocmd BufNewFile,BufRead *.Rout set ft=rout
 autocmd BufNewFile,BufRead *.Rout.save set ft=rout
 autocmd BufNewFile,BufRead *.Rout.fail set ft=rout
+" Tasks file detection
+" Language:    Tasks
+" Maintainer:  Chris Rolfs
+" Last Change: Aug 7, 2015
+" Version:	   0.1
+" URL:         https://github.com/irrationalistic/vim-tasks
+"
+autocmd BufNewFile,BufReadPost *.TODO,TODO,*.todo,*.todolist,*.taskpaper,*.tasks set filetype=tasks
 autocmd BufNewFile,BufRead *.ts setlocal filetype=typescript
 autocmd BufNewFile,BufRead *.json setlocal filetype=json
 autocmd BufNewFile,BufRead *.jsonp setlocal filetype=json
@@ -167,6 +175,7 @@ autocmd BufNewFile,BufRead *.geojson setlocal filetype=json
 augroup rmarkdown
     au! BufRead,BufNewFile *.Rmd  setfiletype rmarkdown
 augroup END
+autocmd BufNewFile,BufRead {.,}tmux*.conf set ft=tmux | compiler tmux
 autocmd BufNewFile,BufRead *.ts,*.tsx setlocal filetype=typescript
 " Detect syntax file.
 autocmd BufNewFile,BufRead *.snip,*.snippets set filetype=neosnippet
@@ -196,4 +205,3 @@ function! s:DetectCoffee()
 endfunction
 
 autocmd BufNewFile,BufRead * call s:DetectCoffee()
-autocmd BufNewFile,BufRead {.,}tmux*.conf set ft=tmux | compiler tmux

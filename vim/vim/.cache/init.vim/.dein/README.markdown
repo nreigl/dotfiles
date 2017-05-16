@@ -1,54 +1,28 @@
-repeat.vim
-==========
+YATS: Yet Another TypeScript Syntax
+===================================
+![screenshot](https://raw.githubusercontent.com/HerringtonDarkholme/yats.vim/master/screenshot.png)
 
-If you've ever tried using the `.` command after a plugin map, you were
-likely disappointed to discover it only repeated the last native command
-inside that map, rather than the map as a whole.  That disappointment
-ends today.  Repeat.vim remaps `.` in a way that plugins can tap into
-it.
+Yet Another TypeScript Syntax file for Vim, adapted from [YAJS](https://github.com/othree/yajs.vim).
+Key differences:
 
-The following plugins support repeat.vim:
+* Exuberant Highlighting. The most elaborate or byzatine syntax highlighting for TypeScript.
+* Bundled with snippets for UltiSnips!
+* Builtin Support for tagbar!
+* Use 'typescript' as group name's prefix, not 'typeScript' nor 'TypeScript'. Works great with [SyntaxComplete](https://github.com/vim-scripts/SyntaxComplete).
+* Inherit Web API and DOM keywords from YAJS
+* Syntax fold. Fold long code block, semantically!
+* Remove old, unused syntax definitions.
 
-* [surround.vim](https://github.com/tpope/vim-surround)
-* [speeddating.vim](https://github.com/tpope/vim-speeddating)
-* [abolish.vim](https://github.com/tpope/vim-abolish)
-* [unimpaired.vim](https://github.com/tpope/vim-unimpaired)
-* [commentary.vim](https://github.com/tpope/vim-commentary)
-* [vim-easyclip](https://github.com/svermeulen/vim-easyclip)
+Credits
+-------
 
-Adding support to a plugin is generally as simple as the following
-command at the end of your map functions.
-
-    silent! call repeat#set("\<Plug>MyWonderfulMap", v:count)
-
-Installation
-------------
-
-If you don't have a preferred installation method, I recommend
-installing [pathogen.vim](https://github.com/tpope/vim-pathogen), and
-then simply copy and paste:
-
-    cd ~/.vim/bundle
-    git clone git://github.com/tpope/vim-repeat.git
-
-Contributing
-------------
-
-See the contribution guidelines for
-[pathogen.vim](https://github.com/tpope/vim-pathogen#readme).
-
-Self-Promotion
---------------
-
-Like repeat.vim? Follow the repository on
-[GitHub](https://github.com/tpope/vim-repeat) and vote for it on
-[vim.org](http://www.vim.org/scripts/script.php?script_id=2136).  And if
-you're feeling especially charitable, follow [tpope](http://tpo.pe/) on
-[Twitter](http://twitter.com/tpope) and
-[GitHub](https://github.com/tpope).
+- [othree](https://github.com/othree), whose YAJS is the most up-to-date js syntax for Vim
+- Jose Elera, [Enhanced Javascript syntax](http://www.vim.org/scripts/script.php?script_id=3425)
+- Zhao Yi, Claudio Fleiner, Scott Shattuck (This file is based on their hard work)
+- gumnos (From the #vim IRC Channel in Freenode) (Who helped me figured out the crazy Vim Regexes)
 
 License
 -------
 
-Copyright (c) Tim Pope.  Distributed under the same terms as Vim itself.
-See `:help license`.
+The same as Vim
+

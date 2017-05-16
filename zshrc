@@ -73,11 +73,14 @@ source ~/.zsh/syntax.zsh
 # external plugins
 source ~/.zsh/plugins/z/z.sh
 
+# source ~/perl5/perlbrew/etc/bashrc
+
 # Don't resolve symbolic links in z
 _Z_NO_RESOLVE_SYMLINKS="true"
 
-# Julia path
-export PATH="/Users/nicolasreigl/github/repos/julia/usr/bin:$PATH"
+# Julia version path: Call version  with symnlink eg. julia5 or julia7
+# export PATH="/Users/nicolasreigl/github/repos/julia/usr/bin:$PATH" #  Julia Dev (git)
+export PATH="/usr/local/opt/julia/bin:$PATH" #  Julia Stable (homebrew)
 
 # Python path
 export PYTHONNOUSERSITE="$HOME/.local"
