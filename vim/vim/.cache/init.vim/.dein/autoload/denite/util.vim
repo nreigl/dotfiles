@@ -6,50 +6,61 @@
 
 let s:is_windows = has('win32') || has('win64')
 
-function! denite#util#set_default(var, val, ...)  abort "{{{
+function! denite#util#set_default(var, val, ...)  abort
   if !exists(a:var) || type({a:var}) != type(a:val)
     let alternate_var = get(a:000, 0, '')
 
     let {a:var} = exists(alternate_var) ?
           \ {alternate_var} : a:val
   endif
-endfunction"}}}
-function! denite#util#print_error(string) abort "{{{
+endfunction
+function! denite#util#print_error(string) abort
   echohl Error | echomsg '[denite] ' . a:string | echohl None
-endfunction"}}}
-function! denite#util#print_warning(string) abort "{{{
+endfunction
+function! denite#util#print_warning(string) abort
   echohl WarningMsg | echomsg '[denite] ' . a:string | echohl None
-endfunction"}}}
+endfunction
 
-function! denite#util#convert2list(expr) abort "{{{
+function! denite#util#convert2list(expr) abort
   return type(a:expr) ==# type([]) ? a:expr : [a:expr]
-endfunction"}}}
+endfunction
 
-function! denite#util#redir(cmd) abort "{{{
-  let [save_verbose, save_verbosefile] = [&verbose, &verbosefile]
-  set verbose=0 verbosefile=
-  redir => res
-  silent! execute a:cmd
-  redir END
-  let [&verbose, &verbosefile] = [save_verbose, save_verbosefile]
-  return res
-endfunction"}}}
+function! denite#util#execute_path(command, path) abort
+  let dir = s:path2directory(a:path)
+  " Auto make directory.
+  if dir !~# '^\a\+:' && !isdirectory(dir)
+        \ && denite#util#input_yesno(
+        \       printf('"%s" does not exist. Create?', dir))
+    call mkdir(dir, 'p')
+  endif
 
-function! denite#util#execute_path(command, path) abort "{{{
   try
     execute a:command fnameescape(a:path)
+    if &l:filetype ==# ''
+      filetype detect
+    endif
+  catch /^Vim\%((\a\+)\)\=:E325/
+    " Ignore swap file error
   catch
     call denite#util#print_error(v:throwpoint)
     call denite#util#print_error(v:exception)
   endtry
-endfunction"}}}
-function! denite#util#echo(color, string) abort "{{{
+endfunction
+function! denite#util#execute_command(command) abort
+  try
+    execute a:command
+  catch /^Vim\%((\a\+)\)\=:E/
+    call denite#util#print_error(v:errmsg)
+  endtry
+endfunction
+
+function! denite#util#echo(color, string) abort
   execute 'echohl' a:color
   echon a:string
   echohl NONE
-endfunction"}}}
+endfunction
 
-function! denite#util#open(filename) abort "{{{
+function! denite#util#open(filename) abort
   let filename = fnamemodify(a:filename, ':p')
 
   let s:is_unix = has('unix')
@@ -98,13 +109,13 @@ function! denite#util#open(filename) abort "{{{
     " Give up.
     throw 'Not supported.'
   endif
-endfunction"}}}
+endfunction
 
-function! denite#util#split(string) abort "{{{
+function! denite#util#split(string) abort
   return split(a:string, '\s*,\s*')
-endfunction"}}}
+endfunction
 
-function! denite#util#path2project_directory(path, ...) abort "{{{
+function! denite#util#path2project_directory(path, ...) abort
   let is_allow_empty = get(a:000, 0, 0)
   let search_directory = s:path2directory(a:path)
   let directory = ''
@@ -150,18 +161,18 @@ function! denite#util#path2project_directory(path, ...) abort "{{{
   endif
 
   return s:substitute_path_separator(directory)
-endfunction"}}}
-function! s:path2directory(path) abort "{{{
+endfunction
+function! s:path2directory(path) abort
   return s:substitute_path_separator(
         \ isdirectory(a:path) ? a:path : fnamemodify(a:path, ':p:h'))
-endfunction"}}}
-function! s:substitute_path_separator(path) abort "{{{
+endfunction
+function! s:substitute_path_separator(path) abort
   return s:is_windows ? substitute(a:path, '\\', '/', 'g') : a:path
-endfunction"}}}
+endfunction
 function! s:escape_file_searching(buffer_name) abort
   return escape(a:buffer_name, '*[]?{}, ')
 endfunction
-function! s:_path2project_directory_git(path) abort "{{{
+function! s:_path2project_directory_git(path) abort
   let parent = a:path
 
   while 1
@@ -175,8 +186,8 @@ function! s:_path2project_directory_git(path) abort "{{{
     endif
     let parent = next
   endwhile
-endfunction"}}}
-function! s:_path2project_directory_svn(path) abort "{{{
+endfunction
+function! s:_path2project_directory_svn(path) abort
   let search_directory = a:path
   let directory = ''
 
@@ -199,8 +210,8 @@ function! s:_path2project_directory_svn(path) abort "{{{
     endif
   endif
   return directory
-endfunction"}}}
-function! s:_path2project_directory_others(vcs, path) abort "{{{
+endfunction
+function! s:_path2project_directory_others(vcs, path) abort
   let vcs = a:vcs
   let search_directory = a:path
 
@@ -210,6 +221,74 @@ function! s:_path2project_directory_others(vcs, path) abort "{{{
     return ''
   endif
   return fnamemodify(d, ':p:h:h')
-endfunction"}}}
+endfunction
 
-" vim: foldmethod=marker
+function! denite#util#alternate_buffer() abort
+  if len(filter(range(1, bufnr('$')), 'buflisted(v:val)')) <= 1
+    enew
+    return
+  endif
+
+  let cnt = 0
+  let pos = 1
+  let current = 0
+  while pos <= bufnr('$')
+    if buflisted(pos)
+      if pos == bufnr('%')
+        let current = cnt
+      endif
+
+      let cnt += 1
+    endif
+
+    let pos += 1
+  endwhile
+
+  if current > cnt / 2
+    bprevious
+  else
+    bnext
+  endif
+endfunction
+function! denite#util#delete_buffer(command, bufnr) abort
+  if index(tabpagebuflist(), a:bufnr) < 0
+    silent execute a:bufnr a:command
+    return
+  endif
+
+  let buffers = filter(range(1, bufnr('$')), 'buflisted(v:val)')
+  if len(buffers) == 1 && bufname(buffers[0]) ==# ''
+    " Noname buffer only
+    return
+  endif
+
+  " Not to close window, move to alternate buffer.
+  let prev_winnr = winnr()
+  for winnr in range(1, winnr('$'))
+    if winbufnr(winnr) == a:bufnr
+      execute winnr . 'wincmd w'
+      call denite#util#alternate_buffer()
+    endif
+  endfor
+  execute prev_winnr . 'wincmd w'
+  silent execute a:bufnr a:command
+endfunction
+
+function! denite#util#input_yesno(message) abort
+  let yesno = input(a:message . ' [yes/no]: ')
+  while yesno !~? '^\%(y\%[es]\|n\%[o]\)$'
+    redraw
+    if yesno ==# ''
+      echo 'Canceled.'
+      break
+    endif
+
+    " Retry.
+    call denite#util#print_error('Invalid input.')
+    let yesno = input(a:message . ' [yes/no]: ')
+  endwhile
+
+  redraw
+
+  return yesno =~? 'y\%[es]'
+endfunction

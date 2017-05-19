@@ -19,7 +19,7 @@ syntax region typescriptTypeArguments matchgroup=typescriptTypeBrackets
   \ contained skipwhite
 
 syntax region typescriptTypeCast matchgroup=typescriptTypeBrackets
-  \ start=/</ end=/>/ skip=/\s*,\s*/
+  \ start=/< \@!/ end=/>/ skip=/\s*,\s*/
   \ contains=@typescriptType
   \ nextgroup=@typescriptExpression
   \ contained skipwhite oneline
@@ -48,7 +48,7 @@ syntax region typescriptParenthesizedType matchgroup=typescriptParens
   \ nextgroup=typescriptUnionOrArrayType
   \ contained skipwhite skipempty
 
-syntax keyword typescriptPredefinedType any number boolean string void
+syntax keyword typescriptPredefinedType any number boolean string void never undefined null object
   \ nextgroup=typescriptUnionOrArrayType
   \ contained skipwhite skipempty
 
@@ -117,11 +117,16 @@ syntax keyword typescriptTypeQuery typeof keyof
   \ contained skipwhite skipnl
 
 syntax region typescriptPropertySignature
-  \ start=/[A-Za-z_$'"]\|\d/ end=/;\|$\|:\@=/
-  \ contains=@typescriptCallSignature,typescriptNumber,typescriptString,typescriptOptionalMark
+  \ start=/[A-Za-z_$'"]\|\d/ end=/\k\@!/
+  \ contains=typescriptString,typescriptOptionalMark
   \ nextgroup=typescriptTypeAnnotation
   \ containedin=typescriptTypeMember
-  \ contained skipwhite
+  \ contained skipwhite oneline
+
+syntax match typescriptMethodSignature /[A-Za-z_$]\w*\ze<\|(/
+  \ nextgroup=@typescriptCallSignature
+  \ containedin=typescriptTypeMember
+  \ contained skipwhite oneline
 
 syntax cluster typescriptCallSignature contains=typescriptGenericCall,typescriptCall
 syntax region typescriptGenericCall matchgroup=typescriptTypeBrackets
@@ -175,5 +180,6 @@ syntax keyword typescriptAliasKeyword type
 syntax region typescriptAliasDeclaration matchgroup=typescriptOpSymbols
   \ start=/ / end=/=/
   \ nextgroup=@typescriptType
+  \ contains=typescriptConstraint
   \ contained skipwhite skipnl skipempty
 

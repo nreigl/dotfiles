@@ -1,12 +1,10 @@
-" Vim filetype plugin file
-" Language:     JavaScript
-" Maintainer:   vim-javascript community
-" URL:          https://github.com/pangloss/vim-javascript
+let s:save_cpo = &cpo
+set cpo&vim
 
-setlocal iskeyword+=$ suffixesadd+=.js
-
-if exists('b:undo_ftplugin')
-  let b:undo_ftplugin .= ' | setlocal iskeyword< suffixesadd<'
-else
-  let b:undo_ftplugin = 'setlocal iskeyword< suffixesadd<'
+if flood#is_flow_project() == 1
+  setlocal omnifunc=flood#complete
 endif
+
+let &cpo = s:save_cpo
+unlet s:save_cpo
+

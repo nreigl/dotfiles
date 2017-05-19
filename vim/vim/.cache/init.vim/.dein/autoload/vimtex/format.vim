@@ -4,31 +4,6 @@
 " Email:      karl.yngve@gmail.com
 "
 
-function! vimtex#format#init_options() " {{{1
-  call vimtex#util#set_default('g:vimtex_format_enabled', 0)
-endfunction
-
-" }}}1
-function! vimtex#format#init_script() " {{{1
-  let s:border_beginning = '\v^\s*%(' . join([
-        \ '\\item',
-        \ '\\begin',
-        \ '\\end',
-        \ '%(\\\[|\$\$)\s*$',
-        \], '|') . ')'
-
-  let s:border_end = '\v\\%(' . join([
-        \   '\\\*?',
-        \   'clear%(double)?page',
-        \   'linebreak',
-        \   'new%(line|page)',
-        \   'pagebreak',
-        \   '%(begin|end)\{[^}]*\}',
-        \  ], '|') . ')\s*$'
-        \ . '|^\s*%(\\\]|\$\$)\s*$'
-endfunction
-
-" }}}1
 function! vimtex#format#init_buffer() " {{{1
   if !g:vimtex_format_enabled | return | endif
 
@@ -110,7 +85,7 @@ function! s:format(top, bottom) " {{{1
     endif
 
     " Handle long lines
-    if len(l:line) > s:textwidth
+    if strdisplaywidth(l:line) > s:textwidth
       let l:bottom += s:format_build_lines(l:current, l:mark)
       let l:mark = l:current-1
     endif
@@ -158,12 +133,12 @@ function! s:format_build_lines(start, end) " {{{1
   " Add the words in properly indented and formatted lines
   "
   let l:lnum = a:start-1
-  let l:current = repeat(' ', indent(a:start))
+  let l:current = s:get_indents(indent(a:start))
   for l:word in l:words
-    if len(l:word) + len(l:current) > s:textwidth
+    if strdisplaywidth(l:word) + strdisplaywidth(l:current) > s:textwidth
       call append(l:lnum, substitute(l:current, '\s$', '', ''))
       let l:lnum += 1
-      let l:current = repeat(' ', VimtexIndent(a:start))
+      let l:current = s:get_indents(VimtexIndent(a:start))
     endif
     let l:current .= l:word . ' '
   endfor
@@ -201,6 +176,35 @@ function! s:compare_lines(new, old) " {{{1
   endfor
   return l:min_length
 endfunction
+
+" }}}1
+function! s:get_indents(number) " {{{1
+  return !&l:expandtab && &l:shiftwidth == &l:tabstop
+        \ ? repeat("\t", a:number/&l:tabstop)
+        \ : repeat(' ', a:number)
+endfunction
+
+" }}}1
+
+
+" {{{1 Initialize module
+
+let s:border_beginning = '\v^\s*%(' . join([
+      \ '\\item',
+      \ '\\begin',
+      \ '\\end',
+      \ '%(\\\[|\$\$)\s*$',
+      \], '|') . ')'
+
+let s:border_end = '\v\\%(' . join([
+      \   '\\\*?',
+      \   'clear%(double)?page',
+      \   'linebreak',
+      \   'new%(line|page)',
+      \   'pagebreak',
+      \   '%(begin|end)\{[^}]*\}',
+      \  ], '|') . ')\s*$'
+      \ . '|^\s*%(\\\]|\$\$)\s*$'
 
 " }}}1
 

@@ -65,22 +65,20 @@ function! s:ToggleMapping() "{{{2
   endif
 endfunction
 
-function! tablemode#SyntaxEnable()
-  exec 'syntax match Table'
-        \ '/' . tablemode#table#StartExpr() . '\zs|.\+|\ze' . tablemode#table#EndExpr() . '/'
-        \ 'contains=TableBorder,TableSeparator,TableColumnAlign containedin=ALL'
-  syntax match TableSeparator /|/ contained
-  syntax match TableColumnAlign /:/ contained
-  syntax match TableBorder /[\-+]\+/ contained
+function! s:ToggleSyntax() "{{{2
+  if !g:table_mode_syntax | return | endif
 
-  hi! link TableBorder Delimiter
-  hi! link TableSeparator Delimiter
-  hi! link TableColumnAlign Type
-endfunction
-
-function! s:ToggleSyntax()
   if tablemode#IsActive()
-    call tablemode#SyntaxEnable()
+    exec 'syntax match Table'
+          \ '/' . tablemode#table#StartExpr() . '\zs|.\+|\ze' . tablemode#table#EndExpr() . '/'
+          \ 'contains=TableBorder,TableSeparator,TableColumnAlign containedin=ALL'
+    syntax match TableSeparator /|/ contained
+    syntax match TableColumnAlign /:/ contained
+    syntax match TableBorder /[\-+]\+/ contained
+
+    hi! link TableBorder Delimiter
+    hi! link TableSeparator Delimiter
+    hi! link TableColumnAlign Type
   else
     syntax clear Table
     syntax clear TableBorder
@@ -93,10 +91,35 @@ function! s:ToggleSyntax()
   endif
 endfunction
 
+function! s:ToggleAutoAlign() "{{{2
+  if !g:table_mode_auto_align | return | endif
+
+  if tablemode#IsActive()
+    augroup TableModeAutoAlign
+      au!
+
+      autocmd CursorHold <buffer> nested silent! call tablemode#table#Realign('.')
+    augroup END
+  else
+    silent! augroup! TableModeAutoAlign
+  endif
+endfunction
+
+function! s:ToggleOptions() "{{{2
+  if tablemode#IsActive()
+    let b:old_update_time = &updatetime
+    exec 'set updatetime='.g:table_mode_update_time
+  else
+    exec 'set updatetime='.get(b:, 'old_update_time', 4000)
+  endif
+endfunction
+
 function! s:SetActive(bool) "{{{2
   let b:table_mode_active = a:bool
   call s:ToggleSyntax()
   call s:ToggleMapping()
+  call s:ToggleAutoAlign()
+  call s:ToggleOptions()
   if tablemode#IsActive()
     doautocmd User TableModeEnabled
   else

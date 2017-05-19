@@ -2,15 +2,15 @@
 " This is a modification version to the Stata/Mata syntax highlighting file by Jeff 
 " Pitblado (2015) <jpitblado at stata.com> which could highlight about 173 Stata
 " commands and 296 Stata functions.
-" Apart from his syntax highlighting file, the file could further highlight
-    " 1. most of the Stata in-built commands,
-    " 2. popular user-written commands, 
+"The file could highlight
+    " 1. most of the Stata in-built commands (keep updated),
+    " 2. some popular user-written commands, 
     " 3. abbreviation of commands, 
     " 4. numbers,
     " 5. logical and mathematic operators. 
     " 6. enable different colours for commands used for different purpose.
 " This syntax highlighting file is also compatible with Stata 14.
-" Modified by Zizhong Yan (helloyzz@gmail.com)  --- 29 Feb 2016.
+" Modified by Zizhong Yan (helloyzz@gmail.com) --- 22 December 2015.
 if version < 600
   syntax clear
 elseif exists("b:current_syntax")

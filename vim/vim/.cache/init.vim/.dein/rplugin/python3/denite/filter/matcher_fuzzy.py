@@ -29,8 +29,7 @@ class Filter(Base):
                 candidates = [x for x in candidates
                               if p.search(x['word'].lower())]
             else:
-                candidates = [x for x in candidates
-                              if p.search(x['word'])]
+                candidates = [x for x in candidates if p.search(x['word'])]
         return candidates
 
     def convert_pattern(self, input_str):

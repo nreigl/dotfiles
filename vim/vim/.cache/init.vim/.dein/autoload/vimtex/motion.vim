@@ -4,57 +4,8 @@
 " Email:      karl.yngve@gmail.com
 "
 
-function! vimtex#motion#init_options() " {{{1
-  call vimtex#util#set_default('g:vimtex_motion_enabled', 1)
-  if !g:vimtex_motion_enabled | return | endif
-
-  call vimtex#util#set_default('g:vimtex_motion_matchparen', 1)
-endfunction
-
-" }}}1
-function! vimtex#motion#init_script() " {{{1
-  if !g:vimtex_motion_enabled | return | endif
-
-  "
-  " Define patterns used by motion.vim
-  "
-
-  " No preceding backslash
-  let s:notbslash = '\%(\\\@<!\%(\\\\\)*\)\@<='
-
-  " Not in a comment
-  let s:notcomment = '\%(\%(\\\@<!\%(\\\\\)*\)\@<=%.*\)\@<!'
-
-  " Pattern to match section/chapter/...
-  let s:section  = s:notcomment . '\v\s*\\'
-  let s:section .= '((sub)*section|chapter|part|'
-  let s:section .= 'appendix|(front|back|main)matter)>'
-
-  " List of paragraph boundaries
-  let s:paragraph_boundaries = [
-        \ '\%',
-        \ '\\part',
-        \ '\\chapter',
-        \ '\\(sub)*section',
-        \ '\\paragraph',
-        \ '\\label',
-        \ '\\begin',
-        \ '\\end',
-        \ ]
-endfunction
-
-" }}}1
 function! vimtex#motion#init_buffer() " {{{1
   if !g:vimtex_motion_enabled | return | endif
-
-  " Highlight matching delimiters ($, (), ...)
-  if g:vimtex_motion_matchparen
-    execute 'augroup vimtex_motion' . bufnr('%')
-      autocmd!
-      autocmd CursorMoved  <buffer> call s:highlight_matching_pair()
-      autocmd CursorMovedI <buffer> call s:highlight_matching_pair()
-    augroup END
-  endif
 
   " Utility map to avoid conflict with "normal" command
   nnoremap <buffer> <sid>(v) v
@@ -92,8 +43,6 @@ function! vimtex#motion#find_matching_pair(...) " {{{1
     normal! gv
   endif
 
-  if vimtex#util#in_comment() | return | endif
-
   let delim = vimtex#delim#get_current('all', 'both')
   if empty(delim)
     let delim = vimtex#delim#get_next('all', 'both')
@@ -104,7 +53,7 @@ function! vimtex#motion#find_matching_pair(...) " {{{1
   if empty(delim) | return | endif
 
   normal! m`
-  call cursor(delim.lnum,
+  call vimtex#pos#set_cursor(delim.lnum,
         \ (delim.is_open
         \   ? delim.cnum
         \   : delim.cnum + strlen(delim.match) - 1))
@@ -182,30 +131,25 @@ endfunction
 
 " }}}1
 
-function! s:highlight_matching_pair() " {{{1
-  if exists('w:vimtex_match_id1')
-    silent! call matchdelete(w:vimtex_match_id1)
-    silent! call matchdelete(w:vimtex_match_id2)
-    unlet w:vimtex_match_id1
-    unlet w:vimtex_match_id2
-  endif
-  if vimtex#util#in_comment() | return | endif
 
-  let l:current = vimtex#delim#get_current('all', 'both')
-  if empty(l:current) | return | endif
+" {{{1 Initialize module
 
-  let l:corresponding = vimtex#delim#get_matching(l:current)
-  if empty(l:corresponding) | return | endif
+" Pattern to match section/chapter/...
+let s:section = '\v%(%(\\<!%(\\\\)*)@<=\%.*)@<!'
+      \ . '\s*\\((sub)*section|chapter|part|'
+      \ .        'appendix|(front|back|main)matter)>'
 
-  let [l:open, l:close] = l:current.is_open
-        \ ? [l:current, l:corresponding]
-        \ : [l:corresponding, l:current]
-
-  let w:vimtex_match_id1 = matchadd('MatchParen',
-        \ '\%' . l:open.lnum . 'l\%' . l:open.cnum . 'c' . l:open.re.this)
-  let w:vimtex_match_id2 = matchadd('MatchParen',
-        \ '\%' . l:close.lnum . 'l\%' . l:close.cnum . 'c' . l:close.re.this)
-endfunction
+" List of paragraph boundaries
+let s:paragraph_boundaries = [
+      \ '\%',
+      \ '\\part',
+      \ '\\chapter',
+      \ '\\(sub)*section',
+      \ '\\paragraph',
+      \ '\\label',
+      \ '\\begin',
+      \ '\\end',
+      \ ]
 
 " }}}1
 

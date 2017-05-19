@@ -8,7 +8,6 @@ import subprocess
 from threading import Thread
 from queue import Queue
 from time import time, sleep
-from collections import deque
 import os
 
 
@@ -19,6 +18,7 @@ class Process(object):
             startupinfo = subprocess.STARTUPINFO()
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
         self.__proc = subprocess.Popen(commands,
+                                       stdin=subprocess.DEVNULL,
                                        stdout=subprocess.PIPE,
                                        stderr=subprocess.PIPE,
                                        startupinfo=startupinfo,
@@ -26,7 +26,6 @@ class Process(object):
         self.__eof = False
         self.__context = context
         self.__queue_out = Queue()
-        self.__outs = []
         self.__thread = Thread(target=self.enqueue_output)
         self.__thread.start()
 
@@ -37,10 +36,11 @@ class Process(object):
         if not self.__proc:
             return
         self.__proc.kill()
+        self.__proc.wait()
         self.__proc = None
         self.__queue_out = None
+        self.__thread.join(1.0)
         self.__thread = None
-        self.__outs = None
 
     def enqueue_output(self):
         for line in self.__proc.stdout:
@@ -55,22 +55,14 @@ class Process(object):
             return ([], [])
 
         start = time()
-        outs = deque()
+        outs = []
 
+        if self.__queue_out.empty():
+            sleep(0.1)
         while not self.__queue_out.empty() and time() < start + timeout:
             outs.append(self.__queue_out.get_nowait())
 
-        outs = list(outs)
-        if self.__outs:
-            outs = self.__outs + outs
-            self.__outs = None
-
-        sleep(0.1)
         if self.__thread.is_alive() or not self.__queue_out.empty():
-            if len(outs) < 5000:
-                # Skip the update
-                self.__outs = outs
-                return ([], [])
             return (outs, [])
 
         _, errs = self.__proc.communicate(timeout=timeout)

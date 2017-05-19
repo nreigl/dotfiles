@@ -109,6 +109,13 @@ let g:switch_builtins =
       \     'function \(\k\+\)(':              'var \1 = function(',
       \     '\%(var \)\=\(\k\+\) = function(': 'function \1(',
       \   },
+      \   'javascript_arrow_function': {
+      \     'function\s*()\s*{':                        '() => {',
+      \     'function\s*(\([^()]\{-},[^()]\{-}\))\s*{': '(\1) => {',
+      \     'function\s*(\(\k\+\))\s*{':                '\1 => {',
+      \     '(\([^()]\{-}\))\s*=>\s*{':                 'function(\1) {',
+      \     '\(\k\+\)\s*=>\s*{':                        'function(\1) {',
+      \   },
       \   'coffee_arrow': {
       \     '^\(.*\)->': '\1=>',
       \     '^\(.*\)=>': '\1->',
@@ -191,6 +198,7 @@ autocmd FileType cpp let b:switch_definitions =
 autocmd FileType javascript let b:switch_definitions =
       \ [
       \   g:switch_builtins.javascript_function,
+      \   g:switch_builtins.javascript_arrow_function,
       \ ]
 
 autocmd FileType coffee let b:switch_definitions =
@@ -211,46 +219,22 @@ autocmd FileType scala let b:switch_definitions =
 
 command! Switch call s:Switch()
 function! s:Switch()
-  let definitions = s:GetDefinitions()
-  call switch#Switch(definitions, {})
+  silent call switch#Switch()
   silent! call repeat#set(":Switch\<cr>")
 endfunction
 
 command! SwitchReverse call s:SwitchReverse()
 function! s:SwitchReverse()
-  let definitions = s:GetDefinitions()
-  call switch#Switch(definitions, {'reverse': 1})
+  silent call switch#Switch({'reverse': 1})
   silent! call repeat#set(":Switch\<cr>")
 endfunction
 
-function! s:GetDefinitions()
-  let definitions = []
-
-  if exists('g:switch_custom_definitions')
-    call extend(definitions, g:switch_custom_definitions)
-  endif
-
-  if !exists('g:switch_no_builtins')
-    let definitions = extend(definitions, g:switch_definitions)
-  endif
-
-  if exists('b:switch_custom_definitions')
-    call extend(definitions, b:switch_custom_definitions)
-  endif
-
-  if exists('b:switch_definitions') && !exists('b:switch_no_builtins')
-    call extend(definitions, b:switch_definitions)
-  endif
-
-  return definitions
-endfunction
-
 if g:switch_mapping != ''
-  exe 'nnoremap '.g:switch_mapping.' :Switch<cr>'
+  exe 'nnoremap <silent> '.g:switch_mapping.' :Switch<cr>'
 endif
 
 if g:switch_reverse_mapping != ''
-  exe 'nnoremap '.g:switch_reverse_mapping.' :SwitchReverse<cr>'
+  exe 'nnoremap <silent> '.g:switch_reverse_mapping.' :SwitchReverse<cr>'
 endif
 
 let &cpo = s:keepcpo

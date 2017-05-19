@@ -52,6 +52,7 @@ INSTALL						*tsuquyomi-install*
 Tsuquyomi requires the following:
 * Vim (v.7.4.0 or later)
 * Shougo/vimproc.vim (https://github.com/Shougo/vimproc.vim)
+  (Not required if you use vim8 or later)
 * Node.js and TypeScript (v.1.5.0 or later)
 
 In the first, If you haven't installed |vimproc|, please install this.
@@ -94,7 +95,7 @@ COMMANDS					*tsuquyomi-commands*
 						*:TsuquyomiStartServer*
 						*:TsuStartServer*
 :TsuquyomiStartServer
-		Start TSServer process using |vimproc|.
+		Start TSServer process.
 		If already the process is running, this command does not
 		anything.
 
@@ -197,9 +198,25 @@ COMMANDS					*tsuquyomi-commands*
 						*:TsuquyomiSeaarch*
 						*:TsuSearch*
 :TsuquyomiSearch {keyword}
-		Search locations which containts {keyword} from ptoject.
+		Search locations which contain {keyword} from project.
 
-Todo
+						*:TsuquyomiQuickFix*
+						*:TsuQuickFix*
+:TsuquyomiQuickFix
+		If the cursor is on some errors and there is supported
+		quick fix, apply it.
+		This command requires TypeScript@v2.1.0 or later.
+
+						*:TsuquyomiSignatureHelp*
+						*:TsuSignatureHelp*
+:TsuquyomiSignatureHelp
+		Display signature help for the method signature the cursor is
+		currently inside, and display the output in the preview
+		window. If there are multiple overloads they will be
+		displayed, along with any documentation.
+		Note that the cursor must be between the method parentheses,
+		or at least after the opening parenthesis of a partially
+		written method call.
 
 ------------------------------------------------------------------------------
 VARIABLES					*tsuquyomi-variables*
@@ -311,6 +328,12 @@ g:tsuquyomi_ignore_missing_modules (default 0)
 		"Cannot find module". Useful when you don't have type
 		definitions for all of your imports.
 
+						*g:tsuquyomi_use_vimproc*
+g:tsuquyomi_use_vimproc (default 0)
+		If set, Tsuquyomi will use vimproc instead of vim8 default
+		jobs. 
+
+
 ------------------------------------------------------------------------------
 KEY MAPPINGS					*tsuquyomi-key-mappings*
 
@@ -339,10 +362,21 @@ Normal mode key mappings.
 		Rename the identifier under the cursor to a new name.
 		Please see |:TsuquyomiRenameSymbolC|.
 
+
+						*<Plug>(TsuquyomiQuickFix)*
+<Plug>(TsuquyomiQuickFix)
+		Apply quick fix under the cursor if it's available.
+		Please see |:TsuquyomiQuickFix|.
+
 						*<Plug>(TsuquyomiImport)*
 <Plug>(TsuquyomiImport)
 		Generate ES6 import declaration whose alias is under 
 		the cursor. See |:TsuquyomiImport|.
+
+						*<Plug>(TsuquyomiSignatureHelp)*
+<Plug>(TsuquyomiSignatureHelp)
+		Display signature help for the method arguments under the
+		cursor. See |:TsuquyomiSignatureHelp|.
 
 Following keymappings are default keymappings.
 
@@ -386,6 +420,11 @@ tsuquyomi#hint					*tsuquyomi#hint*
 		autocmd FileType typescript nmap <buffer> <Leader>t :
 		\ <C-u>echo tsuquyomi#hint()<CR>
 <
+tsuquyomi#getSupportedCodeFixes		 *tsuquyomi#getSupportedCodeFixes*
+		Returns a list of all codes quick fix available.
+		An error whose code is in this list can be fixed via
+		|:TsuquyomiQuickFix| command.
+
 Todo
 
 ==============================================================================

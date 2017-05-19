@@ -4,91 +4,209 @@ scriptencoding utf-8
 
 " Function: #detect {{{1
 function! sy#repo#detect() abort
-  let vcs_list = s:vcs_list
-  " Simple cache. If there is a registered VCS-controlled file in this
-  " directory already, assume that this file is probably controlled by
-  " the same VCS. Thus we shuffle that VCS to the top of our copy of
-  " s:vcs_list, so we don't affect the preference order of s:vcs_list.
-  if has_key(g:sy_cache, b:sy_info.dir)
-    let vcs_list = [g:sy_cache[b:sy_info.dir]] +
-          \ filter(copy(s:vcs_list), 'v:val != "'.
-          \        g:sy_cache[b:sy_info.dir] .'"')
-  endif
-
-  for type in vcs_list
-    let [istype, diff] = sy#repo#get_diff_{type}()
-    if istype
-      return [diff, type]
-    endif
+  for vcs in s:vcs_list
+    let b:sy.detecting += 1
+    call sy#repo#get_diff_start(vcs)
   endfor
+endfunction
 
-  return ['', 'unknown']
+" Function: s:callback_nvim_stdout{{{1
+function! s:callback_nvim_stdout(_job_id, data, _event) dict abort
+  if empty(self.stdoutbuf) || empty(self.stdoutbuf[-1])
+    let self.stdoutbuf += a:data
+  else
+    let self.stdoutbuf = self.stdoutbuf[:-2]
+          \ + [self.stdoutbuf[-1] . get(a:data, 0, '')]
+          \ + a:data[1:]
+  endif
+endfunction
+
+" Function: s:callback_nvim_exit {{{1
+function! s:callback_nvim_exit(_job_id, exitval, _event) dict abort
+  call s:job_exit(self.bufnr, self.vcs, a:exitval, self.stdoutbuf)
+endfunction
+
+" Function: s:callback_vim_stdout {{{1
+function! s:callback_vim_stdout(_job_id, data) dict abort
+  let self.stdoutbuf += [a:data]
+endfunction
+
+" Function: s:callback_vim_close {{{1
+function! s:callback_vim_close(channel) dict abort
+  let job = ch_getjob(a:channel)
+  while 1
+    if job_status(job) == 'dead'
+      let exitval = job_info(job).exitval
+      break
+    endif
+    sleep 10m
+  endwhile
+  call s:job_exit(self.bufnr, self.vcs, exitval, self.stdoutbuf)
+endfunction
+
+" Function: s:job_exit {{{1
+function! s:job_exit(bufnr, vcs, exitval, diff) abort
+  call sy#verbose('job_exit()', a:vcs)
+  let sy = getbufvar(a:bufnr, 'sy')
+  if empty(sy)
+    call sy#verbose(printf('No b:sy found for %s', bufname(a:bufnr)), a:vcs)
+    return
+  elseif !empty(sy.updated_by)
+    call sy#verbose(printf('Signs already got updated by %s.', sy.updated_by), a:vcs)
+    return
+  elseif empty(sy.vcs) && sy.active
+    let sy.detecting -= 1
+  endif
+  call sy#repo#get_diff_{a:vcs}(sy, a:exitval, a:diff)
+  call setbufvar(a:bufnr, 'sy_job_id_'.a:vcs, 0)
+endfunction
+
+" Function: sy#get_diff_start {{{1
+function! sy#repo#get_diff_start(vcs) abort
+  call sy#verbose('get_diff_start()', a:vcs)
+
+  let job_id = get(b:, 'sy_job_id_'.a:vcs)
+  " Neovim
+  if has('nvim')
+    if job_id
+      silent! call jobstop(job_id)
+    endif
+
+    let [cmd, options] = s:initialize_job(a:vcs)
+    let [cwd, chdir] = sy#util#chdir()
+
+    call sy#verbose(printf('CMD: %s | CWD: %s', string(cmd), b:sy_info.dir), a:vcs)
+    let b:sy_job_id_{a:vcs} = jobstart(cmd, extend(options, {
+          \ 'cwd':       b:sy_info.dir,
+          \ 'on_stdout': function('s:callback_nvim_stdout'),
+          \ 'on_exit':   function('s:callback_nvim_exit'),
+          \ }))
+
+  " Newer Vim
+  elseif has('patch-7.4.1967')
+    if type(job_id) != type(0)
+      silent! call job_stop(job_id)
+    endif
+
+    let [cmd, options] = s:initialize_job(a:vcs)
+    let [cwd, chdir] = sy#util#chdir()
+
+    try
+      execute chdir fnameescape(b:sy_info.dir)
+      call sy#verbose(printf('CMD: %s | CWD: %s', string(cmd), getcwd()), a:vcs)
+      let opts = {
+            \ 'in_io':    'null',
+            \ 'out_cb':   function('s:callback_vim_stdout', options),
+            \ 'close_cb': function('s:callback_vim_close', options),
+            \ }
+      let b:sy_job_id_{a:vcs} = job_start(cmd, opts)
+    finally
+      execute chdir fnameescape(cwd)
+    endtry
+
+  " Older Vim
+  else
+    let diff = split(s:run(a:vcs), '\n')
+    call sy#repo#get_diff_{a:vcs}(b:sy, v:shell_error, diff)
+  endif
+endfunction
+
+" Function: s:get_diff_end {{{1
+function! s:get_diff_end(sy, found_diff, vcs, diff) abort
+  call sy#verbose('get_diff_end()', a:vcs)
+  if a:found_diff
+    if index(a:sy.vcs, a:vcs) == -1
+      let a:sy.vcs += [a:vcs]
+    endif
+    call sy#set_signs(a:sy, a:vcs, a:diff)
+  else
+    call sy#verbose('No valid diff found. Disabling this VCS.', a:vcs)
+  endif
 endfunction
 
 " Function: #get_diff_git {{{1
-function! sy#repo#get_diff_git() abort
-  let diff = s:run(g:signify_vcs_cmds.git, b:sy_info.file, 1)
-  return v:shell_error ? [0, ''] : [1, diff]
+function! sy#repo#get_diff_git(sy, exitval, diff) abort
+  call sy#verbose('get_diff_git()', 'git')
+  let [found_diff, diff] = a:exitval ? [0, []] : [1, a:diff]
+  call s:get_diff_end(a:sy, found_diff, 'git', diff)
 endfunction
 
 " Function: #get_diff_hg {{{1
-function! sy#repo#get_diff_hg() abort
-  let diff = s:run(g:signify_vcs_cmds.hg, b:sy_info.path, 1)
-  return v:shell_error ? [0, ''] : [1, diff]
+function! sy#repo#get_diff_hg(sy, exitval, diff) abort
+  call sy#verbose('get_diff_hg()', 'hg')
+  let [found_diff, diff] = a:exitval ? [0, []] : [1, a:diff]
+  call s:get_diff_end(a:sy, found_diff, 'hg', diff)
 endfunction
 
 " Function: #get_diff_svn {{{1
-function! sy#repo#get_diff_svn() abort
-  let diff = s:run(g:signify_vcs_cmds.svn, b:sy_info.path, 0)
-  return v:shell_error ? [0, ''] : [1, diff]
+function! sy#repo#get_diff_svn(sy, exitval, diff) abort
+  call sy#verbose('get_diff_svn()', 'svn')
+  let [found_diff, diff] = a:exitval ? [0, []] : [1, a:diff]
+  call s:get_diff_end(a:sy, found_diff, 'svn', diff)
 endfunction
 
 " Function: #get_diff_bzr {{{1
-function! sy#repo#get_diff_bzr() abort
-  let diff = s:run(g:signify_vcs_cmds.bzr, b:sy_info.path, 0)
-  return (v:shell_error =~ '[012]') ? [1, diff] : [0, '']
+function! sy#repo#get_diff_bzr(sy, exitval, diff) abort
+  call sy#verbose('get_diff_bzr()', 'bzr')
+  let [found_diff, diff] = (a:exitval =~ '[012]') ? [1, a:diff] : [0, []]
+  call s:get_diff_end(a:sy, found_diff, 'bzr', diff)
 endfunction
 
 " Function: #get_diff_darcs {{{1
-function! sy#repo#get_diff_darcs() abort
-  let diff = s:run(g:signify_vcs_cmds.darcs, b:sy_info.path, 1)
-  return v:shell_error ? [0, ''] : [1, diff]
+function! sy#repo#get_diff_darcs(sy, exitval, diff) abort
+  call sy#verbose('get_diff_darcs()', 'darcs')
+  let [found_diff, diff] = a:exitval ? [0, []] : [1, a:diff]
+  call s:get_diff_end(a:sy, found_diff, 'darcs', diff)
 endfunction
 
 " Function: #get_diff_fossil {{{1
-function! sy#repo#get_diff_fossil() abort
-  let diff = s:run(g:signify_vcs_cmds.fossil, b:sy_info.path, 1)
-  return v:shell_error ? [0, ''] : [1, diff]
+function! sy#repo#get_diff_fossil(sy, exitval, diff) abort
+  call sy#verbose('get_diff_fossil()', 'fossil')
+  let [found_diff, diff] = a:exitval ? [0, []] : [1, a:diff]
+  call s:get_diff_end(a:sy, found_diff, 'fossil', diff)
 endfunction
 
 " Function: #get_diff_cvs {{{1
-function! sy#repo#get_diff_cvs() abort
-  let diff = s:run(g:signify_vcs_cmds.cvs, b:sy_info.file, 1)
-  return ((v:shell_error == 1) && (diff =~ '+++')) ? [1, diff] : [0, '']
+function! sy#repo#get_diff_cvs(sy, exitval, diff) abort
+  call sy#verbose('get_diff_cvs()', 'cvs')
+  let [found_diff, diff] = [0, []]
+  if a:exitval == 1
+    for diffline in a:diff
+      if diffline =~ '+++'
+        let [found_diff, diff] = [1, a:diff]
+        break
+      endif
+    endfor
+  endif
+  call s:get_diff_end(a:sy, found_diff, 'cvs', diff)
 endfunction
 
 " Function: #get_diff_rcs {{{1
-function! sy#repo#get_diff_rcs() abort
-  let diff = s:run(g:signify_vcs_cmds.rcs, b:sy_info.path, 0)
-  return v:shell_error ? [0, ''] : [1, diff]
+function! sy#repo#get_diff_rcs(sy, exitval, diff) abort
+  call sy#verbose('get_diff_rcs()', 'rcs')
+  let [found_diff, diff] = a:exitval ? [0, []] : [1, a:diff]
+  call s:get_diff_end(a:sy, found_diff, 'rcs', diff)
 endfunction
 
 " Function: #get_diff_accurev {{{1
-function! sy#repo#get_diff_accurev() abort
-  let diff = s:run(g:signify_vcs_cmds.accurev, b:sy_info.file, 1)
-  return (v:shell_error >= 2) ? [0, ''] : [1, diff]
+function! sy#repo#get_diff_accurev(sy, exitval, diff) abort
+  call sy#verbose('get_diff_accurev()', 'accurev')
+  let [found_diff, diff] = (a:exitval >= 2) ? [0, []] : [1, a:diff]
+  call s:get_diff_end(a:sy, found_diff, 'accurev', diff)
 endfunction
 
 " Function: #get_diff_perforce {{{1
-function! sy#repo#get_diff_perforce() abort
-  let diff = s:run(g:signify_vcs_cmds.perforce, b:sy_info.path, 0)
-  return v:shell_error ? [0, ''] : [1, diff]
+function! sy#repo#get_diff_perforce(sy, exitval, diff) abort
+  call sy#verbose('get_diff_perforce()', 'perforce')
+  let [found_diff, diff] = a:exitval ? [0, []] : [1, a:diff]
+  call s:get_diff_end(a:sy, found_diff, 'perforce', diff)
 endfunction
 
 " Function: #get_diff_tfs {{{1
-function! sy#repo#get_diff_tfs() abort
-  let diff = s:run(g:signify_vcs_cmds.tfs, b:sy_info.file, 0)
-  return v:shell_error ? [0, ''] : [1, s:strip_context(diff)]
+function! sy#repo#get_diff_tfs(sy, exitval, diff) abort
+  call sy#verbose('get_diff_tfs()', 'tfs')
+  let [found_diff, diff] = a:exitval ? [0, []] : [1, s:strip_context(a:diff)]
+  call s:get_diff_end(a:sy, found_diff, 'tfs', diff)
 endfunction
 
 " Function: #get_stats {{{1
@@ -107,28 +225,14 @@ function! sy#repo#debug_detection()
     return
   endif
 
-  let vcs_args = {
-        \ 'git':      [g:signify_vcs_cmds.git,      b:sy_info.file, 1],
-        \ 'hg':       [g:signify_vcs_cmds.hg,       b:sy_info.path, 1],
-        \ 'svn':      [g:signify_vcs_cmds.svn,      b:sy_info.path, 0],
-        \ 'darcs':    [g:signify_vcs_cmds.darcs,    b:sy_info.path, 1],
-        \ 'bzr':      [g:signify_vcs_cmds.bzr,      b:sy_info.path, 0],
-        \ 'fossil':   [g:signify_vcs_cmds.fossil,   b:sy_info.path, 1],
-        \ 'cvs':      [g:signify_vcs_cmds.cvs,      b:sy_info.file, 1],
-        \ 'rcs':      [g:signify_vcs_cmds.rcs,      b:sy_info.path, 0],
-        \ 'accurev':  [g:signify_vcs_cmds.accurev,  b:sy_info.file, 1],
-        \ 'perforce': [g:signify_vcs_cmds.perforce, b:sy_info.path, 0],
-        \ 'tfs':      [g:signify_vcs_cmds.tfs,      b:sy_info.file, 0],
-        \ }
-
   for vcs in s:vcs_list
-    let cmd = s:expand_cmd(vcs_args[vcs][0], vcs_args[vcs][1])
+    let cmd = s:expand_cmd(vcs)
     echohl Statement
     echo cmd
     echo repeat('=', len(cmd))
     echohl NONE
 
-    let diff = call('s:run', vcs_args[vcs])
+    let diff = s:run(vcs)
     if v:shell_error
       echohl ErrorMsg
       echo diff
@@ -140,26 +244,53 @@ function! sy#repo#debug_detection()
   endfor
 endfunction
 
+" Function: s:initialize_job {{{1
+function! s:initialize_job(vcs) abort
+  let vcs_cmd = s:expand_cmd(a:vcs)
+  if has('win32')
+    if has('nvim')
+      let cmd = &shell =~ 'cmd' ? vcs_cmd : ['sh', '-c', vcs_cmd]
+    else
+      let cmd = join([&shell, &shellcmdflag, vcs_cmd])
+    endif
+  else
+    let cmd = ['sh', '-c', vcs_cmd]
+  endif
+  let options = {
+        \ 'stdoutbuf':   [],
+        \ 'vcs':         a:vcs,
+        \ 'bufnr':       bufnr('%'),
+        \ }
+  return [cmd, options]
+endfunction
+
+" Function: s:get_vcs_path {{{1
+function! s:get_vcs_path(vcs) abort
+  return (a:vcs =~# '\v(git|cvs|accurev|tfs)') ? b:sy_info.file : b:sy_info.path
+endfunction
+
 " Function: s:expand_cmd {{{1
-function! s:expand_cmd(cmd, path) abort
-  let cmd = s:replace(a:cmd, '%f', a:path)
-  let cmd = s:replace(cmd,   '%d', s:difftool)
-  let cmd = s:replace(cmd,   '%n', s:devnull)
+function! s:expand_cmd(vcs) abort
+  let cmd = g:signify_vcs_cmds[a:vcs]
+  let cmd = s:replace(cmd, '%f', s:get_vcs_path(a:vcs))
+  let cmd = s:replace(cmd, '%d', s:difftool)
+  let cmd = s:replace(cmd, '%n', s:devnull)
   let b:sy_info.cmd = cmd
   return cmd
 endfunction
 
 " Function: s:run {{{1
-function! s:run(cmd, path, do_switch_dir)
-  execute b:sy_info.chdir fnameescape(b:sy_info.dir)
+function! s:run(vcs)
+  let [cwd, chdir] = sy#util#chdir()
   try
-    let ret = system(s:expand_cmd(a:cmd, a:path))
+    execute chdir fnameescape(b:sy_info.dir)
+    let ret = system(s:expand_cmd(a:vcs))
   catch
     " This exception message can be seen via :SignifyDebugUnknown.
     " E.g. unquoted VCS programs in vcd_cmds can lead to E484.
     let ret = v:exception .' at '. v:throwpoint
   finally
-    execute b:sy_info.chdir b:sy_info.cwd
+    execute chdir fnameescape(cwd)
     return ret
   endtry
 endfunction
@@ -175,7 +306,7 @@ function! s:strip_context(context)
   let diff = []
   let hunk = []
   let state = 0
-  let lines = split(a:context,"\n",1)
+  let lines = a:context
   let linenr = 0
 
   while linenr < len(lines)
@@ -248,7 +379,7 @@ function! s:strip_context(context)
     let diff = diff + hunk
     let hunk = []
   endif
-  return join(diff,"\n")."\n"
+  return diff
 endfunction
 
 " Variables {{{1
@@ -302,7 +433,7 @@ let s:vcs_cmds = {
 if exists('g:signify_vcs_cmds')
   call extend(g:signify_vcs_cmds, s:vcs_cmds, 'keep')
 else
-    let g:signify_vcs_cmds = s:vcs_cmds
+  let g:signify_vcs_cmds = s:vcs_cmds
 endif
 
 let s:difftool = sy#util#escape(s:difftool)

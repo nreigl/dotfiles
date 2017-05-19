@@ -7,8 +7,8 @@
 
 from .base import Base
 from denite.process import Process
-from os.path import relpath, isabs
-from copy import copy
+from os.path import relpath, isabs, join
+from denite.util import parse_command, abspath
 
 
 class Source(Base):
@@ -25,19 +25,26 @@ class Source(Base):
         self.__cache = {}
 
     def on_init(self, context):
-        self.__proc = None
+        if not context['is_windows'] and not self.vars['command']:
+            self.vars['command'] = [
+                'find', '-L', ':directory',
+                '-path', '*/.git/*', '-prune', '-o',
+                '-type', 'l', '-print', '-o', '-type', 'd', '-print']
+
+        context['__proc'] = None
         directory = context['args'][0] if len(
-            context['args']) > 0 else self.vim.call('getcwd')
-        context['__directory'] = self.vim.call('expand', directory)
+            context['args']) > 0 else context['path']
+        context['__directory'] = abspath(self.vim, directory)
 
     def on_close(self, context):
-        if self.__proc:
-            self.__proc.kill()
-            self.__proc = None
+        if context['__proc']:
+            context['__proc'].kill()
+            context['__proc'] = None
 
     def gather_candidates(self, context):
-        if self.__proc:
-            return self.__async_gather_candidates(context, 0.5)
+        if context['__proc']:
+            return self.__async_gather_candidates(
+                context, context['async_timeout'])
 
         if context['is_redraw']:
             self.__cache = {}
@@ -47,38 +54,36 @@ class Source(Base):
         if directory in self.__cache:
             return self.__cache[directory]
 
-        command = copy(self.vars['command'])
-        if not self.vars['command']:
-            if context['is_windows']:
-                return []
-
-            command = [
-                'find', '-L', context['__directory'],
-                '-path', '*/.git/*', '-prune', '-o',
-                '-type', 'l', '-print', '-o', '-type', 'd', '-print']
+        if ':directory' in self.vars['command']:
+            command = parse_command(
+                self.vars['command'], directory=directory)
         else:
-            command.append(directory)
-        self.__proc = Process(command, context, directory)
-        self.__current_candidates = []
-        return self.__async_gather_candidates(context, 2.0)
+            command = self.vars['command'] + [directory]
+        context['__proc'] = Process(command, context, directory)
+        context['__current_candidates'] = []
+        return self.__async_gather_candidates(context, 0.5)
 
     def __async_gather_candidates(self, context, timeout):
-        outs, errs = self.__proc.communicate(timeout=timeout)
-        context['is_async'] = not self.__proc.eof()
-        if self.__proc.eof():
-            self.__proc = None
+        outs, errs = context['__proc'].communicate(timeout=timeout)
+        context['is_async'] = not context['__proc'].eof()
+        if context['__proc'].eof():
+            context['__proc'] = None
         if not outs:
             return []
         if isabs(outs[0]):
-            candidates = [{'word': relpath(x, start=context['__directory']),
-                           'action__path': x}
-                          for x in outs
-                          if x != '' and x != context['__directory']]
+            candidates = [{
+                'word': relpath(x, start=context['__directory']),
+                'abbr': relpath(x, start=context['__directory']) + '/',
+                'action__path': x
+            } for x in outs if x != '' and x != context['__directory']]
         else:
-            candidates = [{'word': x, 'action__path':
-                           context['__directory'] + '/' + x}
-                          for x in outs if x != '' and x != '.']
-        self.__current_candidates += candidates
-        if len(self.__current_candidates) >= self.vars['min_cache_files']:
-            self.__cache[context['__directory']] = self.__current_candidates
+            candidates = [{
+                'word': x, 'abbr': x + '/',
+                'action__path': join(context['__directory'], x)
+            } for x in outs if x != '' and x != '.']
+        context['__current_candidates'] += candidates
+        if (len(context['__current_candidates']) >=
+                self.vars['min_cache_files']):
+            self.__cache[context['__directory']] = context[
+                '__current_candidates']
         return candidates

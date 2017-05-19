@@ -16,7 +16,7 @@
 
 
   set nocompatible
-
+  
 " Required:
     set runtimepath+=~/.vim/repos/github.com/Shougo/dein.vim/
     " set runtimepath+=~/Github/deoplete-angular/
@@ -27,7 +27,6 @@
 " Let NeoBundle manage NeoBundle
 " Required:
   call dein#add('Shougo/dein.vim')
-  call dein#add('Shougo/deoplete.nvim')
   call dein#add('haya14busa/dein-command.vim')
   " syntax
   call dein#add('othree/yajs.vim', {'on_ft': 'javascript'})
@@ -79,7 +78,7 @@
   call dein#add('junkblocker/unite-codesearch')
   call dein#add('Shougo/vimproc.vim', {'build' : 'make'})
   " call dein#add('Shougo/neocomplete.vim')
-  " call dein#add('maralla/completor.vim')
+  call dein#add('maralla/completor.vim')
   call dein#add('davidhalter/jedi-vim', {'on_ft': 'python'})
   call dein#add('ternjs/tern_for_vim', {'build': 'npm install'})
   call dein#add('Valloric/YouCompleteMe', {'build': './install.py'})
@@ -130,12 +129,19 @@
  call dein#add('junegunn/limelight.vim')
  call dein#add('junegunn/goyo.vim')
  call dein#add('irrationalistic/vim-tasks')
+ call dein#add('bnbeckwith/vim-writegood')
+ call dein#add('flazz/vim-colorschemes')
  " R
  call dein#add('jalvesaq/Nvim-R')
  call dein#add('mllg/vim-devtools-plugin')
+ " markdown
+ call dein#add('plasticboy/vim-markdown')
+ call dein#add('godlygeek/tabular')
  call dein#add('vim-pandoc/vim-pandoc')
  call dein#add('vim-pandoc/vim-pandoc-syntax')
- call dein#add('vim-pandoc/vim-rmarkdown')
+ call dein#add('SirVer/ultisnips')
+ call dein#add('ervandew/supertab')
+ call dein#add('ctrlpvim/ctrlp.vim')
  " stan
  call dein#add('maverickg/stan.vim')
  " REPL
@@ -285,40 +291,30 @@ syntax enable
 colorscheme OceanicNext
 " set background=dark
 " set background=light
-" no need to fold things in markdown all the time
-let g:vim_markdown_folding_disabled = 1
-" turn on spelling for markdown files
 autocmd BufRead,BufNewFile *.md setlocal spell complete+=kspell
 " highlight bad words in red
 autocmd BufRead,BufNewFile *.md hi SpellBad guibg=#ff2929 guifg=#ffffff" ctermbg=224
-" disable markdown auto-preview. Gets annoying
-let g:instant_markdown_autostart = 0
 "}}}
 
 " MarkDown ------------------------------------------------------------------{{{
-" no need to fold things in markdown all the time
-  let g:vim_markdown_folding_disabled = 1
-  let g:instant_markdown_autostart = 0
-" turn on spelling for markdown files
-  autocmd FileType ghmarkdown,markdown,text,html setlocal spell complete+=kspell
-" don't mess with folding text for markdown
-  let g:markdown_fold_override_foldtext = 1
-  let g:vim_markdown_conceal = 0
-
-"}}}
-
-" Julia  ------------------------------------------------------------------{{{
-" no need to fold things in markdown all the time
- let g:vim_markdown_folding_disabled = 1
+" unfold things in markdown all the time
+ let g:vim_markdown_folding_disabled = 1 
  let g:instant_markdown_autostart = 0
 " turn on spelling for markdown files
  autocmd FileType ghmarkdown,markdown,text,html setlocal spell complete+=kspell
 " don't mess with folding text for markdown
  let g:markdown_fold_override_foldtext = 1
  let g:vim_markdown_conceal = 0
+" Use Tab for everything (except UltiSnips)
+ autocmd FileType markdown let g:SuperTabDefaultCompletionType = "<c-x><c-o>"
+ let g:UltiSnipsExpandTrigger="<C-j>"
+ inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 
- " deoplete"
- let g:deoplete#enable_at_startup = 1
+"}}}
+
+" Julia  ------------------------------------------------------------------{{{
+" deoplete"
+let g:deoplete#enable_at_startup = 1
 
 " nerdcommenter proper" single-line comment
 let g:NERDCustomDelimiters = { 'julia' : { 'left' : '#', 'right' : '' } }

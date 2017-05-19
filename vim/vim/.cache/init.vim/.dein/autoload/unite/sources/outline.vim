@@ -682,6 +682,9 @@ function! s:create_context(bufnr, ...) abort
         \ 'sw'  : getbufvar(a:bufnr, '&shiftwidth'),
         \ 'ts'  : getbufvar(a:bufnr, '&tabstop'),
         \ }
+  if buffer.sw == 0
+    let buffer.sw = buffer.ts
+  endif
   let buffer.filetypes = split(getbufvar(a:bufnr, '&filetype'), '\.')
   let buffer.filetype = get(buffer.filetypes, 0, '')
   let context = {
@@ -696,7 +699,7 @@ endfunction
 "
 function! s:is_valid_candidates(candidates, context) abort
   let last_method = (!empty(a:candidates) &&
-        \ a:candidates[0].source__heading_type ==# 'folding' ? 'folding' : 'filetype')
+        \ get(a:candidates[0], 'source__heading_type', '') ==# 'folding' ? 'folding' : 'filetype')
   if a:context.extracted_by == '?'
     let a:context.extracted_by = last_method
   endif

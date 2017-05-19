@@ -18,6 +18,7 @@ import re
 import struct
 import subprocess
 import sys
+import threading
 import time
 from glob import glob
 
@@ -126,12 +127,12 @@ def retry_completion(func):
             return func(self, source, *args, **kwargs)
         except Exception:
             if '@' in source:
-                log.warn('Retrying completion %r', func.__name__)
+                log.warn('Retrying completion %r', func.__name__, exc_info=True)
                 try:
                     return func(self, strip_decor(source), *args, **kwargs)
                 except Exception:
                     pass
-            log.warn('Failed completion %r', func.__name__)
+            log.warn('Failed completion %r', func.__name__, exc_info=True)
     return wrapper
 
 
@@ -195,7 +196,7 @@ class Server(object):
                 log.debug('Fallback to scoped completions')
                 out = self.scoped_completions(source, filename, cache_key[-2])
 
-            if not out and 'synthetic' in options:
+            if not out and isinstance(options, dict) and 'synthetic' in options:
                 synthetic = options.get('synthetic')
                 log.debug('Using synthetic completion: %r', synthetic)
                 out = self.script_completion(synthetic['src'],
@@ -394,7 +395,11 @@ class Server(object):
                         continue
                     if '\\n' in desc:
                         desc = desc.replace('\\n', '\\x0A')
-                    params.append(desc)
+                    # Note: Hack for jedi param bugs
+                    if desc.startswith('param ') or desc == 'param':
+                        desc = desc[5:].strip()
+                    if desc:
+                        params.append(desc)
         except Exception:
             params = None
 
@@ -412,15 +417,10 @@ class Server(object):
 
         Returns (name, type, description, abbreviated)
         """
-        from jedi.api.classes import Completion
-
         name = comp.name
 
-        if isinstance(comp, Completion):
-            type_, desc = [x.strip() for x in comp.description.split(':', 1)]
-        else:
-            type_ = comp.type
-            desc = comp.description
+        type_ = comp.type
+        desc = comp.description
 
         if type_ == 'instance' and desc.startswith(('builtins.', 'posix.')):
             # Simple description
@@ -464,11 +464,12 @@ class Client(object):
     def __init__(self, desc_len=0, short_types=False, show_docstring=False,
                  debug=False, python_path=None):
         self._server = None
+        self.restarting = threading.Lock()
         self.version = (0, 0, 0, 'final', 0)
         self.env = os.environ.copy()
         self.env.update({
-            'PYTHONPATH': ':'.join((jedi_path,
-                                    os.path.dirname(os.path.dirname(__file__)))),
+            'PYTHONPATH': os.pathsep.join(
+                (jedi_path, os.path.dirname(os.path.dirname(__file__)))),
         })
 
         if not python_path:
@@ -489,24 +490,40 @@ class Client(object):
             self.cmd.extend(('--debug', debug[0], '--debug-level',
                              str(debug[1])))
 
-        self.restart()
+        try:
+            self.restart()
+        except Exception as exc:
+            from deoplete.exceptions import SourceInitError
+            raise SourceInitError('Failed to start server ({}): {}'.format(
+                ' '.join(self.cmd), exc))
 
     def shutdown(self):
         """Shut down the server."""
         if self._server is not None and self._server.returncode is None:
             # Closing the server's stdin will cause it to exit.
             self._server.stdin.close()
+            self._server.kill()
 
     def restart(self):
         """Start or restart the server
 
         If a server is already running, shut it down.
         """
-        self.shutdown()
-        self._server = subprocess.Popen(self.cmd, stdin=subprocess.PIPE,
-                                        stdout=subprocess.PIPE, env=self.env)
-        self.version = stream_read(self._server.stdout)
-        self._count = 0
+        with self.restarting:
+            self.shutdown()
+            self._server = subprocess.Popen(self.cmd, stdin=subprocess.PIPE,
+                                            stdout=subprocess.PIPE,
+                                            stderr=subprocess.PIPE,
+                                            env=self.env)
+            # Might result in "pyenv: version `foo' is not installed (set by
+            # /cwd/.python-version)" on stderr.
+            try:
+                self.version = stream_read(self._server.stdout)
+            except StreamEmpty:
+                out, err = self._server.communicate()
+                raise Exception('Server exited with {}: error: {}'.format(
+                    err, self._server.returncode))
+            self._count = 0
 
     def completions(self, *args):
         """Get completions from the server.
@@ -522,10 +539,12 @@ class Client(object):
             stream_write(self._server.stdin, args)
             return stream_read(self._server.stdout)
         except StreamError as exc:
-            log.error('Caught %s during handling completions(%s), '
-                      ' restarting server', exc, args)
-            self.restart()
-            time.sleep(0.2)
+            if self.restarting.acquire(False):
+                self.restarting.release()
+                log.error('Caught %s during handling completions(%s), '
+                          ' restarting server', exc, args)
+                self.restart()
+                time.sleep(0.2)
 
 
 if __name__ == '__main__':

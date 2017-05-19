@@ -56,6 +56,11 @@ endfunction
 
 " s:prototype.handle_window() {{{1
 function! s:prototype.handle_window()
+  if has_key(get(g:, 'sayonara_filetypes', {}), &filetype)
+    execute g:sayonara_filetypes[&filetype]
+    return
+  endif
+
   " quickfix, location or q:
   if &buftype == 'quickfix' || (&buftype == 'nofile' && &filetype == 'vim')
     try
@@ -71,6 +76,8 @@ function! s:prototype.handle_window()
   catch /E11/  " invalid in command-line window
     close
     let ret = 1
+  catch /E444/  " cannot close last window
+    execute self.handle_quit()
   endtry
   if exists('ret')
     unlet ret

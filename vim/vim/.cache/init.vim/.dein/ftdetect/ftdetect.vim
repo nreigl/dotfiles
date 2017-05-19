@@ -7,20 +7,28 @@ endif
 
 autocmd BufRead,BufNewFile *.jl      set filetype=julia
 
-autocmd BufEnter *                   call LaTeXtoUnicode#Refresh()
 autocmd FileType *                   call LaTeXtoUnicode#Refresh()
-
-autocmd VimEnter *                    call LaTeXtoUnicode#Init()
+autocmd BufEnter *                   call LaTeXtoUnicode#Refresh()
 
 " This autocommand is used to postpone the first initialization of LaTeXtoUnicode as much as possible,
 " by calling LaTeXtoUnicode#SetTab amd LaTeXtoUnicode#SetAutoSub only at InsertEnter or later
-augroup L2UInit
-  autocmd InsertEnter *                   let g:did_insert_enter = 1 | call LaTeXtoUnicode#Init(0)
-augroup END
-au BufNewFile,BufRead *.js setf javascript
-au BufNewFile,BufRead *.jsm setf javascript
-au BufNewFile,BufRead Jakefile setf javascript
-au BufNewFile,BufRead *.es6 setf javascript
+function! s:L2UTrigger()
+  augroup L2UInit
+    autocmd!
+    autocmd InsertEnter *            let g:did_insert_enter = 1 | call LaTeXtoUnicode#Init(0)
+  augroup END
+endfunction
+autocmd BufEnter *                   call s:L2UTrigger()
+au BufNewFile,BufRead *.{js,jsm,es,es6},Jakefile setf javascript
+
+fun! s:SourceFlowSyntax()
+  if !exists('javascript_plugin_flow') && !exists('b:flow_active') &&
+        \ search('\v\C%^\_s*%(//\s*|/\*[ \t\n*]*)\@flow>','nw')
+    runtime extras/flow.vim
+    let b:flow_active = 1
+  endif
+endfun
+au FileType javascript au BufRead,BufWritePost <buffer> call s:SourceFlowSyntax()
 
 fun! s:SelectJavascript()
   if getline(1) =~# '^#!.*/bin/\%(env\s\+\)\?node\>'
@@ -155,11 +163,31 @@ if has('nvim')
           \ if executable('lein') |
           \   call neoterm#repl#set('lein repl') |
           \ end
+    " Lua
+    au FileType lua
+          \ if executable('luap') |
+          \   let s:lua_repl='luap' |
+          \ elseif executable('lua') |
+          \   let s:lua_repl='lua' |
+          \ endif |
+          \ if executable('luarocks') && exists("s:lua_repl") |
+          \   call neoterm#repl#set(s:lua_repl . " -l\"luarocks.require\"") |
+          \ endif
+    " TCL
+    au FileType tcl
+          \ if executable('tclsh') |
+          \   call neoterm#repl#set('tclsh') |
+          \ endif
   aug END
 end
 autocmd BufNewFile,BufRead *.Rout set ft=rout
 autocmd BufNewFile,BufRead *.Rout.save set ft=rout
 autocmd BufNewFile,BufRead *.Rout.fail set ft=rout
+autocmd BufNewFile,BufRead *.Rprofile set ft=r
+" recognize .snippet files
+if has("autocmd")
+    autocmd BufNewFile,BufRead *.snippets setf snippets
+endif
 " Tasks file detection
 " Language:    Tasks
 " Maintainer:  Chris Rolfs
@@ -168,23 +196,17 @@ autocmd BufNewFile,BufRead *.Rout.fail set ft=rout
 " URL:         https://github.com/irrationalistic/vim-tasks
 "
 autocmd BufNewFile,BufReadPost *.TODO,TODO,*.todo,*.todolist,*.taskpaper,*.tasks set filetype=tasks
-autocmd BufNewFile,BufRead *.ts setlocal filetype=typescript
+autocmd BufNewFile,BufRead *.ts,*.tsx setlocal filetype=typescript
 autocmd BufNewFile,BufRead *.json setlocal filetype=json
 autocmd BufNewFile,BufRead *.jsonp setlocal filetype=json
 autocmd BufNewFile,BufRead *.geojson setlocal filetype=json
-augroup rmarkdown
-    au! BufRead,BufNewFile *.Rmd  setfiletype rmarkdown
-augroup END
 autocmd BufNewFile,BufRead {.,}tmux*.conf set ft=tmux | compiler tmux
-autocmd BufNewFile,BufRead *.ts,*.tsx setlocal filetype=typescript
+autocmd BufNewFile,BufRead *.ts,*.tsx set filetype=typescript
 " Detect syntax file.
 autocmd BufNewFile,BufRead *.snip,*.snippets set filetype=neosnippet
-autocmd BufNewFile,BufRead *.markdown,*.md,*.mdown,*.mkd,*.mkdn
-      \ if &ft =~# '^\%(conf\|modula2\)$' |
-      \   set ft=markdown |
-      \ else |
-      \   setf markdown |
-      \ endif
+" markdown filetype file
+au BufRead,BufNewFile *.{md,mdown,mkd,mkdn,markdown,mdwn} set filetype=markdown
+au BufRead,BufNewFile *.{md,mdown,mkd,mkdn,markdown,mdwn}.{des3,des,bf,bfa,aes,idea,cast,rc2,rc4,rc5,desx} set filetype=markdown
 au BufNewFile,BufRead .tern-project setf json
 au BufNewFile,BufRead .tern-config setf json
 autocmd BufNewFile,BufRead *.stan,*.STAN setfiletype stan
@@ -205,3 +227,11 @@ function! s:DetectCoffee()
 endfunction
 
 autocmd BufNewFile,BufRead * call s:DetectCoffee()
+" Language:   Literate CoffeeScript
+" Maintainer: Michael Smith <michael@diglumi.com>
+" URL:        https://github.com/mintplant/vim-literate-coffeescript
+" License:    MIT
+
+autocmd BufNewFile,BufRead *.litcoffee set filetype=litcoffee
+autocmd BufNewFile,BufRead *.coffee.md set filetype=litcoffee
+

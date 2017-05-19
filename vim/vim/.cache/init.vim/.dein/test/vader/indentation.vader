@@ -14,10 +14,10 @@ Given tex (Indent: regular tex):
 
     \end{document}
 
-Do (Indent):
+Do:
   gg=G
 
-Expect tex (Verify):
+Expect tex:
   \documentclass{minimal}
   \usepackage{amsmath}
   \usepackage{tikz}
@@ -42,10 +42,10 @@ Given tex (Indent: lists):
     (Author): commentaries here
   \end{description}
 
-Do (Indent):
+Do:
   gg=G
 
-Expect tex (Verify):
+Expect tex:
   \begin{itemize}
     \item item is indented twice
       and the next line is indented to match
@@ -64,8 +64,9 @@ Given tex (Indent: math):
         \]
 
   \begin{align}
-      2+2=4
-  \end{align}
+      2+2 = 4\\[1ex]
+          3+3 = 6
+      \end{align}
 
   \begin{equation}
      \left(
@@ -82,16 +83,17 @@ Given tex (Indent: math):
   In R, there is the operator \verb|[<-|...
   that ...
 
-Do (Indent):
+Do:
   gg=G
 
-Expect tex (Verify):
+Expect tex:
   \[
     1+1
   \]
 
   \begin{align}
-    2+2=4
+    2+2 = 4\\[1ex]
+    3+3 = 6
   \end{align}
 
   \begin{equation}
@@ -130,12 +132,22 @@ Given tex (Indent: tikz):
     \draw [solid] let \p{O} = (outerContactHead)
       in (outerContactHead) -- (\x{O},-2.5)
         node [yshift=-.25cm] {(ii)};
+
+  \begin{axis}
+    \addplot
+      table[row sep=crcr]{%
+        0       0\\
+        1       1\\
+        2       2\\
+      };
+    \end{axis}
        \end{tikzpicture}
 
-Do (Indent):
-  gg=G
+Execute:
+  let b:vimtex.packages.tikz = 1
+  normal gg=G
 
-Expect tex (Verify):
+Expect tex:
   \tikz \fill[green] rectangle (0.5,0.5); Something
   about something.
 
@@ -156,6 +168,15 @@ Expect tex (Verify):
     \draw [solid] let \p{O} = (outerContactHead)
       in (outerContactHead) -- (\x{O},-2.5)
       node [yshift=-.25cm] {(ii)};
+
+    \begin{axis}
+      \addplot
+        table[row sep=crcr]{%
+          0       0\\
+          1       1\\
+          2       2\\
+        };
+    \end{axis}
   \end{tikzpicture}
 
 Given tex (Indent: verbatims):
@@ -170,10 +191,10 @@ Given tex (Indent: verbatims):
       not affect verbatim environments!
       \end{lstlisting}
 
-Do (Indent):
+Do:
   gg=G
 
-Expect tex (Verify):
+Expect tex:
   \begin{verbatim}
   #!/bin/bash
   echo "test"
@@ -185,7 +206,7 @@ Expect tex (Verify):
       not affect verbatim environments!
   \end{lstlisting}
 
-Given tex (Indent: Ampersands):
+Given tex (Indent: ampersands):
   \begin{tabular}{cc}
       \begin{tabular}{c}
           Cell 1
@@ -204,10 +225,10 @@ Given tex (Indent: Ampersands):
       \end{aligned}
   \end{equation}
 
-Do (Indent):
+Do:
   gg=G
 
-Expect tex (Verify):
+Expect tex:
   \begin{tabular}{cc}
     \begin{tabular}{c}
       Cell 1
@@ -225,4 +246,79 @@ Expect tex (Verify):
         & 4 \\
     \end{aligned}
   \end{equation}
+
+Given:
+Execute (let g:vimtex_indent_on_ampersands = 0):
+  let g:vimtex_indent_on_ampersands = 0
+
+Given tex (Indent: ampersands 2):
+  \begin{equation}
+      \begin{aligned}
+          1 &
+          & 2 \\
+          3 &
+          & 4 \\
+      \end{aligned}
+  \end{equation}
+
+
+Do:
+  gg=G
+
+Expect tex:
+  \begin{equation}
+    \begin{aligned}
+      1 &
+      & 2 \\
+      3 &
+      & 4 \\
+    \end{aligned}
+  \end{equation}
+
+Given tex (Format: ampersands 3):
+  \begin{align}
+    &x(
+  y)
+  \end{align}
+
+Do:
+  gg=G
+
+Expect tex:
+  \begin{align}
+    &x(
+    y)
+  \end{align}
+
+Given:
+Execute (let g:vimtex_indent_ignored_envs = ...):
+  let g:vimtex_indent_ignored_envs = ['document', 'proof']
+
+Given tex (Indent: ignored environments):
+  \documentclass{minimal}
+  \usepackage{amsmath}
+  \begin{document}
+
+  \begin{proof}
+    This statement is false.
+  \end{proof}
+  \end{document}
+
+Do:
+  gg=G
+
+Expect tex:
+  \documentclass{minimal}
+  \usepackage{amsmath}
+  \begin{document}
+
+  \begin{proof}
+  This statement is false.
+  \end{proof}
+  \end{document}
+
+Given:
+Execute (unlet g:vimtex_indent_...):
+  unlet g:vimtex_indent_ignored_envs
+  unlet g:vimtex_indent_on_ampersands
 

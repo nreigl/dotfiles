@@ -2,47 +2,56 @@
 import os.path
 import sys
 import string
+import re
 from pybtex.database.input import bibtex
 from citation_vim.item import Item
 from citation_vim.utils import check_path, raiseError
 
-class bibtexParser(object):
+class BibtexParser(object):
 
     def __init__(self, context):
         self.context = context
-        self.bibtex_file = check_path(self.context.bibtex_file)
+
+        if not check_path(self.context.bibtex_file):
+            raiseError(u"Citation.vim Error:", self.context.bibtex_file, \
+                    u" does not exist")
+            return []
 
     def load(self):
         """
         Returns: A bibtex file as an array of standardised Items.
         """
         items = []
-        bib_data = self._read_file(self.bibtex_file)
+        bib_data = self._read_file(self.context.bibtex_file)
+        return self.build_items(bib_data)
 
+    def build_items(self, bib_data):
+        items = []
+        
         for key in bib_data.entries:
-            bib_entry = bib_data.entries[key]
-            authors = self.parse_authors(bib_entry)
-
             item = Item()
             item.collections  = []
+            bib_entry = bib_data.entries[key]
+            authors = self.parse_authors(bib_entry)
+            item.author    = self.format_author(authors)
             item.type      = bib_entry.type
             item.abstract  = self.get_field(bib_entry, "abstract")
-            item.date      = self.get_field(bib_entry, "year")
             item.doi       = self.get_field(bib_entry, "doi")
             item.isbn      = self.get_field(bib_entry, "isbn")
             item.publication = self.get_field(bib_entry, "journal")
-            item.language  = self.get_field(bib_entry, "language")
+            item.language  = self.get_field_from(bib_entry, ["language", "langid"])
             item.issue     = self.get_field(bib_entry, "number")
-            item.notes     = self.get_field(bib_entry, "annote")
+            item.notes     = self.get_field_from(bib_entry, ["annotation", "annote"])
             item.pages     = self.get_field(bib_entry, "pages")
-            item.publisher = self.get_field(bib_entry, "publisher")
-            item.tags      = self.get_field(bib_entry, "keyword")
+            item.publisher = self.get_field_from(bib_entry, ["publisher", "school", "institution"])
+            item.tags      = self.get_field_from(bib_entry, ["keyword", "keywords"])
             item.title     = self.get_field(bib_entry, "title")
             item.volume    = self.get_field(bib_entry, "volume")
+            item.date      = self.format_date(bib_entry)
             item.url       = self.format_url(bib_entry)
             item.file      = self.format_file(bib_entry)
-            item.author    = self.format_author(authors)
-            item.key       = self.format_key(authors, bib_entry, key)
+            item.key       = key
+            item.key_raw   = key
             item.combine()
             items.append(item)
         return items
@@ -55,7 +64,7 @@ class bibtexParser(object):
             parser = bibtex.Parser()
             output = parser.parse_file(filename)
         except:
-            raiseError(u"Failed to read {}".format(self.bibtex_file))
+            raiseError(u"Failed to read {}".format(self.context.bibtex_file))
         return output
 
     def strip_braces(self, string):
@@ -71,6 +80,14 @@ class bibtexParser(object):
         output = bib_entry.fields[field] if field in bib_entry.fields else ""
         return self.strip_braces(output)
 
+    def get_field_from(self, bib_entry, fields):
+        output = ""
+        for field in fields:
+            if field in bib_entry.fields:
+                output = bib_entry.fields[field] 
+                break
+        return self.strip_braces(output)
+
     def parse_authors(self, bib_entry):
         """
         Returns: Array of authors
@@ -84,17 +101,6 @@ class bibtexParser(object):
         except KeyError:
             authors = []
         return authors
-
-    def format_first_author(self, authors):
-        """
-        Returns: The first authors surname, if one exists.
-        """
-        if authors == []: 
-            return ""
-        return self.strip_braces(authors[0][0]).replace(' ', '_') 
-
-    def format_title_word(self, bib_entry):
-        return self.get_field(bib_entry, "title").partition(' ')[0]
 
     def format_author(self, authors):
         """
@@ -131,7 +137,9 @@ class bibtexParser(object):
         Returns: Url string
         """
         url = ""
-        if u"file" in bib_entry.fields:
+        if u"url" in bib_entry.fields:
+            url = bib_entry.fields[u"url"]
+        elif u"file" in bib_entry.fields:
             for file in bib_entry.fields[u"file"].split(";"):
                 details = file.split(":")
                 if 2 < len(details) and details[2] != "application/pdf":
@@ -148,24 +156,15 @@ class bibtexParser(object):
             tags = ", ".join(bib_entry.fields[u"keywords"])
         return tags
 
-    def format_key(self, authors, bib_entry, key):
-        """
-        Returns:
-        A key manual format or default bibtex key.
-        """
-        if self.context.key_format == "":
-            return key
-
-        author = self.format_first_author(authors)
-        title = self.format_title_word(bib_entry)
-        date = self.get_field(bib_entry, "year")
-        replacements = {
-            u"title": title.lower(),
-            u"Title": title.capitalize(), 
-            u"author": author.lower(), 
-            u"Author": author.capitalize(),
-            u"date": date
-        }
-        key_format = u"%s" % self.context.key_format
-        return key_format.format(**replacements)
+    def format_date(self, bib_entry):
+        output = ""
+        if "year" in bib_entry.fields:
+            output = self.strip_braces(bib_entry.fields["year"])
+        elif "date" in bib_entry.fields:
+            date = self.strip_braces(bib_entry.fields['date'])
+            for split in re.split(' |-|/', date):
+                if len(split) == 4 and split.isdigit():
+                    output = split
+                    break
+        return output 
 

@@ -4,12 +4,13 @@ import os
 import json
 import shutil
 import sqlite3
-from citation_vim.zotero.data import zoteroData
-from citation_vim.zotero.betterbibtex import betterBibtex
+import re
+from citation_vim.zotero.data import ZoteroData
+from citation_vim.zotero.betterbibtex import BetterBibtex
 from citation_vim.utils import check_path, raiseError
 from citation_vim.item import Item
 
-class zoteroParser(object):
+class ZoteroParser(object):
 
     def __init__(self, context):
         self.context = context
@@ -17,6 +18,9 @@ class zoteroParser(object):
         self.cache_path = context.cache_path
         self.et_al_limit = context.et_al_limit
         self.key_format = context.key_format
+        self.clean_regex = re.compile("[^A-Za-z0-9\ \!\$\&\*\+\-\.\/\:\;\<\>\?\[\]\^\_\`\|]+")
+        self.html_regex = re.compile('<[^<]+?>')
+
 
     def load(self):
         """
@@ -27,37 +31,45 @@ class zoteroParser(object):
             raiseError(u"Citation.vim Error:", self.zotero_path, \
                     u"is not a valid zotero path")
             return []
-
-        zotero = zoteroData(self.context)
+        zotero = ZoteroData(self.context)
         zot_data = zotero.load()
-        bb = betterBibtex(self.zotero_path, self.cache_path)
+        bb = BetterBibtex(self.zotero_path, self.cache_path)
         citekeys = bb.load_citekeys()
+        return self.build_items(zot_data, citekeys)
 
+    def build_items(self, zot_data, citekeys):
         items = []
         for zot_id, zot_item in zot_data:
             item = Item()
-            item.abstract    = zot_item.abstract
-            item.collections = zot_item.collections
-            item.doi         = zot_item.doi
-            item.isbn        = zot_item.isbn
-            item.publication = zot_item.publication
-            item.language    = zot_item.language
-            item.issue       = zot_item.issue
-            item.pages       = zot_item.pages
-            item.publisher   = zot_item.publisher
-            item.title       = zot_item.title
-            item.type        = zot_item.type
+            item.collections = zot_item.collections # Allways an array.
+            item.abstract    = self.clean(zot_item.abstractNote)
+            item.doi         = self.clean(zot_item.DOI)
+            item.isbn        = self.clean(zot_item.ISBN)
+            item.publication = self.clean(zot_item.publicationTitle)
+            item.language    = self.clean(zot_item.language)
+            item.issue       = self.clean(zot_item.issue)
+            item.pages       = self.clean(zot_item.pages)
+            item.publisher   = self.clean(zot_item.publisher)
+            item.title       = self.clean(zot_item.title)
+            item.type        = self.clean(zot_item.type)
             item.url         = zot_item.url
-            item.volume      = zot_item.volume
-            item.author      = self.format_author(zot_item)
-            item.date        = self.format_date(zot_item)
-            item.file        = self.format_fulltext(zot_item)
-            item.notes       = self.format_notes(zot_item)
-            item.tags        = self.format_tags(zot_item)
+            item.volume      = self.clean(zot_item.volume)
+            item.author      = self.clean(zot_item.format_author(self.et_al_limit))
+            item.date        = self.clean(zot_item.format_date())
+            item.file        = zot_item.format_attachment()
+            item.notes       = self.clean(zot_item.format_notes())
+            item.tags        = self.clean(zot_item.format_tags())
+            item.zotero_key  = self.clean(zot_item.key)
             item.key         = self.format_key(item, zot_item, citekeys)
             item.combine()
             items.append(item)
+
         return items
+
+    def clean(self, string):
+        string = self.html_regex.sub('', string)
+        return self.clean_regex.sub('', string)
+        
 
     def format_key(self, item, zot_item, citekeys):
         """
@@ -65,98 +77,24 @@ class zoteroParser(object):
         A user formatted key if present, or a better bibtex key, or zotero hash.
         """
         if self.context.key_format > "":
-            title = zot_item.title.partition(' ')[0]
-            author = self.format_first_author(zot_item)
+            title = zot_item.title.lower()
+            title = self.context.key_title_banned_regex.sub("", title)
+            title = title.partition(" ")[0]
+            date = item.date # Use the allready formatted date
+            author = zot_item.format_first_author().replace(" ", "_")
             replacements = {
                 u"title": title.lower(),
                 u"Title": title.capitalize(), 
                 u"author": author.lower(), 
                 u"Author": author.capitalize(),
-                u"date": item.date.replace(' ', '-').capitalize() # Date may be 'In-press' 
+                u"date": date.replace(' ', '-').capitalize() # Date may be 'In-press' 
             }
             key_format = u'%s' % self.context.key_format
-            return key_format.format(**replacements)
+            key = key_format.format(**replacements)
+            key = self.context.key_clean_regex.sub("", key)
+            return key 
         elif zot_item.id in citekeys:
             return citekeys[zot_item.id]
         else:
             return zot_item.key
 
-    def format_first_author(self, zot_item):
-        """
-        Returns: The first authors surname, if one exists.
-        """
-        if zot_item.authors == []:
-            return ""
-        return zot_item.authors[0][0]
-        
-    def format_author(self, zot_item):
-        """
-        Returns: A pretty representation of the author.
-        """
-        if zot_item.authors == []:
-            return ""
-        if len(zot_item.authors) > self.et_al_limit:
-            return u"%s et al." % zot_item.authors[0][0]
-        if len(zot_item.authors) > 2:
-            auth_string = u""
-            for author in zot_item.authors[:-1]:
-                auth_string += author[0] + ', '
-            return auth_string + u"& " + zot_item.authors[-1][0]
-        if len(zot_item.authors) == 2:
-            return zot_item.authors[0][0] + u" & " + zot_item.authors[1][0]
-        return ', '.join(zot_item.authors[0])
-
-    def format_tags(self, zot_item):
-        """
-        Returns: Comma separated tags.
-        """
-        return u", ".join(zot_item.tags)
-
-    def format_notes(self, zot_item):
-        """
-        Returns: Linebreak separated notes.
-        """
-        return u"\n\n".join(zot_item.notes)
-
-    def format_fulltext(self, zot_item):
-        """
-        Returns: The first file.
-        """
-        if zot_item.fulltext == []:
-            return ""
-        else:
-            return zot_item.fulltext[0]
-
-    def format_date(self, zot_item):
-        """
-        Returns: The year or special string.
-        """
-        # Some dates are treated as special and are not parsed into a year
-        # representation
-        special_dates = u"in press", u"submitted", u"in preparation", \
-            u"unpublished"
-        for specialdate in special_dates:
-            if specialdate in zot_item.date.lower():
-                return specialdate
-
-        # Dates can have months, days, and years, or just a
-        # year, and can be split by '-' and '/' characters.
-        # Detect whether the date should be split
-        date = ""
-        if u'/' in zot_item.date:
-            split = u'/'
-        elif u'-' in zot_item.date:
-            split = u'-'
-        else:
-            split = None
-        # If not, just use the last four characters
-        if split == None:
-            date = zot_item.date[-4:]
-        # Else take the first slice that is four characters
-        else:
-            l = zot_item.date.split(split)
-            for i in l:
-                if len(i) == 4:
-                    date = i
-                    break
-        return date

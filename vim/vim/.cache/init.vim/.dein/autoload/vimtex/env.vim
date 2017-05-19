@@ -4,20 +4,12 @@
 " Email:      karl.yngve@gmail.com
 "
 
-function! vimtex#env#init_options() " {{{1
-endfunction
-
-" }}}1
-function! vimtex#env#init_script() " {{{1
-endfunction
-
-" }}}1
 function! vimtex#env#init_buffer() " {{{1
   nnoremap <silent><buffer> <plug>(vimtex-env-delete)
-        \ :call vimtex#env#delete('env')<cr>
+        \ :call vimtex#env#delete('env_tex')<cr>
 
   nnoremap <silent><buffer> <plug>(vimtex-env-change)
-        \ :call vimtex#env#change_prompt('env')<cr>
+        \ :call vimtex#env#change_prompt('env_tex')<cr>
 
   nnoremap <silent><buffer> <plug>(vimtex-env-delete-math)
         \ :call vimtex#env#delete('env_math')<cr>
@@ -62,10 +54,10 @@ function! vimtex#env#change(open, close, new) " {{{1
     let n = len(l:beg) - len(a:open.match)
     let l:c1 += n
     let l:c2 += n
-    let pos = getpos('.')
+    let pos = vimtex#pos#get_cursor()
     if pos[2] > a:open.cnum + len(a:open.match) - 1
       let pos[2] += n
-      call setpos('.', pos)
+      call vimtex#pos#set_cursor(pos)
     endif
   endif
 
@@ -102,11 +94,26 @@ function! vimtex#env#delete(type) " {{{1
   let [l:open, l:close] = vimtex#delim#get_surrounding(a:type)
   if empty(l:open) | return | endif
 
+  " Remove opening and closing environment commands
   call vimtex#env#change(l:open, l:close, '')
+
+  " If the lines are empty afterwords, then we also delete the lines
+  if getline(l:close.lnum) =~# '^\s*$'
+    execute l:close.lnum . 'd _'
+  endif
+  if getline(l:open.lnum) =~# '^\s*$'
+    execute l:open.lnum . 'd _'
+  endif
+
+  if a:type ==# 'env_tex'
+    silent! call repeat#set("\<plug>(vimtex-env-delete)", v:count)
+  elseif a:type ==# 'env_math'
+    silent! call repeat#set("\<plug>(vimtex-env-delete-math)", v:count)
+  endif
 endfunction
 
 function! vimtex#env#toggle_star() " {{{1
-  let [l:open, l:close] = vimtex#delim#get_surrounding('env')
+  let [l:open, l:close] = vimtex#delim#get_surrounding('env_tex')
   if empty(l:open) | return | endif
 
   call vimtex#env#change(l:open, l:close,
@@ -118,8 +125,9 @@ endfunction
 " }}}1
 
 function! vimtex#env#is_inside(env) " {{{1
+  let l:stopline = max([line('.') - 50, 1])
   return searchpair('\\begin\s*{' . a:env . '\*\?}', '',
-        \ '\\end\s*{' . a:env . '\*\?}', 'bnWm')
+        \ '\\end\s*{' . a:env . '\*\?}', 'bnW', 0, l:stopline)
 endfunction
 
 " }}}1
@@ -143,13 +151,6 @@ endfunction
 
 " }}}1
 
-function! s:pos_prev(env) " {{{1
-    return a:env.cnum > 1
-          \ ? [0, a:env.lnum, a:env.cnum-1, 0]
-          \ : [0, max([a:env.lnum-1, 1]), strlen(getline(a:env.lnum-1)), 0]
-endfunction
-
-" }}}1
 function! s:uniq(list) " {{{1
   "
   " Trivial cases (uniq exists or one or fewer list elements)

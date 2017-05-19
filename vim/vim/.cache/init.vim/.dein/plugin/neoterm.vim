@@ -83,10 +83,23 @@ if !exists("g:neoterm_eof")
   let g:neoterm_eof = ""
 end
 
+if !exists("g:neoterm_autoscroll")
+  let g:neoterm_autoscroll = 0
+end
+
+if !exists("g:neoterm_fixedsize")
+  let g:neoterm_fixedsize = 0
+end
+
+if !exists("g:neoterm_open_in_all_tabs")
+  let g:neoterm_open_in_all_tabs = 0
+end
+
 command! -bar -complete=shellcmd Tnew silent call neoterm#tnew()
-command! -bar -complete=shellcmd Topen silent call neoterm#open()
-command! -bar -complete=shellcmd Tclose silent call neoterm#close()
-command! -bar -complete=shellcmd Ttoggle silent call neoterm#toggle()
+command! -bar Topen silent call neoterm#open()
+command! -bar Tclose silent call neoterm#close()
+command! -bar TcloseAll silent call neoterm#closeAll()
+command! -bar Ttoggle silent call neoterm#toggle()
 command! -complete=shellcmd -nargs=+ T silent call neoterm#do(<q-args>)
 command! -complete=shellcmd -nargs=+ Tmap silent call neoterm#map_for(<q-args>)
 command! -nargs=1 Tpos let g:neoterm_position=<q-args>

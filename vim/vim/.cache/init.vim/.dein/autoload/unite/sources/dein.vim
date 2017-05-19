@@ -4,9 +4,9 @@
 " License: MIT license
 "=============================================================================
 
-function! unite#sources#dein#define() abort "{{{
+function! unite#sources#dein#define() abort
   return s:source
-endfunction"}}}
+endfunction
 
 let s:source = {
       \ 'name': 'dein',
@@ -14,19 +14,19 @@ let s:source = {
       \ 'hooks': {},
       \ }
 
-function! s:source.hooks.on_init(args, context) abort "{{{
+function! s:source.hooks.on_init(args, context) abort
   let a:context.source__bang = index(a:args, '!') >= 0
   let a:context.source__plugins = values(dein#get())
-endfunction"}}}
+endfunction
 
-" Filters "{{{
-function! s:source.source__converter(candidates, context) abort "{{{
+" Filters
+function! s:source.source__converter(candidates, context) abort
   for candidate in a:candidates
     let type = dein#util#_get_type(candidate.source__type)
     let candidate.source__uri = has_key(type, 'get_uri') ?
           \ type.get_uri(candidate.action__plugin.repo,
           \              candidate.action__plugin) : ''
-    if candidate.source__uri =~
+    if candidate.source__uri =~#
           \ '^\%(https\?\|git\)://github.com/'
       let candidate.action__uri = candidate.source__uri
       let candidate.action__uri =
@@ -37,12 +37,12 @@ function! s:source.source__converter(candidates, context) abort "{{{
   endfor
 
   return a:candidates
-endfunction"}}}
+endfunction
 
 let s:source.converters = s:source.source__converter
-"}}}
 
-function! s:source.gather_candidates(args, context) abort "{{{
+
+function! s:source.gather_candidates(args, context) abort
   let _ = map(copy(a:context.source__plugins), "{
         \ 'word': substitute(v:val.repo,
         \  '^\%(https\?\|git\)://\%(github.com/\)\?', '', ''),
@@ -71,25 +71,23 @@ function! s:source.gather_candidates(args, context) abort "{{{
 
     if a:context.source__bang
       let status = s:get_commit_status(candidate.action__plugin)
-      if status != ''
+      if status !=# ''
         let candidate.abbr .= "\n   " . status
       endif
     endif
   endfor
 
   return _
-endfunction"}}}
+endfunction
 
-function! s:get_commit_status(plugin) abort "{{{
+function! s:get_commit_status(plugin) abort
   if !isdirectory(a:plugin.path)
     return 'Not installed'
   endif
 
   let type = dein#types#git#define()
-  let cmd = has_key(type, 'get_revision_pretty_command') ?
-        \ type.get_revision_pretty_command(a:plugin) :
-        \ type.get_revision_number_command(a:plugin)
-  if cmd == ''
+  let cmd = type.get_revision_number_command(a:plugin)
+  if cmd ==# ''
     return ''
   endif
 
@@ -107,6 +105,4 @@ function! s:get_commit_status(plugin) abort "{{{
   endif
 
   return output
-endfunction"}}}
-
-" vim: foldmethod=marker
+endfunction

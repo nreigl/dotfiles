@@ -1,9 +1,9 @@
 {
-  "name" : "snipmate-snippets",
-  "author" : "community",
-  "maintainer" : "honza @ github & others",
-  "repository" : {"type": "git", "url": "git://github.com/honza/snipmate-snippets.git"},
-  "dependencies" : {
-  },
-  "description" : "community driven set of snippets for snipmate"
+    "name" : "tcomment",
+    "version" : "dev",
+    "author" : "Tom Link <micathom at gmail com>",
+    "maintainer" : "Tom Link <micathom at gmail com>",
+    "repository" : {"type": "git", "url": "git://github.com/tomtom/tcomment_vim.git"},
+    "dependencies" : {},
+    "description" : "An easily extensible & universal comment plugin"
 }

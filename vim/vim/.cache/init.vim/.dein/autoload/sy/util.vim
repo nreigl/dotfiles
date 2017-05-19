@@ -24,9 +24,21 @@ endfunction
 
 " Function: #refresh_windows {{{1
 function! sy#util#refresh_windows() abort
-  let winnr = winnr()
-  windo if exists('b:sy') | call sy#start() | endif
-  execute winnr .'wincmd w'
+  if exists('*win_getid')
+    let winid = win_getid()
+  else
+    let winnr = winnr()
+  endif
+
+  if !get(g:, 'signify_cmdwin_active')
+    windo if exists('b:sy') | call sy#start() | endif
+  endif
+
+  if exists('winid')
+    call win_gotoid(winid)
+  else
+    execute winnr .'wincmd w'
+  endif
 endfunction
 
 " Function: #hunk_text_object {{{1
@@ -68,4 +80,12 @@ function! sy#util#shell_redirect(path) abort
   else
     return &shellredir .' '. a:path
   endif
+endfunction
+
+" Function: #chdir {{{1
+function! sy#util#chdir() abort
+  let chdir = haslocaldir()
+        \ ? 'lcd'
+        \ : (exists(':tcd') && haslocaldir(-1, 0)) ? 'tcd' : 'cd'
+  return [getcwd(), chdir]
 endfunction

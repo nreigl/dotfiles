@@ -5,15 +5,7 @@
 "
 
 function! vimtex#view#mupdf#new() " {{{1
-  "
-  " Set default options
-  "
-  call vimtex#util#set_default('g:vimtex_view_mupdf_options', '')
-  call vimtex#util#set_default('g:vimtex_view_mupdf_send_keys', '')
-
-  "
   " Check if the viewer is executable
-  "
   if !executable('mupdf')
     call vimtex#echo#warning('MuPDF is not executable!')
     call vimtex#echo#echo('- vimtex viewer will not work!')
@@ -21,35 +13,34 @@ function! vimtex#view#mupdf#new() " {{{1
     return {}
   endif
 
-  "
   " Check if the xdotool is available
-  "
   if !executable('xdotool')
     call vimtex#echo#warning('MuPDF requires xdotool!')
     return {}
   endif
 
-  "
   " Use the xwin template
-  "
   return vimtex#view#common#apply_xwin_template('MuPDF',
         \ vimtex#view#common#apply_common_template(deepcopy(s:mupdf)))
 endfunction
 
 " }}}1
 
-let s:mupdf = {}
+let s:mupdf = {
+      \ 'name': 'MuPDF',
+      \}
 
 function! s:mupdf.start(outfile) dict " {{{1
-  let exe = {}
-  let exe.cmd  = 'mupdf ' .  g:vimtex_view_mupdf_options
-  let exe.cmd .= ' ' . vimtex#util#shellescape(a:outfile)
-  call vimtex#util#execute(exe)
-  let self.cmd_start = exe.cmd
+  let l:cmd = 'mupdf ' .  g:vimtex_view_mupdf_options
+        \ . ' ' . vimtex#util#shellescape(a:outfile)
+  let self.process = vimtex#process#start(l:cmd)
 
   call self.xwin_get_id()
   call self.xwin_send_keys(g:vimtex_view_mupdf_send_keys)
-  call self.forward_search(a:outfile)
+
+  if g:vimtex_view_forward_search_on_start
+    call self.forward_search(a:outfile)
+  endif
 endfunction
 
 " }}}1
@@ -66,12 +57,11 @@ function! s:mupdf.forward_search(outfile) dict " {{{1
   let self.page = system(self.cmd_synctex_view)
 
   if self.page > 0
-    let exe = {}
-    let exe.cmd  = 'xdotool'
-    let exe.cmd .= ' type --window ' . self.xwin_id
-    let exe.cmd .= ' "' . self.page . 'g"'
-    call vimtex#util#execute(exe)
-    let self.cmd_forward_search = exe.cmd
+    let l:cmd = 'xdotool'
+          \ . ' type --window ' . self.xwin_id
+          \ . ' "' . self.page . 'g"'
+    call vimtex#process#run(l:cmd)
+    let self.cmd_forward_search = l:cmd
   endif
 
   call self.focus_viewer()
@@ -82,7 +72,7 @@ function! s:mupdf.reverse_search() dict " {{{1
   if !executable('xdotool') | return | endif
   if !executable('synctex') | return | endif
 
-  let outfile = b:vimtex.out()
+  let outfile = self.out()
   if vimtex#view#common#not_readable(outfile) | return | endif
 
   if !self.xwin_exists()
@@ -122,7 +112,7 @@ function! s:mupdf.reverse_search() dict " {{{1
 endfunction
 
 " }}}1
-function! s:mupdf.latexmk_callback(status) dict " {{{1
+function! s:mupdf.compiler_callback(status) dict " {{{1
   if !a:status | return | endif
 
   if g:vimtex_view_use_temp_files
@@ -144,7 +134,7 @@ function! s:mupdf.latexmk_callback(status) dict " {{{1
     endif
 
     if !self.xwin_exists() && !has_key(self, 'started_through_callback')
-      call self.start(self.out)
+      call self.start(self.out())
       let self.started_through_callback = 1
     endif
   endif
@@ -163,10 +153,10 @@ function! s:mupdf.latexmk_append_argument() dict " {{{1
   if g:vimtex_view_use_temp_files
     let cmd = ' -view=none'
   else
-    let cmd  = vimtex#latexmk#add_option('new_viewer_always', '0')
-    let cmd .= vimtex#latexmk#add_option('pdf_update_method', '2')
-    let cmd .= vimtex#latexmk#add_option('pdf_update_signal', 'SIGHUP')
-    let cmd .= vimtex#latexmk#add_option('pdf_previewer',
+    let cmd  = vimtex#compiler#latexmk#wrap_option('new_viewer_always', '0')
+    let cmd .= vimtex#compiler#latexmk#wrap_option('pdf_update_method', '2')
+    let cmd .= vimtex#compiler#latexmk#wrap_option('pdf_update_signal', 'SIGHUP')
+    let cmd .= vimtex#compiler#latexmk#wrap_option('pdf_previewer',
           \ 'mupdf ' .  g:vimtex_view_mupdf_options)
   endif
   return cmd
@@ -177,7 +167,7 @@ function! s:mupdf.focus_viewer() dict " {{{1
   if !executable('xdotool') | return | endif
 
   if self.xwin_id > 0
-    silent call system('xdotool windowfocus ' . self.xwin_id . ' --sync')
+    silent call system('xdotool windowactivate ' . self.xwin_id . ' --sync')
     silent call system('xdotool windowraise ' . self.xwin_id)
   endif
 endfunction
@@ -186,7 +176,7 @@ endfunction
 function! s:mupdf.focus_vim() dict " {{{1
   if !executable('xdotool') | return | endif
 
-  silent call system('xdotool windowfocus ' . v:windowid . ' --sync')
+  silent call system('xdotool windowactivate ' . v:windowid . ' --sync')
   silent call system('xdotool windowraise ' . v:windowid)
 endfunction
 

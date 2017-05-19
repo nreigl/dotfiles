@@ -4,77 +4,48 @@
 " Email:      karl.yngve@gmail.com
 "
 
-function! vimtex#index#init_options() " {{{1
-  call vimtex#util#set_default('g:vimtex_index_hide_line_numbers', 1)
-  call vimtex#util#set_default('g:vimtex_index_resize', 0)
-  call vimtex#util#set_default('g:vimtex_index_show_help', 1)
-  call vimtex#util#set_default('g:vimtex_index_split_pos', 'vert leftabove')
-  call vimtex#util#set_default('g:vimtex_index_split_width', 30)
-endfunction
-
-" }}}1
-function! vimtex#index#init_script() " {{{1
-  call vimtex#util#set_highlight('IndexHelp', 'helpVim')
-  call vimtex#util#set_highlight('IndexLine', 'ModeMsg')
-endfunction
-
-" }}}1
-function! vimtex#index#init_buffer() " {{{1
+function! vimtex#index#new(index) abort " {{{1
+  return extend(a:index, deepcopy(s:index), 'keep')
 endfunction
 
 " }}}1
 
-function! vimtex#index#open(bufname) " {{{1
-  let winnr = bufwinnr(bufnr(a:bufname))
-  if winnr >= 0
-    silent execute winnr . 'wincmd w'
-    return 1
-  else
-    return 0
+let s:index = {
+      \ 'show_help' : g:vimtex_index_show_help,
+      \}
+
+function! s:index.open() abort dict " {{{1
+  if self.is_open() | return | endif
+
+  let self.calling_file = expand('%:p')
+  let self.calling_line = line('.')
+
+  if has_key(self, 'update')
+    call self.update(0)
   endif
+
+  call self.create()
 endfunction
 
 " }}}1
-function! vimtex#index#close(bufname) " {{{1
-  if g:vimtex_index_resize
-    silent exe 'set columns -=' . g:vimtex_index_split_width
-  endif
-  silent execute 'bwipeout' . bufnr(a:bufname)
-endfunction
-
-" }}}1
-function! vimtex#index#create(index) " {{{1
-  let default = {
-        \ 'refresh'          : function('s:actions_refresh'),
-        \ 'activate'         : function('s:actions_activate'),
-        \ 'close'            : function('s:actions_close'),
-        \ 'position_save'    : function('s:position_save'),
-        \ 'position_restore' : function('s:position_restore'),
-        \ 'print_entries'    : function('s:print_entries'),
-        \ 'print_help'       : function('s:print_help'),
-        \ 'syntax'           : function('s:syntax'),
-        \ 'show_help'        : g:vimtex_index_show_help,
-        \ }
-  for [key, FnVal] in items(default)
-    if !has_key(a:index, key)
-      let a:index[key] = FnVal
-    endif
-    unlet FnVal
-  endfor
-
+function! s:index.create() abort dict " {{{1
+  let l:bufnr = bufnr('')
   let l:vimtex = get(b:, 'vimtex', {})
+
   if g:vimtex_index_split_pos ==# 'full'
-    silent execute 'edit' escape(a:index.name, ' ')
+    silent execute 'edit' escape(self.name, ' ')
   else
     if g:vimtex_index_resize
       silent exe 'set columns +=' . g:vimtex_index_split_width
     endif
     silent execute
           \ g:vimtex_index_split_pos g:vimtex_index_split_width
-          \ 'new' escape(a:index.name, ' ')
+          \ 'new' escape(self.name, ' ')
   endif
+
+  let self.prev_winnr = bufwinnr(l:bufnr)
+  let b:index = self
   let b:vimtex = l:vimtex
-  let b:index = a:index
 
   setlocal bufhidden=wipe
   setlocal buftype=nofile
@@ -107,18 +78,50 @@ function! vimtex#index#create(index) " {{{1
   nnoremap <silent><buffer> <cr>          :call b:index.activate(1)<cr>
   nnoremap <silent><buffer> <2-leftmouse> :call b:index.activate(1)<cr>
 
-  call b:index.syntax()
-  call b:index.refresh()
+  call self.syntax()
+  call self.refresh()
 
-  if has_key(b:index, 'hook_init_post')
-    call b:index.hook_init_post()
-    unlet b:index.hook_init_post
+  if has_key(self, 'hook_init_post')
+    call self.hook_init_post()
   endif
 endfunction
 
 " }}}1
+function! s:index.goto() abort dict " {{{1
+  if self.is_open()
+    let l:winnr = bufwinnr(bufnr(self.name))
+    let l:prev_winnr = winnr()
+    silent execute l:winnr . 'wincmd w'
+    let b:index.prev_winnr = l:prev_winnr
+  endif
+endfunction
 
-function! s:actions_refresh() dict " {{{1
+" }}}1
+function! s:index.toggle() abort dict " {{{1
+  if self.is_open()
+    call self.close()
+  else
+    call self.open()
+    silent execute self.prev_winnr . 'wincmd w'
+  endif
+endfunction
+
+" }}}1
+function! s:index.is_open() abort dict " {{{1
+  return bufwinnr(bufnr(self.name)) >= 0
+endfunction
+
+" }}}1
+function! s:index.refresh() abort dict " {{{1
+  let l:index_winnr = bufwinnr(bufnr(self.name))
+  let l:buf_winnr = bufwinnr(bufnr(''))
+
+  if l:index_winnr < 0
+    return
+  elseif l:buf_winnr != l:index_winnr
+    silent execute l:index_winnr . 'wincmd w'
+  endif
+
   call self.position_save()
   setlocal modifiable
   %delete
@@ -129,11 +132,15 @@ function! s:actions_refresh() dict " {{{1
   0delete _
   setlocal nomodifiable
   call self.position_restore()
+
+  if l:buf_winnr != l:index_winnr
+    silent execute l:buf_winnr . 'wincmd w'
+  endif
 endfunction
 
 " }}}1
-function! s:actions_activate(close) dict "{{{1
-  let n = getpos('.')[1] - 1
+function! s:index.activate(close) abort dict "{{{1
+  let n = vimtex#pos#get_cursor_line() - 1
   if n < self.help_nlines | return | endif
   let entry = self.entries[n - self.help_nlines]
   let l:vimtex_main = get(b:vimtex, 'tex', '')
@@ -143,7 +150,7 @@ function! s:actions_activate(close) dict "{{{1
   let toc_wnr = winnr()
 
   " Return to calling window
-  wincmd w
+  silent execute self.prev_winnr . 'wincmd w'
 
   " Get buffer number, add buffer if necessary
   let bnr = bufnr(entry.file)
@@ -174,7 +181,7 @@ function! s:actions_activate(close) dict "{{{1
 
   " Go to entry line
   if has_key(entry, 'line')
-    call setpos('.', [0, entry.line, 0, 0])
+    call vimtex#pos#set_cursor(entry.line, 0)
   endif
 
   " If relevant, enable vimtex stuff
@@ -199,34 +206,35 @@ function! s:actions_activate(close) dict "{{{1
   endif
 endfunction
 
-function! s:actions_close() dict "{{{1
+function! s:index.close() abort dict " {{{1
   if g:vimtex_index_resize
     silent exe 'set columns -=' . g:vimtex_index_split_width
   endif
-  bwipeout
-endfunction
-
-function! s:position_save() dict " {{{1
-  let self.position = getpos('.')
+  silent execute 'bwipeout' . bufnr(self.name)
 endfunction
 
 " }}}1
-function! s:position_restore() dict " {{{1
+function! s:index.position_save() abort dict " {{{1
+  let self.position = vimtex#pos#get_cursor()
+endfunction
+
+" }}}1
+function! s:index.position_restore() abort dict " {{{1
   if self.position[1] <= self.help_nlines
     let self.position[1] = self.help_nlines + 1
   endif
-  call setpos('.', self.position)
+  call vimtex#pos#set_cursor(self.position)
 endfunction
 
 " }}}1
-function! s:print_entries() dict " {{{1
+function! s:index.print_entries() abort dict " {{{1
   for entry in self.entries
     call append('$', printf('%s', entry.title))
   endfor
 endfunction
 
 " }}}1
-function! s:print_help() dict " {{{1
+function! s:index.print_help() abort dict " {{{1
   let self.help_nlines = 0
   if self.show_help
     call append('$', '<Esc>/q: close')
@@ -244,9 +252,9 @@ function! s:print_help() dict " {{{1
 endfunction
 
 " }}}1
-function! s:syntax() dict " {{{1
-  syntax match IndexHelp /^.*: .*/
-  syntax match IndexLine /^  .*$/ contains=@Tex
+function! s:index.syntax() abort dict " {{{1
+  syntax match VimtexIndexHelp /^.*: .*/
+  syntax match VimtexIndexLine /^  .*$/ contains=@Tex
 endfunction
 
 " }}}1

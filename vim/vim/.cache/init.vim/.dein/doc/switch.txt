@@ -5,6 +5,7 @@ CONTENTS                                                *switch* *switch-content
 
     Installation................................: |switch-installation|
     Usage.......................................: |switch-usage|
+    Advanced usage..............................: |switch-advanced-usage|
     Customization...............................: |switch-customization|
     Builtins....................................: |switch-builtins|
     Settings....................................: |switch-settings|
@@ -118,6 +119,37 @@ rather just attempt all matches in order, set the value of
 
 
 ==============================================================================
+ADVANCED USAGE                                           *switch-advanced-usage*
+
+Instead of using the `:Switch` and `:SwitchReverse` commands, you can use the
+autoloaded function `switch#Switch`. Calling it without any arguments is the
+same as calling the `:Switch` command:
+>
+    :call switch#Switch()
+    " equivalent to:
+    :Switch
+<
+However, you can also call the function with a |Dict| of options. Instead of
+`:SwitchReverse`, you can invoke it with the `reverse` option:
+>
+    :call switch#Switch({'reverse': 1})
+    " or,
+    :call switch#Switch({'reverse': v:true})
+    " equivalent to:
+    :SwitchReverse
+<
+The other option you can provide is `definitions` to set an explicit list of
+definitions that are different from the built-ins.
+>
+    :call switch#Switch({'definitions': list_of_definitions})
+<
+The `switch#Switch()` function returns 1 if it succeeded, and 0 if it failed.
+You can use the return value to decide if you'd like to apply some other mapping.
+
+See below in |switch-customization| for more details and examples on how to
+write use this function.
+
+==============================================================================
 CUSTOMIZATION                                             *switch-customization*
 
 There are two variables that hold the global definition list and the
@@ -126,6 +158,16 @@ buffer-local definition list -- |g:switch_definitions| and
 built-ins provided by the plugin. In order to add the switches you want, you
 should override |g:switch_custom_definitions| and
 |b:switch_custom_definitions| instead.
+
+Use the `g:` version of the variable for global definitions, and the `b:`
+version for specific filetypes. For instance, here is how you would define
+switches only for ruby:
+>
+    autocmd FileType ruby let b:switch_custom_definitions =
+        \ [
+        \   ...
+        \ ]
+<
 
 The format of all of these variables is a simple List of items. Each item can
 be either a List or a Dict.
@@ -208,7 +250,7 @@ The following expression replaces underscored identifier names with their
 camelcased versions.
 
 >
-    let b:switch_custom_definitions = [
+    let g:switch_custom_definitions = [
         \   {
         \     '\<[a-z0-9]\+_\k\+\>': {
         \       '_\(.\)': '\U\1'
@@ -260,13 +302,28 @@ several mappings with your own custom definitions:
         \     },
         \   }
         \ ]
-    nnoremap + :call switch#Switch(g:variable_style_switch_definitions)<cr>
+    nnoremap + :call switch#Switch({'definitions': g:variable_style_switch_definitions})<cr>
     nnoremap - :Switch<cr>
 <
 With this, typing "-" would invoke the built-in switch definitions, while
 typing "+" would switch between camelcase and underscored variable styles.
 This may be particularly useful if you have several clashing switches on
 patterns that match similar things.
+
+More complicated mappings ~
+
+By using the `switch#Switch()` function, you can also write more complicated
+mappings that check if a switch succeeded, and apply some fallback if it
+didn't. The function returns 1 for success and 0 for failure.
+
+For example, if you want to switch, or fall back to activating the
+"speeddating" plugin, you could map <c-a> and <c-x> like so:
+>
+    nnoremap <c-a> :if !switch#Switch() <bar>
+          \ call speeddating#increment() <bar> endif<cr>
+    nnoremap <c-x> :if !switch#Switch({'reverse': 1}) <bar>
+          \ call speeddating#decrement() <bar> endif<cr>
+<
 
 Builtins ~
 
@@ -452,6 +509,11 @@ Function definitions (g:switch_builtins.javascript_function)
 >
     function example(one, two) { }
     var example = function(one, two) { }
+<
+ES6-style arrow functions (g:switch_builtins.javascript_arrow_function)
+>
+    var example = function(one, two) { }
+    var example = (one, two) => { }
 <
 
 Coffeescript ~

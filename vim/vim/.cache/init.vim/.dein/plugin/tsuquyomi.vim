@@ -52,10 +52,16 @@ let g:tsuquyomi_save_onrename =
       \ get(g:, 'tsuquyomi_save_onrename', 0)
 let g:tsuquyomi_single_quote_import =
       \ get(g:, 'tsuquyomi_single_quote_import', 0)
+let g:tsuquyomi_import_curly_spacing =
+      \ get(g:, 'tsuquyomi_import_curly_spacing', 1)
 let g:tsuquyomi_javascript_support =
       \ get(g:, 'tsuquyomi_javascript_support', 0)
 let g:tsuquyomi_ignore_missing_modules =
       \ get(g:, 'tsuquyomi_ignore_missing_modules', 0)
+let g:tsuquyomi_shortest_import_path = 
+      \ get(g:, 'tsuquyomi_shortest_import_path', 0)
+let g:tsuquyomi_use_vimproc =
+      \ get(g:, 'tsuquyomi_use_vimproc', 0)
 " Global options defintion. }}}
 
 " augroup tsuquyomi_global_command_group

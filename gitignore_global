@@ -230,3 +230,7 @@ TSWLatexianTemp*
 
 # auto folder when using emacs and auctex
 /auto/*
+
+# vim .chache
+.cache
+

@@ -1,5 +1,10 @@
-" Language:     Colorful CSS Color Preview
-" Author:       Aristotle Pagaltzis <pagaltzis@gmx.de>
+" Vim plugin file
+" Language:    
+" Maintainer:  othree <othree@gmail.com>
+" Last Change: 2017/04/18
+" Version:     0.4.2
+" URL:         https://github.com/othree/javascript-libraries-syntax.vim
 
-" default html syntax should already be including the css syntax
-call css_color#init('none', 'none', 'htmlString,htmlCommentPart')
+if exists('b:current_syntax') && b:current_syntax == 'html'
+  call jslibsyntax#load()
+endif

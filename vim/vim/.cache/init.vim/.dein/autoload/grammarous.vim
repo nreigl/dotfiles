@@ -1,7 +1,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:V = vital#of('grammarous')
+let s:V = vital#grammarous#new()
 let s:XML = s:V.import('Web.XML')
 let s:O = s:V.import('OptionParser')
 let s:P = s:V.import('Process')
@@ -10,7 +10,7 @@ let s:job_is_available = has('job') && has('patch-8.0.0027')
 
 let g:grammarous#root                            = fnamemodify(expand('<sfile>'), ':p:h:h')
 let g:grammarous#jar_dir                         = get(g:, 'grammarous#jar_dir', g:grammarous#root . '/misc')
-let g:grammarous#jar_url                         = get(g:, 'grammarous#jar_url', 'https://www.languagetool.org/download/LanguageTool-3.6.zip')
+let g:grammarous#jar_url                         = get(g:, 'grammarous#jar_url', 'https://www.languagetool.org/download/LanguageTool-3.7.zip')
 let g:grammarous#java_cmd                        = get(g:, 'grammarous#java_cmd', 'java')
 let g:grammarous#default_lang                    = get(g:, 'grammarous#default_lang', 'en')
 let g:grammarous#use_vim_spelllang               = get(g:, 'grammarous#use_vim_spelllang', 0)

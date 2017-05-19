@@ -15,10 +15,17 @@ endif
 let s:script_dir = expand('<sfile>:p:h')
 
 let s:V = vital#of('tsuquyomi')
-let s:P = s:V.import('ProcessManager')
 let s:JSON = s:V.import('Web.JSON')
 let s:Filepath = s:V.import('System.Filepath')
-let s:tsq = 'tsuquyomiTSServer'
+
+let s:is_vim8 = has('patch-8.0.1')
+
+if !s:is_vim8 || g:tsuquyomi_use_vimproc
+  let s:P = s:V.import('ProcessManager')
+  let s:tsq = 'tsuquyomiTSServer'
+else
+  let s:tsq = {'job':0}
+endif
 
 let s:request_seq = 0
 
@@ -27,14 +34,11 @@ let s:ignore_respons_conditions = []
 call add(s:ignore_respons_conditions, '{"reloadFinished":true}}$')
 " ignore events configFileDiag triggered by reload event. See also #99
 call add(s:ignore_respons_conditions, '"type":"event","event":"configFileDiag"')
+call add(s:ignore_respons_conditions, '"type":"event","event":"requestCompleted"')
 
 " ### Utilites {{{
 function! s:error(msg)
   echoerr (a:msg)
-endfunction
-
-function! s:waitTss(sec)
-  call s:P.read_wait(s:tsq, a:sec, [])
 endfunction
 
 function! s:debugLog(msg)
@@ -48,7 +52,7 @@ endfunction
 " ### Core Functions {{{
 "
 " If not exsiting process of TSServer, create it.
-function! tsuquyomi#tsClient#startTss()
+function! s:startTssVimproc()
   if s:P.state(s:tsq) == 'existing'
     return 'existing'
   endif
@@ -66,17 +70,69 @@ function! tsuquyomi#tsClient#startTss()
   return l:is_new
 endfunction
 
-"
-"Terminate TSServer process if it exsits.
-function! tsuquyomi#tsClient#stopTss()
-  if tsuquyomi#tsClient#statusTss() != 'undefined'
-    let l:res = s:P.term(s:tsq)
-    return l:res
+function! s:startTssVim8()
+  if type(s:tsq['job']) == 8 && job_info(s:tsq['job']).status == 'run'
+    return 'existing'
+  endif
+  let l:cmd = substitute(tsuquyomi#config#tsscmd(), '\\', '\\\\', 'g')
+  try
+    let s:tsq['job'] = job_start(l:cmd)
+    let s:tsq['channel'] = job_getchannel(s:tsq['job'])
+
+    let out =  ch_readraw(s:tsq['channel'])
+    let st = tsuquyomi#tsClient#statusTss()
+    if !g:tsuquyomi_tsserver_debug
+      if err != ''
+        call s:error('Fail to start TSServer... '.err)
+        return 0
+      endif
+    endif
+  catch
+    return 0
+  endtry
+  return 1
+endfunction
+
+function! tsuquyomi#tsClient#startTss()
+  if !s:is_vim8 || g:tsuquyomi_use_vimproc
+    return s:startTssVimproc()
+  else
+    return s:startTssVim8()
   endif
 endfunction
 
+"
+"Terminate TSServer process if it exsits.
+function! tsuquyomi#tsClient#stopTss()
+  if tsuquyomi#tsClient#statusTss() != 'dead'
+    if !s:is_vim8 || g:tsuquyomi_use_vimproc
+      let l:res = s:P.term(s:tsq)
+      return l:res
+    else
+      let l:res = job_stop(s:tsq['job'])
+      return l:res
+    endif
+  endif
+endfunction
+
+" RETURNS: {string} 'run' or 'dead'
 function! tsuquyomi#tsClient#statusTss()
-  return s:P.state(s:tsq)
+  try
+    if !s:is_vim8 || g:tsuquyomi_use_vimproc
+      let stat = s:P.state(s:tsq)
+      if stat == 'undefined'
+        return 'dead'
+      elseif stat == 'reading'
+        return 'run'
+      else
+        return stat
+      endif
+    else
+      return job_info(s:tsq['job']).status
+    endif
+  catch
+    return 'dead' 
+  endtry
 endfunction
 
 "
@@ -90,28 +146,36 @@ endfunction
 function! tsuquyomi#tsClient#sendRequest(line, delay, retry_count, response_length)
   "call s:debugLog('called! '.a:line)
   call tsuquyomi#tsClient#startTss()
-  call s:P.writeln(s:tsq, a:line)
+  if !s:is_vim8 || g:tsuquyomi_use_vimproc
+    call s:P.writeln(s:tsq, a:line)
+  else
+    call ch_sendraw(s:tsq['channel'], a:line."\n")
+  endif
 
   let l:retry = 0
   let response_list = []
 
   while len(response_list) < a:response_length
-    let [out, err, type] = s:P.read_wait(s:tsq, a:delay, ['Content-Length: \d\+'])
-    call s:debugLog('out: '.out.', type:'.type)
-    if type == 'timedout'
-      let retry_delay = 0.05
-      while l:retry < a:retry_count
-        let [out, err, type] = s:P.read_wait(s:tsq, retry_delay, ['Content-Length: \d\+'])
-        if type == 'matched'
-          call tsuquyomi#perfLogger#record('tssMatched')
-          "call s:debugLog('retry: '.l:retry.', length: '.len(response_list))
-          break
-        endif
-        let l:retry = l:retry + 1
-        call tsuquyomi#perfLogger#record('tssRetry:'.l:retry)
-      endwhile
+    if !s:is_vim8 || g:tsuquyomi_use_vimproc
+      let [out, err, type] = s:P.read_wait(s:tsq, a:delay, ['Content-Length: \d\+'])
+      call s:debugLog('out: '.out.', type:'.type)
+      if type == 'timedout'
+        let retry_delay = 0.05
+        while l:retry < a:retry_count
+          let [out, err, type] = s:P.read_wait(s:tsq, retry_delay, ['Content-Length: \d\+'])
+          if type == 'matched'
+            call tsuquyomi#perfLogger#record('tssMatched')
+            "call s:debugLog('retry: '.l:retry.', length: '.len(response_list))
+            break
+          endif
+          let l:retry = l:retry + 1
+          call tsuquyomi#perfLogger#record('tssRetry:'.l:retry)
+        endwhile
+      endif
+    else
+      let out = ch_readraw(s:tsq['channel'])
+      let type = 'matched'
     endif
-
     if type == 'matched'
       let l:tmp1 = substitute(out, 'Content-Length: \d\+', '', 'g')
       let l:tmp2 = substitute(l:tmp1, '\r', '', 'g')
@@ -147,7 +211,7 @@ endfunction
 function! tsuquyomi#tsClient#sendCommandSyncResponse(cmd, args)
   let l:input = s:JSON.encode({'command': a:cmd, 'arguments': a:args, 'type': 'request', 'seq': s:request_seq})
   call tsuquyomi#perfLogger#record('beforeCmd:'.a:cmd)
-  let l:stdout_list = tsuquyomi#tsClient#sendRequest(l:input, 0.0001, 100, 1)
+  let l:stdout_list = tsuquyomi#tsClient#sendRequest(l:input, 0.0001, 1000, 1)
   call tsuquyomi#perfLogger#record('afterCmd:'.a:cmd)
   let l:length = len(l:stdout_list)
   if l:length == 1
@@ -537,6 +601,50 @@ endfunction
 " This command does not return any response.
 function! tsuquyomi#tsClient#tsReloadProjects()
   return tsuquyomi#tsClient#sendCommandOneWay('reloadProjects', {})
+endfunction
+
+" This command is available only at tsserver ~v.2.1
+" PARAM: {string} file File name.
+" PARAM: {number} startLine The line number for the req
+" PARAM: {number} startOffset The character offset for the req
+" PARAM: {number} endLine The line number for the req
+" PARAM: {number} endOffset The character offset for the req
+" PARAM: {list<number>} errorCodes Error codes we want to get the fixes for
+" RETURNS: {list<dict>}
+"   e.g.:
+"     [
+"       {
+"         'description': 'Add missing ''super()'' call.',
+"         'changes': [
+"           {
+"             'fileName': '/SamplePrj/codeFixesTest.ts',
+"             'textChanges': [
+"               {
+"                 'start': {'offset': 20, 'line': 6},
+"                 'end': {'offset': 20, 'line': 6},
+"                 'newText': 'super();'
+"               }
+"             ]
+"           }
+"         ]
+"       }
+"     ]
+function! tsuquyomi#tsClient#tsGetCodeFixes(file, startLine, startOffset, endLine, endOffset, errorCodes)
+  let l:arg = {
+        \ 'file': a:file,
+        \ 'startLine': a:startLine, 'startOffset': a:startOffset,
+        \ 'endLine': a:endLine, 'endOffset': a:endOffset,
+        \ 'errorCodes': a:errorCodes
+        \ }
+  let l:result = tsuquyomi#tsClient#sendCommandSyncResponse('getCodeFixes', l:arg)
+  return tsuquyomi#tsClient#getResponseBodyAsList(l:result)
+endfunction
+
+" Get available code fixes list
+" This command is available only at tsserver ~v.2.1
+function! tsuquyomi#tsClient#tsGetSupportedCodeFixes()
+  let l:result = tsuquyomi#tsClient#sendCommandSyncResponse('getSupportedCodeFixes', {})
+  return tsuquyomi#tsClient#getResponseBodyAsDict(l:result)
 endfunction
 
 

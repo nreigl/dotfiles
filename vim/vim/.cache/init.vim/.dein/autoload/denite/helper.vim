@@ -4,12 +4,12 @@
 " License: MIT license
 "=============================================================================
 
-function! denite#helper#complete(arglead, cmdline, cursorpos) abort "{{{
+function! denite#helper#complete(arglead, cmdline, cursorpos) abort
   let _ = []
 
-  if a:arglead =~ ':'
+  if a:arglead =~# ':'
     " Todo: source arguments completion.
-  elseif a:arglead =~ '^-'
+  elseif a:arglead =~# '^-'
     " Option names completion.
     let bool_options = keys(filter(copy(denite#init#_user_options()),
           \ 'type(v:val) == type(v:true) || type(v:val) == type(v:false)'))
@@ -25,17 +25,17 @@ function! denite#helper#complete(arglead, cmdline, cursorpos) abort "{{{
     let _ += filter(map(globpath(&runtimepath,
           \             'rplugin/python3/denite/source/*.py', 1, 1),
           \             "fnamemodify(v:val, ':t:r')"),
-          \         "v:val != 'base'")
+          \         "v:val !=# 'base' && v:val !=# '__init__'")
   endif
 
   return uniq(sort(filter(_, 'stridx(v:val, a:arglead) == 0')))
-endfunction"}}}
-function! denite#helper#complete_actions(arglead, cmdline, cursorpos) abort "{{{
+endfunction
+function! denite#helper#complete_actions(arglead, cmdline, cursorpos) abort
   return uniq(sort(filter(copy(g:denite#_actions),
         \ 'stridx(v:val, a:arglead) == 0')))
-endfunction"}}}
+endfunction
 
-function! denite#helper#call_denite(command, args, line1, line2) abort "{{{
+function! denite#helper#call_denite(command, args, line1, line2) abort
   let [args, context] = denite#helper#_parse_options_args(a:args)
 
   let context.firstline = a:line1
@@ -46,18 +46,14 @@ function! denite#helper#call_denite(command, args, line1, line2) abort "{{{
   elseif a:command ==# 'DeniteBufferDir'
     let context.path = fnamemodify(bufname('%'), ':p:h')
   elseif a:command ==# 'DeniteProjectDir'
-    let context.path = denite#util#path2project_directory(getcwd())
+    let context.path = denite#util#path2project_directory(
+          \ get(context, 'path', getcwd()))
   endif
 
   call denite#start(args, context)
-endfunction"}}}
+endfunction
 
-function! denite#helper#preview_file(context, filename) abort "{{{
-  if has_key(a:context, '__prev_winid')
-    " Move to denite window
-    call win_gotoid(a:context.__prev_winid)
-  endif
-
+function! denite#helper#preview_file(context, filename) abort
   if a:context.vertical_preview
     let denite_winwidth = &columns
     call denite#util#execute_path('silent vertical pedit!', a:filename)
@@ -72,33 +68,33 @@ function! denite#helper#preview_file(context, filename) abort "{{{
       let &previewheight = previewheight_save
     endtry
   endif
-endfunction"}}}
+endfunction
 
-function! denite#helper#options() abort "{{{
+function! denite#helper#options() abort
   return map(keys(denite#init#_user_options()), "tr(v:val, '_', '-')")
-endfunction"}}}
+endfunction
 
-function! denite#helper#_parse_options_args(cmdline) abort "{{{
+function! denite#helper#_parse_options_args(cmdline) abort
   let _ = []
   let [args, options] = s:parse_options(a:cmdline)
   for arg in args
     " Add source name.
     let source_name = matchstr(arg, '^[^:]*')
     let source_arg = arg[len(source_name)+1 :]
-    let source_args = source_arg  == '' ? [] :
+    let source_args = source_arg  ==# '' ? [] :
           \  map(split(source_arg, '\\\@<!:', 1),
-          \      'substitute(v:val, ''\\\(.\)'', "\\1", "g")')
+          \      'substitute(v:val, ''\\\(.\)'', "\\1", ''g'')')
     call add(_, { 'name': source_name, 'args': source_args })
   endfor
 
   return [_, options]
-endfunction"}}}
-function! s:parse_options(cmdline) abort "{{{
+endfunction
+function! s:parse_options(cmdline) abort
   let args = []
   let options = {}
 
   " Eval
-  let cmdline = (a:cmdline =~ '\\\@<!`.*\\\@<!`') ?
+  let cmdline = (a:cmdline =~# '\\\@<!`.*\\\@<!`') ?
         \ s:eval_cmdline(a:cmdline) : a:cmdline
 
   for arg in split(cmdline, '\%(\\\@<!\s\)\+')
@@ -106,14 +102,15 @@ function! s:parse_options(cmdline) abort "{{{
     let arg_key = substitute(arg, '=\zs.*$', '', '')
 
     let name = substitute(tr(arg_key, '-', '_'), '=$', '', '')[1:]
-    if name =~ '^no_'
+    if name =~# '^no_'
       let name = name[3:]
       let value = 0
     else
-      let value = (arg_key =~ '=$') ? arg[len(arg_key) :] : 1
+      let value = (arg_key =~# '=$') ? arg[len(arg_key) :] : 1
     endif
 
-    if index(keys(denite#init#_user_options()), name) >= 0
+    if index(keys(denite#init#_user_options())
+          \ + keys(denite#init#_deprecated_options()), name) >= 0
       let options[name] = value
     else
       call add(args, arg)
@@ -121,8 +118,8 @@ function! s:parse_options(cmdline) abort "{{{
   endfor
 
   return [args, options]
-endfunction"}}}
-function! s:eval_cmdline(cmdline) abort "{{{
+endfunction
+function! s:eval_cmdline(cmdline) abort
   let cmdline = ''
   let prev_match = 0
   let match = match(a:cmdline, '\\\@<!`.\{-}\\\@<!`')
@@ -132,7 +129,7 @@ function! s:eval_cmdline(cmdline) abort "{{{
     endif
     let prev_match = matchend(a:cmdline,
           \ '\\\@<!`.\{-}\\\@<!`', match)
-    let cmdline .= escape(eval(a:cmdline[match+1 : prev_match - 2]), '\: ')
+    let cmdline .= escape(eval(a:cmdline[match+1 : prev_match - 2]), '\ ')
 
     let match = match(a:cmdline, '\\\@<!`.\{-}\\\@<!`', prev_match)
   endwhile
@@ -141,6 +138,23 @@ function! s:eval_cmdline(cmdline) abort "{{{
   endif
 
   return cmdline
-endfunction"}}}
+endfunction
 
-" vim: foldmethod=marker
+function! denite#helper#has_cmdline() abort
+  if !exists('*getcompletion')
+    return 0
+  endif
+
+  try
+    call getcompletion('', 'cmdline')
+  catch
+    return 0
+  endtry
+
+  return 1
+endfunction
+
+
+function! denite#helper#_set_oldfiles(oldfiles) abort
+  let v:oldfiles = a:oldfiles
+endfunction

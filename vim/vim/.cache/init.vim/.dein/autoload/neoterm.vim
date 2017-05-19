@@ -37,6 +37,12 @@ function! neoterm#close()
   end
 endfunction
 
+function! neoterm#closeAll()
+  for instance in values(g:neoterm.instances)
+    call instance.close()
+  endfor
+endfunction
+
 " Public: Executes a command on terminal.
 " Evaluates any "%" inside the command to the full path of the current file.
 function! neoterm#do(command)
@@ -47,7 +53,10 @@ endfunction
 " Internal: Loads a terminal, if it is not loaded, and execute a list of
 " commands.
 function! neoterm#exec(command)
-  call neoterm#open()
+  if !g:neoterm.has_any() || g:neoterm_open_in_all_tabs
+    call neoterm#open()
+  end
+
   call g:neoterm.last().exec(a:command)
 endfunction
 
@@ -83,6 +92,14 @@ endfunction
 " Internal: Clear the current neoterm buffer. (Send a <C-l>)
 function! neoterm#clear()
   silent call g:neoterm.last().clear()
+endfunction
+
+function! neoterm#normal(cmd)
+  silent call g:neoterm.last().normal(a:cmd)
+endfunction
+
+function! neoterm#vim_exec(cmd)
+  silent call g:neoterm.last().vim_exec(a:cmd)
 endfunction
 
 " Internal: Kill current process on neoterm. (Send a <C-c>)

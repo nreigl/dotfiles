@@ -4,212 +4,24 @@
 " Email:      karl.yngve@gmail.com
 "
 
-" {{{1 Script Initialization
-
-"
-" The flag s:initialized is set to 1 after vimtex has been initialized to
-" prevent errors if the scripts are loaded more than once (e.g. when opening
-" more than one LaTeX buffer in one vim instance).  Thus it allows us to
-" distinguish between global initialization and buffer initialization.
-"
-if !exists('s:initialized')
-  let s:initialized = 0
-endif
-
-"
-" Define list of vimtex modules
-"
-if !exists('s:modules')
-  let s:modules = map(
-        \ split(
-        \   globpath(
-        \     fnamemodify(expand('<sfile>'), ':r'),
-        \     '*.vim'),
-        \   '\n'),
-        \ 'fnamemodify(v:val, '':t:r'')')
-endif
-
-" }}}1
-
 function! vimtex#init() " {{{1
   call s:check_version()
-  "
-  " First initialize buffer options and construct (if necessary) the vimtex
-  " data blob.
-  "
+
+  call s:init_options()
+  call s:init_highlights()
+  call s:init_state()
   call s:init_buffer()
+  call s:init_default_mappings()
 
-  "
-  " Then we initialize the modules.  This is done in three steps:
-  "
-  " 1. Initialize options (load default options if not otherwise set).  This is
-  "    only done once for each vim session.
-  "
-  " 2. Initialize module scripts (set script variables and similar).  This is
-  "    also only done once for each vim session.
-  "
-  " 3. Initialize module for current buffer.  This is done for each new LaTeX
-  "    buffer.
-  "
-  if !s:initialized
-    call s:init_modules('options')
-    call s:init_modules('script')
-  endif
-  call s:init_modules('buffer')
-
-  "
-  " Initialize local blob (if main file is different then current file)
-  "
-  call s:init_local_blob()
-
-  "
-  " Parse the document to set local options
-  "
-  call s:init_local_options()
-
-  "
-  " Finally we create the mappings
-  "
-  call s:init_mappings()
-
-  let s:initialized = 1
-
-  "
-  " Allow custom configuration through an event hook
-  "
   if exists('#User#VimtexEventInitPost')
     doautocmd User VimtexEventInitPost
   endif
 endfunction
 
 " }}}1
-function! vimtex#info(global) " {{{1
-  if !s:initialized
-    echoerr 'Error: vimtex has not been initialized!'
-    return
-  endif
-
-  if a:global
-    for [id, data] in items(g:vimtex_data)
-      let d = deepcopy(data)
-      for f in ['aux', 'out', 'log']
-        silent execute 'let d.' . f . ' = data.' . f . '()'
-      endfor
-
-      call vimtex#echo#formatted([
-            \ "\ng:vimtex_data[", ['VimtexSuccess', id], '] : ',
-            \ ['VimtexSuccess', remove(d, 'name') . "\n"]])
-      call s:print_dict(d)
-    endfor
-  else
-    let d = deepcopy(b:vimtex)
-    for f in ['aux', 'out', 'log']
-      silent execute 'let d.' . f . ' = b:vimtex.' . f . '()'
-    endfor
-    call vimtex#echo#formatted([
-          \ 'b:vimtex : ',
-          \ ['VimtexSuccess', remove(d, 'name') . "\n"]])
-    call s:print_dict(d)
-  endif
-endfunction
-
-" }}}1
-function! vimtex#wc(detailed, ...) " {{{1
-  " Run texcount, save output to lines variable
-  let cmd  = 'cd ' . vimtex#util#shellescape(b:vimtex.root)
-  let cmd .= '; texcount -nosub -sum '
-  let cmd .= a:0 > 0 ? '-letter ' : ''
-  let cmd .= a:detailed > 0 ? '-inc ' : '-merge '
-  let cmd .= vimtex#util#shellescape(b:vimtex.base)
-  let lines = split(system(cmd), '\n')
-
-  " Create wordcount window
-  if bufnr('TeXcount') >= 0
-    bwipeout TeXcount
-  endif
-  split TeXcount
-
-  " Add lines to buffer
-  for line in lines
-    call append('$', printf('%s', line))
-  endfor
-  0delete _
-
-  " Set mappings
-  nnoremap <buffer> <silent> q :bwipeout<cr>
-
-  " Set buffer options
-  setlocal bufhidden=wipe
-  setlocal buftype=nofile
-  setlocal cursorline
-  setlocal nobuflisted
-  setlocal nolist
-  setlocal nospell
-  setlocal noswapfile
-  setlocal nowrap
-  setlocal tabstop=8
-  setlocal nomodifiable
-
-  " Set highlighting
-  syntax match TexcountText  /^.*:.*/ contains=TexcountValue
-  syntax match TexcountValue /.*:\zs.*/
-  highlight link TexcountText  VimtexMsg
-  highlight link TexcountValue Constant
-endfunction
-
-" }}}1
-" {{{1 function! vimtex#reload()
-let s:file = expand('<sfile>')
-if get(s:, 'reload_guard', 1)
-  function! vimtex#reload()
-    let s:reload_guard = 0
-
-    let l:scripts = [s:file]
-          \ + map(copy(s:modules),
-          \ 'fnamemodify(s:file, '':h'') . ''/vimtex/'' . v:val . ''.vim''')
-
-    for l:file in l:scripts
-      execute 'source' l:file
-    endfor
-
-    let s:initialized = 0
-    call vimtex#init()
-
-    " Reload indent file
-    if exists('b:did_vimtex_indent')
-      unlet b:did_indent
-      runtime indent/tex.vim
-    endif
-
-    call vimtex#echo#info('reloaded')
-    unlet s:reload_guard
-  endfunction
-endif
-
-" }}}1
-function! vimtex#toggle_main() " {{{1
-  if exists('b:vimtex_local')
-    let b:vimtex_local.active = !b:vimtex_local.active
-
-    let b:vimtex_id = b:vimtex_local.active
-          \ ? b:vimtex_local.sub_id
-          \ : b:vimtex_local.main_id
-    let b:vimtex = g:vimtex_data[b:vimtex_id]
-    call b:vimtex.viewer.refresh_paths()
-
-    call vimtex#echo#status(['vimtex: ',
-          \ ['Normal', 'Changed to `'],
-          \ ['VimtexSuccess', b:vimtex.base],
-          \ ['Normal', "' "],
-          \ ['VimtexInfo', b:vimtex_local.active ? '[local]' : '[main]' ]])
-  endif
-endfunction
-
-" }}}1
-
 
 function! s:check_version() " {{{1
-  if s:initialized || get(g:, 'vimtex_disable_version_warning', 0)
+  if get(g:, 'vimtex_disable_version_warning', 0)
     return
   endif
 
@@ -220,15 +32,228 @@ endfunction
 
 " }}}1
 
-function! s:init_buffer() " {{{1
-  "
-  " First we set some vim options
-  "
-  let s:save_cpo = &cpo
-  set cpo&vim
+function! s:init_options() " {{{1
+  call s:init_option('vimtex_compiler_enabled', 1)
+  call s:init_option('vimtex_compiler_method', 'latexmk')
+  call s:init_option('vimtex_compiler_progname',
+        \ get(v:, 'progpath', get(v:, 'progname')))
+  call s:init_option('vimtex_compiler_callback_hooks', [])
 
-  " Ensure tex files are prioritized when listing files
-  for suf in [
+  call s:init_option('vimtex_complete_enabled', 1)
+  call s:init_option('vimtex_complete_close_braces', 0)
+  call s:init_option('vimtex_complete_recursive_bib', 0)
+
+  call s:init_option('vimtex_echo_ignore_wait', 0)
+
+  call s:init_option('vimtex_fold_enabled', 0)
+  if &diff
+    let g:vimtex_fold_manual = 0
+  else
+    call s:init_option('vimtex_fold_manual', 0)
+  endif
+  call s:init_option('vimtex_fold_comments', 0)
+  call s:init_option('vimtex_fold_levelmarker', '*')
+  call s:init_option('vimtex_fold_preamble', 1)
+  call s:init_option('vimtex_fold_envs', 1)
+  call s:init_option('vimtex_fold_markers', 1)
+  call s:init_option('vimtex_fold_parts',
+        \ [
+        \   'part',
+        \   'appendix',
+        \   'frontmatter',
+        \   'mainmatter',
+        \   'backmatter',
+        \ ])
+  call s:init_option('vimtex_fold_sections',
+        \ [
+        \   'chapter',
+        \   'section',
+        \   'subsection',
+        \   'subsubsection',
+        \ ])
+  call s:init_option('vimtex_fold_commands_default', {
+        \ 'hypersetup' : 'single',
+        \ 'tikzset' : 'single',
+        \ 'usepackage' : 'single_opt',
+        \ 'includepdf' : 'single_opt',
+        \ '%(re)?new%(command|environment)' : 'multi',
+        \ 'providecommand' : 'multi',
+        \ 'presetkeys' : 'multi',
+        \ 'Declare%(Multi|Auto)?CiteCommand' : 'multi',
+        \ 'Declare%(Index)?%(Field|List|Name)%(Format|Alias)' : 'multi',
+        \})
+
+  call s:init_option('vimtex_format_enabled', 0)
+
+  call s:init_option('vimtex_imaps_enabled', 1)
+  call s:init_option('vimtex_imaps_disabled', [])
+  call s:init_option('vimtex_imaps_list', [
+        \ { 'lhs' : '0',  'rhs' : '\emptyset' },
+        \ { 'lhs' : '6',  'rhs' : '\partial' },
+        \ { 'lhs' : '8',  'rhs' : '\infty' },
+        \ { 'lhs' : '=',  'rhs' : '\equiv' },
+        \ { 'lhs' : '\',  'rhs' : '\setminus' },
+        \ { 'lhs' : '.',  'rhs' : '\cdot' },
+        \ { 'lhs' : '*',  'rhs' : '\times' },
+        \ { 'lhs' : '<',  'rhs' : '\langle' },
+        \ { 'lhs' : '>',  'rhs' : '\rangle' },
+        \ { 'lhs' : '[',  'rhs' : '\subseteq' },
+        \ { 'lhs' : ']',  'rhs' : '\supseteq' },
+        \ { 'lhs' : '(',  'rhs' : '\subset' },
+        \ { 'lhs' : ')',  'rhs' : '\supset' },
+        \ { 'lhs' : 'A',  'rhs' : '\forall' },
+        \ { 'lhs' : 'E',  'rhs' : '\exists' },
+        \ { 'lhs' : 'jj', 'rhs' : '\downarrow' },
+        \ { 'lhs' : 'jJ', 'rhs' : '\Downarrow' },
+        \ { 'lhs' : 'jk', 'rhs' : '\uparrow' },
+        \ { 'lhs' : 'jK', 'rhs' : '\Uparrow' },
+        \ { 'lhs' : 'jh', 'rhs' : '\leftarrow' },
+        \ { 'lhs' : 'jH', 'rhs' : '\Leftarrow' },
+        \ { 'lhs' : 'jl', 'rhs' : '\rightarrow' },
+        \ { 'lhs' : 'jL', 'rhs' : '\Rightarrow' },
+        \ { 'lhs' : 'a',  'rhs' : '\alpha' },
+        \ { 'lhs' : 'b',  'rhs' : '\beta' },
+        \ { 'lhs' : 'c',  'rhs' : '\chi' },
+        \ { 'lhs' : 'd',  'rhs' : '\delta' },
+        \ { 'lhs' : 'e',  'rhs' : '\epsilon' },
+        \ { 'lhs' : 'f',  'rhs' : '\phi' },
+        \ { 'lhs' : 'g',  'rhs' : '\gamma' },
+        \ { 'lhs' : 'h',  'rhs' : '\eta' },
+        \ { 'lhs' : 'i',  'rhs' : '\iota' },
+        \ { 'lhs' : 'k',  'rhs' : '\kappa' },
+        \ { 'lhs' : 'l',  'rhs' : '\lambda' },
+        \ { 'lhs' : 'm',  'rhs' : '\mu' },
+        \ { 'lhs' : 'n',  'rhs' : '\nu' },
+        \ { 'lhs' : 'p',  'rhs' : '\pi' },
+        \ { 'lhs' : 'q',  'rhs' : '\theta' },
+        \ { 'lhs' : 'r',  'rhs' : '\rho' },
+        \ { 'lhs' : 's',  'rhs' : '\sigma' },
+        \ { 'lhs' : 't',  'rhs' : '\tau' },
+        \ { 'lhs' : 'y',  'rhs' : '\psi' },
+        \ { 'lhs' : 'u',  'rhs' : '\upsilon' },
+        \ { 'lhs' : 'w',  'rhs' : '\omega' },
+        \ { 'lhs' : 'z',  'rhs' : '\zeta' },
+        \ { 'lhs' : 'x',  'rhs' : '\xi' },
+        \ { 'lhs' : 'G',  'rhs' : '\Gamma' },
+        \ { 'lhs' : 'D',  'rhs' : '\Delta' },
+        \ { 'lhs' : 'F',  'rhs' : '\Phi' },
+        \ { 'lhs' : 'G',  'rhs' : '\Gamma' },
+        \ { 'lhs' : 'L',  'rhs' : '\Lambda' },
+        \ { 'lhs' : 'P',  'rhs' : '\Pi' },
+        \ { 'lhs' : 'Q',  'rhs' : '\Theta' },
+        \ { 'lhs' : 'S',  'rhs' : '\Sigma' },
+        \ { 'lhs' : 'U',  'rhs' : '\Upsilon' },
+        \ { 'lhs' : 'W',  'rhs' : '\Omega' },
+        \ { 'lhs' : 'X',  'rhs' : '\Xi' },
+        \ { 'lhs' : 'Y',  'rhs' : '\Psi' },
+        \ { 'lhs' : 've', 'rhs' : '\varepsilon' },
+        \ { 'lhs' : 'vf', 'rhs' : '\varphi' },
+        \ { 'lhs' : 'vk', 'rhs' : '\varkappa' },
+        \ { 'lhs' : 'vq', 'rhs' : '\vartheta' },
+        \ { 'lhs' : 'vr', 'rhs' : '\varrho' },
+        \])
+
+  call s:init_option('vimtex_index_hide_line_numbers', 1)
+  call s:init_option('vimtex_index_resize', 0)
+  call s:init_option('vimtex_index_show_help', 1)
+  call s:init_option('vimtex_index_split_pos', 'vert leftabove')
+  call s:init_option('vimtex_index_split_width', 30)
+
+  call s:init_option('vimtex_matchparen_enabled', 1)
+  call s:init_option('vimtex_motion_enabled', 1)
+
+  call s:init_option('vimtex_labels_enabled', 1)
+  call s:init_option('vimtex_labels_refresh_always', 1)
+
+  call s:init_option('vimtex_quickfix_method', 'latexlog')
+  call s:init_option('vimtex_quickfix_autojump', '0')
+  call s:init_option('vimtex_quickfix_mode', '2')
+  call s:init_option('vimtex_quickfix_open_on_warning', '1')
+
+  call s:init_option('vimtex_text_obj_enabled', 1)
+  call s:init_option('vimtex_text_obj_linewise_operators', ['d', 'y'])
+
+  call s:init_option('vimtex_toc_enabled', 1)
+  call s:init_option('vimtex_toc_custom_matchers', [])
+  call s:init_option('vimtex_toc_fold', 0)
+  call s:init_option('vimtex_toc_fold_levels', 10)
+  call s:init_option('vimtex_toc_number_width', 0)
+  call s:init_option('vimtex_toc_refresh_always', 1)
+  call s:init_option('vimtex_toc_tocdepth', 3)
+  call s:init_option('vimtex_toc_show_numbers', 1)
+  call s:init_option('vimtex_toc_show_preamble', 1)
+
+  call s:init_option('vimtex_view_enabled', 1)
+  call s:init_option('vimtex_view_automatic', 1)
+  call s:init_option('vimtex_view_method', 'general')
+  call s:init_option('vimtex_view_use_temp_files', 0)
+  call s:init_option('vimtex_view_forward_search_on_start', 1)
+  call s:init_option('vimtex_view_general_viewer', get({
+        \ 'linux' : 'xdg-open',
+        \ 'mac'   : 'open',
+        \}, vimtex#util#get_os(), ''))
+  call s:init_option('vimtex_view_general_options', '@pdf')
+  call s:init_option('vimtex_view_general_options_latexmk', '')
+  call s:init_option('vimtex_view_mupdf_options', '')
+  call s:init_option('vimtex_view_mupdf_send_keys', '')
+  call s:init_option('vimtex_view_zathura_options', '')
+endfunction
+
+" }}}1
+function! s:init_option(option, default) " {{{1
+  let l:option = 'g:' . a:option
+  if !exists(l:option)
+    let {l:option} = a:default
+  endif
+endfunction
+
+" }}}1
+function! s:init_highlights() " {{{1
+  for [l:name, l:target] in [
+        \ ['VimtexImapsArrow', 'Comment'],
+        \ ['VimtexImapsLhs', 'ModeMsg'],
+        \ ['VimtexImapsRhs', 'ModeMsg'],
+        \ ['VimtexImapsWrapper', 'Type'],
+        \ ['VimtexIndexHelp', 'helpVim'],
+        \ ['VimtexIndexLine', 'ModeMsg'],
+        \ ['VimtexInfo', 'Question'],
+        \ ['VimtexLabelsChap', 'PreProc'],
+        \ ['VimtexLabelsEq', 'Statement'],
+        \ ['VimtexLabelsFig', 'Identifier'],
+        \ ['VimtexLabelsHelp', 'helpVim'],
+        \ ['VimtexLabelsLine', 'Todo'],
+        \ ['VimtexLabelsSec', 'Type'],
+        \ ['VimtexLabelsTab', 'String'],
+        \ ['VimtexMsg', 'ModeMsg'],
+        \ ['VimtexSuccess', 'Statement'],
+        \ ['VimtexTocHelp', 'helpVim'],
+        \ ['VimtexTocNum', 'Number'],
+        \ ['VimtexTocSec0', 'Title'],
+        \ ['VimtexTocSec1', 'Normal'],
+        \ ['VimtexTocSec2', 'helpVim'],
+        \ ['VimtexTocSec3', 'NonText'],
+        \ ['VimtexTocSec4', 'Comment'],
+        \ ['VimtexTocTag', 'Directory'],
+        \ ['VimtexWarning', 'WarningMsg'],
+        \]
+    if !hlexists(l:name)
+      silent execute 'highlight default link' l:name l:target
+    endif
+  endfor
+endfunction
+
+" }}}1
+function! s:init_state() " {{{1
+  call vimtex#state#init()
+  call vimtex#state#init_local()
+endfunction
+
+" }}}1
+function! s:init_buffer() " {{{1
+  " Set Vim options
+  for l:suf in [
+        \ '.sty',
+        \ '.cls',
         \ '.log',
         \ '.aux',
         \ '.bbl',
@@ -247,13 +272,13 @@ function! s:init_buffer() " {{{1
         \ '.synctex.gz',
         \ '.toc',
         \ ]
-    execute 'set suffixes+=' . suf
+    execute 'set suffixes+=' . l:suf
   endfor
-
-  setlocal suffixesadd=.tex
+  setlocal suffixesadd=.tex,.sty,.cls
   setlocal comments=sO:%\ -,mO:%\ \ ,eO:%%,:%
   setlocal commentstring=%%s
-
+  setlocal includeexpr=vimtex#include#expr()
+  let &l:include = '\v\\%(input|include)\{'
   let &l:define  = '\\\([egx]\|char\|mathchar\|count\|dimen\|muskip\|skip'
   let &l:define .= '\|toks\)\=def\|\\font\|\\\(future\)\=let'
   let &l:define .= '\|\\new\(count\|dimen\|skip'
@@ -263,68 +288,7 @@ function! s:init_buffer() " {{{1
   let &l:define .= '\|theorem\(style\)\=\)\s*\*\=\s*{\='
   let &l:define .= '\|DeclareMathOperator\s*{\=\s*'
 
-  let &l:include = '\v\\%(input|include)\{'
-  let &l:includeexpr  = 'substitute('
-  let &l:includeexpr .=   "substitute(v:fname, '\\\\space', '', 'g'),"
-  let &l:includeexpr .=   "'^.\\{-}{\"\\?\\|\"\\?}.*', '', 'g')"
-
-  let &cpo = s:save_cpo
-  unlet s:save_cpo
-
-  "
-  " Next we initialize the data blob
-  "
-
-  " Create container for data blobs if it does not exist
-  let g:vimtex_data = get(g:, 'vimtex_data', {})
-
-  " Get main file number and check if data blob already exists
-  let main = s:get_main()
-  let id   = s:get_id(main)
-
-  " Create data blob
-  if id >= 0
-    " Link to existing blob
-    let b:vimtex_id = id
-    let b:vimtex = g:vimtex_data[id]
-  else
-    " Create new blob
-    let b:vimtex = {}
-    let b:vimtex.tex  = main
-    let b:vimtex.root = fnamemodify(b:vimtex.tex, ':h')
-    let b:vimtex.base = fnamemodify(b:vimtex.tex, ':t')
-    let b:vimtex.name = fnamemodify(b:vimtex.tex, ':t:r')
-    let b:vimtex.aux = function('s:get_aux')
-    let b:vimtex.log = function('s:get_log')
-    let b:vimtex.out = function('s:get_out')
-    let b:vimtex.ext = function('s:get_ext')
-
-    let s:vimtex_next_id = get(s:, 'vimtex_next_id', -1) + 1
-    let b:vimtex_id = s:vimtex_next_id
-    let g:vimtex_data[b:vimtex_id] = b:vimtex
-  endif
-
-  "
-  " Define commands and mappings
-  "
-
-  " Define commands
-  command! -buffer -bang VimtexInfo         call vimtex#info(<q-bang> == "!")
-  command! -buffer -bang VimtexCountWords   call vimtex#wc(<q-bang> == "!")
-  command! -buffer -bang VimtexCountLetters call vimtex#wc(<q-bang> == "!", 1)
-  command! -buffer       VimtexReload       call vimtex#reload()
-  command! -buffer       VimtexToggleMain   call vimtex#toggle_main()
-
-  " Define mappings
-  nnoremap <buffer> <plug>(vimtex-info)        :VimtexInfo<cr>
-  nnoremap <buffer> <plug>(vimtex-info-full)   :VimtexInfo!<cr>
-  nnoremap <buffer> <plug>(vimtex-reload)      :VimtexReload<cr>
-  nnoremap <buffer> <plug>(vimtex-toggle-main) :VimtexToggleMain<cr>
-
-  "
-  " Attach autocommands
-  "
-
+  " Define autocommands
   augroup vimtex_buffers
     au BufFilePre  <buffer> call s:filename_changed_pre()
     au BufFilePost <buffer> call s:filename_changed_post()
@@ -332,10 +296,20 @@ function! s:init_buffer() " {{{1
     au BufDelete   <buffer> call s:buffer_deleted()
     au QuitPre     <buffer> call s:buffer_deleted(b:vimtex_id)
   augroup END
+
+  " Initialize buffer settings for sub modules
+  for l:mod in s:modules
+    if index(get(b:vimtex, 'disabled_modules', []), l:mod) >= 0 | continue | endif
+
+    try
+      call vimtex#{l:mod}#init_buffer()
+    catch /E117.*#init_/
+    endtry
+  endfor
 endfunction
 
 " }}}1
-function! s:init_mappings() " {{{1
+function! s:init_default_mappings() " {{{1
   if !get(g:,'vimtex_mappings_enabled', 1) | return | endif
 
   function! s:map(mode, lhs, rhs, ...)
@@ -357,15 +331,19 @@ function! s:init_mappings() " {{{1
 
   call s:map('n', 'dsc',  '<plug>(vimtex-cmd-delete)')
   call s:map('n', 'csc',  '<plug>(vimtex-cmd-change)')
-  call s:map('n', '<F7>', '<plug>(vimtex-cmd-create)')
+  call s:map('n', 'tsc',  '<plug>(vimtex-cmd-toggle-star)')
   call s:map('i', '<F7>', '<plug>(vimtex-cmd-create)')
+  call s:map('n', '<F7>', '<plug>(vimtex-cmd-create)')
+  call s:map('x', '<F7>', '<plug>(vimtex-cmd-create)')
 
+  call s:map('n', 'dsd', '<plug>(vimtex-delim-delete)')
+  call s:map('n', 'csd', '<plug>(vimtex-delim-change-math)')
   call s:map('n', 'tsd', '<plug>(vimtex-delim-toggle-modifier)')
-  call s:map('v', 'tsd', '<plug>(vimtex-delim-toggle-modifier)')
+  call s:map('x', 'tsd', '<plug>(vimtex-delim-toggle-modifier)')
   call s:map('i', ']]',  '<plug>(vimtex-delim-close)')
 
-  if get(g:, 'vimtex_latexmk_enabled', 0)
-    call s:map('n', '<localleader>ll', '<plug>(vimtex-compile-toggle)')
+  if get(g:, 'vimtex_compiler_enabled', 0)
+    call s:map('n', '<localleader>ll', '<plug>(vimtex-compile)')
     call s:map('n', '<localleader>lo', '<plug>(vimtex-compile-output)')
     call s:map('n', '<localleader>lL', '<plug>(vimtex-compile-selected)')
     call s:map('x', '<localleader>lL', '<plug>(vimtex-compile-selected)')
@@ -415,6 +393,10 @@ function! s:init_mappings() " {{{1
     call s:map('x', 'a$', '<plug>(vimtex-a$)')
     call s:map('o', 'i$', '<plug>(vimtex-i$)')
     call s:map('o', 'a$', '<plug>(vimtex-a$)')
+    call s:map('x', 'iP', '<plug>(vimtex-iP)')
+    call s:map('x', 'aP', '<plug>(vimtex-aP)')
+    call s:map('o', 'iP', '<plug>(vimtex-iP)')
+    call s:map('o', 'aP', '<plug>(vimtex-aP)')
   endif
 
   if get(g:, 'vimtex_toc_enabled', 0)
@@ -427,7 +409,7 @@ function! s:init_mappings() " {{{1
     call s:map('n', '<localleader>lY', '<plug>(vimtex-labels-toggle)')
   endif
 
-  if get(g:, 'vimtex_view_enabled', 0)
+  if has_key(b:vimtex, 'viewer')
     call s:map('n', '<localleader>lv', '<plug>(vimtex-view)')
     if has_key(b:vimtex.viewer, 'reverse_search')
       call s:map('n', '<localleader>lr', '<plug>(vimtex-reverse-search)')
@@ -437,312 +419,6 @@ function! s:init_mappings() " {{{1
   if get(g:, 'vimtex_imaps_enabled', 0)
     call s:map('n', '<localleader>lm', '<plug>(vimtex-imaps-list)')
   endif
-endfunction
-
-" }}}1
-function! s:init_modules(initmode) " {{{1
-  for module in s:modules
-    if index(get(s:, 'disabled_modules', []), module) >= 0 | continue | endif
-
-    try
-      execute 'call vimtex#' . module . '#init_' . a:initmode . '()'
-    catch /E117.*#init_/
-    endtry
-  endfor
-endfunction
-
-" }}}1
-function! s:init_local_blob() " {{{1
-  let l:filename = expand('%:p')
-
-  if b:vimtex.tex !=# l:filename
-    let l:local = deepcopy(b:vimtex)
-    let l:local.tex = l:filename
-    let l:local.pid = 0
-    let l:local.name = fnamemodify(l:filename, ':t:r')
-    let l:local.root = fnamemodify(l:filename, ':h')
-    let l:local.base = fnamemodify(l:filename, ':t')
-
-    let s:vimtex_next_id += 1
-    let g:vimtex_data[s:vimtex_next_id] = l:local
-
-    let b:vimtex_local = {
-          \ 'active' : 0,
-          \ 'main_id' : b:vimtex_id,
-          \ 'sub_id' : s:vimtex_next_id,
-          \}
-  endif
-endfunction
-
-" }}}1
-function! s:init_local_options() " {{{1
-  let b:vimtex.sources = []
-
-  for [l:file, l:lnum, l:line] in vimtex#parser#tex(b:vimtex.tex)
-    let l:cand = substitute(l:file, '\M' . b:vimtex.root, '', '')
-    if l:cand[0] ==# '/' | let l:cand = l:cand[1:] | endif
-
-    if index(b:vimtex.sources, l:cand) < 0
-      call add(b:vimtex.sources, l:cand)
-    endif
-  endfor
-endfunction
-
-" }}}1
-
-function! s:get_id(main) " {{{1
-  for [id, data] in items(g:vimtex_data)
-    if data.tex == a:main
-      return str2nr(id)
-    endif
-  endfor
-
-  return -1
-endfunction
-
-function! s:get_main() " {{{1
-  "
-  " Check if the current file is a main file
-  "
-  if s:file_is_main(expand('%:p'))
-    return expand('%:p')
-  endif
-
-  "
-  " Use buffer variable if it exists
-  "
-  if exists('b:vimtex_main') && filereadable(b:vimtex_main)
-    return fnamemodify(b:vimtex_main, ':p')
-  endif
-
-  "
-  " Search for TEX root specifier at the beginning of file. This is used by
-  " several other plugins and editors.
-  "
-  let l:candidate = s:get_main_from_specifier(
-        \ '^\c\s*%\s*!\?\s*tex\s\+root\s*=\s*\zs.*\ze\s*$')
-  if !empty(l:candidate)
-    return l:candidate
-  endif
-
-  "
-  " Support for subfiles package
-  "
-  let l:candidate = s:get_main_from_specifier(
-        \ '^\C\s*\\documentclass\[\zs.*\ze\]{subfiles}')
-  if !empty(l:candidate)
-    return l:candidate
-  endif
-
-  "
-  " Search for .latexmain-specifier
-  "
-  let l:candidate = s:get_main_latexmain(expand('%:p'))
-  if !empty(l:candidate)
-    return l:candidate
-  endif
-
-  "
-  " Check if we are class or style file
-  "
-  if index(['cls', 'sty'], expand('%:e')) >= 0
-    let id = getbufvar('#', 'vimtex_id', -1)
-    if id >= 0
-      return g:vimtex_data[id].tex
-    else
-      let s:disabled_modules = ['latexmk', 'view']
-      return expand('%:p')
-    endif
-  endif
-
-  "
-  " Search for main file recursively through include specifiers
-  "
-  let l:candidate = s:get_main_recurse()
-  if l:candidate !=# ''
-    return l:candidate
-  endif
-
-  "
-  " Fallback to the current file
-  "
-  return expand('%:p')
-endfunction
-
-" }}}1
-function! s:get_main_from_specifier(spec) " {{{1
-  for l:line in getline(1, 5)
-    let l:filename = matchstr(l:line, a:spec)
-    if len(l:filename) > 0
-      if l:filename[0] ==# '/'
-        if filereadable(l:filename) | return l:filename | endif
-      else
-        " The candidate may be relative both to the current buffer file and to
-        " the working directory (for subfile package)
-        for l:candidate in map([
-              \   expand('%:p:h'),
-              \   getcwd()],
-              \ 'simplify(v:val . ''/'' . l:filename)')
-          if filereadable(l:candidate) | return l:candidate | endif
-        endfor
-      endif
-    endif
-  endfor
-
-  return ''
-endfunction
-
-" }}}1
-function! s:get_main_latexmain(file) " {{{1
-  "
-  " Gather candidate files
-  "
-  let l:path = expand('%:p:h')
-  let l:dirs = l:path
-  while l:path != fnamemodify(l:path, ':h')
-    let l:path = fnamemodify(l:path, ':h')
-    let l:dirs .= ',' . l:path
-  endwhile
-  let l:candidates = split(globpath(fnameescape(l:dirs), '*.latexmain'), '\n')
-
-  "
-  " Use first valid candidate
-  "
-  for l:cand in l:candidates
-    let l:cand = fnamemodify(l:cand, ':p:r')
-    if s:file_reaches_current(l:cand)
-      return l:cand
-    endif
-  endfor
-
-  return ''
-endfunction
-
-function! s:get_main_recurse(...) " {{{1
-  "
-  " Either start the search from the original file, or check if the supplied
-  " file is a main file (or invalid)
-  "
-  if a:0 == 0
-    let l:file = expand('%:p')
-  else
-    let l:file = a:1
-
-    if s:file_is_main(l:file)
-      return l:file
-    elseif !filereadable(l:file)
-      return ''
-    endif
-  endif
-
-  "
-  " Gather candidate files
-  "
-  let l:path = fnamemodify(l:file, ':p:h')
-  let l:dirs = l:path
-  while l:path != fnamemodify(l:path, ':h')
-    let l:path = fnamemodify(l:path, ':h')
-    let l:dirs .= ',' . l:path
-  endwhile
-  let l:candidates = split(globpath(fnameescape(l:dirs), '*.tex'), '\n')
-
-  "
-  " Search through candidates
-  "
-  for l:cand in l:candidates
-    " Avoid infinite recursion (checking the same file repeatedly)
-    if l:cand == l:file | continue | endif
-
-    let l:file_re = '\s*((.*)\/)?' . fnamemodify(l:file, ':t:r')
-
-    let l:filter  = 'v:val =~# ''\v'
-    let l:filter .= '\\%(input|include)\{' . l:file_re
-    let l:filter .= '|\\subimport\{[^\}]*\}\{' . l:file_re
-    let l:filter .= ''''
-
-    if len(filter(readfile(l:cand), l:filter)) > 0
-      return s:get_main_recurse(fnamemodify(l:cand, ':p'))
-    endif
-  endfor
-endfunction
-
-" }}}1
-function! s:file_is_main(file) " {{{1
-  if !filereadable(a:file) | return 0 | endif
-
-  "
-  " Check if a:file is a main file by looking for the \documentclass command,
-  " but ignore \documentclass[...]{subfiles}
-  "
-  let l:lines = readfile(a:file, 0, 50)
-  call filter(l:lines, 'v:val !~# ''{subfiles}''')
-  call filter(l:lines, 'v:val =~# ''\C\\documentclass\_\s*[\[{]''')
-  return len(l:lines) > 0
-endfunction
-
-" }}}1
-function! s:file_reaches_current(file) " {{{1
-  if !filereadable(a:file) | return 0 | endif
-
-  for l:line in readfile(a:file)
-    let l:file = matchstr(l:line,
-          \ '\v\\%(input|include|subimport\{[^\}]*\})\s*\{\zs\f+')
-    if empty(l:file) | continue | endif
-
-    if l:file[0] !=# '/'
-      let l:file = fnamemodify(a:file, ':h') . '/' . l:file
-    endif
-
-    if l:file !~# '\.tex$'
-      let l:file .= '.tex'
-    endif
-
-    if expand('%:p') ==# l:file
-          \ || s:file_reaches_current(l:file)
-      return 1
-    endif
-  endfor
-
-  return 0
-endfunction
-
-" }}}1
-
-function! s:get_log() dict " {{{1
-  return self.ext('log')
-endfunction
-
-" }}}1
-function! s:get_aux() dict " {{{1
-  return self.ext('aux')
-endfunction
-
-" }}}1
-function! s:get_out(...) dict " {{{1
-  return call(self.ext, ['pdf'] + a:000, self)
-endfunction
-
-" }}}1
-function! s:get_ext(ext, ...) dict " {{{1
-  " First check build dir (latexmk -output_directory option)
-  if get(g:, 'vimtex_latexmk_build_dir', '') !=# ''
-    let cand = g:vimtex_latexmk_build_dir . '/' . self.name . '.' . a:ext
-    if g:vimtex_latexmk_build_dir[0] !=# '/'
-      let cand = self.root . '/' . cand
-    endif
-    if a:0 > 0 || filereadable(cand)
-      return fnamemodify(cand, ':p')
-    endif
-  endif
-
-  " Next check for file in project root folder
-  let cand = self.root . '/' . self.name . '.' . a:ext
-  if a:0 > 0 || filereadable(cand)
-    return fnamemodify(cand, ':p')
-  endif
-
-  " Finally return empty string if no entry is found
-  return ''
 endfunction
 
 " }}}1
@@ -764,11 +440,12 @@ function! s:filename_changed_post() " {{{1
           \ "\n  Old filename: ", ['VimtexInfo', s:filename_old],
           \ "\n  New filename: ", ['VimtexInfo', b:vimtex.base]]
 
-    if b:vimtex.pid
+    if has_key(b:vimtex, 'compiler')
+          \ && b:vimtex.compiler.is_running()
       let message += ["\n  latexmk process: ",
             \ ['VimtexInfo', b:vimtex.pid],
             \ ['VimtexWarning', ' killed!']]
-      call vimtex#latexmk#stop()
+      call vimtex#compiler#stop()
     endif
 
     " Update viewer output file names
@@ -781,44 +458,6 @@ function! s:filename_changed_post() " {{{1
 endfunction
 
 " }}}1
-
-function! s:print_dict(dict, ...) " {{{1
-  let level = a:0 > 0 ? a:1 : 0
-
-  for entry in sort(sort(items(a:dict),
-        \ 's:print_dict_sort_2'),
-        \ 's:print_dict_sort_1')
-    let title = repeat(' ', 2 + 2*level) . entry[0]
-    if type(entry[1]) == type([])
-      call vimtex#echo#echo(title . "\n")
-      for val in entry[1]
-        call vimtex#echo#formatted([['None',
-              \ repeat(' ', 4 + 2*level) . string(val) . "\n"]])
-      endfor
-    elseif type(entry[1]) == type({})
-      call vimtex#echo#echo(title . "\n")
-      call s:print_dict(entry[1], level + 1)
-    else
-      call vimtex#echo#formatted([title . ' : ',
-            \ ['None', string(entry[1]) . "\n"]])
-    endif
-  endfor
-endfunction
-
-" }}}1
-function! s:print_dict_sort_1(i1, i2) " {{{1
-  return type(a:i1[1]) - type(a:i2[1])
-endfunction
-
-" }}}1
-function! s:print_dict_sort_2(i1, i2) " {{{1
-  return string(a:i1[1]) == string(a:i2[1]) ? 0
-        \ : string(a:i1[1]) > string(a:i2[1]) ? 1
-        \ : -1
-endfunction
-
-" }}}1
-
 function! s:buffer_left() " {{{1
   let s:vimtex_id = b:vimtex_id
 endfunction
@@ -830,7 +469,7 @@ function! s:buffer_deleted(...) " {{{1
   "
   let l:vimtex_id = a:0 > 0 ? a:1 : get(s:, 'vimtex_id', -1)
   if exists('s:vimtex_id') | unlet s:vimtex_id | endif
-  if !has_key(g:vimtex_data, l:vimtex_id) | return | endif
+  if !vimtex#state#exists(l:vimtex_id) | return | endif
 
   "
   " Count the number of open buffers for the given blob
@@ -844,23 +483,18 @@ function! s:buffer_deleted(...) " {{{1
   " latex project
   "
   if l:count <= 1
-    let l:vimtex = remove(g:vimtex_data, l:vimtex_id)
-
-    if exists('#User#VimtexEventQuit')
-      if exists('b:vimtex')
-        let b:vimtex_tmp = b:vimtex
-      endif
-      let b:vimtex = l:vimtex
-      doautocmd User VimtexEventQuit
-      if exists('b:vimtex_tmp')
-        let b:vimtex = b:vimtex_tmp
-        unlet b:vimtex_tmp
-      else
-        unlet b:vimtex
-      endif
-    endif
+    call vimtex#state#cleanup(l:vimtex_id)
   endif
 endfunction
+
+" }}}1
+
+
+" {{{1 Initialize module
+
+let s:modules = map(
+      \ glob(fnamemodify(expand('<sfile>'), ':r') . '/*.vim', 0, 1),
+      \ 'fnamemodify(v:val, '':t:r'')')
 
 " }}}1
 

@@ -5,20 +5,7 @@
 "
 
 function! vimtex#view#general#new() " {{{1
-  "
-  " Set default options
-  "
-  call vimtex#util#set_default_os_specific('g:vimtex_view_general_viewer',
-        \ {
-        \   'linux' : 'xdg-open',
-        \   'mac'   : 'open',
-        \ })
-  call vimtex#util#set_default('g:vimtex_view_general_options', '@pdf')
-  call vimtex#util#set_default('g:vimtex_view_general_options_latexmk', '')
-
-  "
   " Check if the viewer is executable
-  "
   if !executable(g:vimtex_view_general_viewer)
     call vimtex#echo#warning('viewer "'
           \ . g:vimtex_view_general_viewer . '" is not executable!')
@@ -27,16 +14,12 @@ function! vimtex#view#general#new() " {{{1
     return {}
   endif
 
-  "
   " Start from standard template
-  "
   let l:viewer = vimtex#view#common#apply_common_template(deepcopy(s:general))
 
-  "
   " Add callback hook
-  "
   if exists('g:vimtex_view_general_callback')
-    let l:viewer.latexmk_callback = function(g:vimtex_view_general_callback)
+    let l:viewer.compiler_callback = function(g:vimtex_view_general_callback)
   endif
 
   return l:viewer
@@ -44,11 +27,13 @@ endfunction
 
 " }}}1
 
-let s:general = {}
+let s:general = {
+      \ 'name' : 'General'
+      \}
 
 function! s:general.view(file) dict " {{{1
   if empty(a:file)
-    let outfile = self.out
+    let outfile = self.out()
 
     " Only copy files if they don't exist
     if g:vimtex_view_use_temp_files
@@ -61,18 +46,18 @@ function! s:general.view(file) dict " {{{1
   if vimtex#view#common#not_readable(outfile) | return | endif
 
   " Parse options
-  let opts = g:vimtex_view_general_options
-  let opts = substitute(opts, '@line', line('.'), 'g')
-  let opts = substitute(opts, '@col', col('.'), 'g')
-  let opts = substitute(opts, '@tex',
-        \ vimtex#util#shellescape(expand('%:p')), 'g')
-  let opts = substitute(opts, '@pdf', vimtex#util#shellescape(outfile), 'g')
+  let l:cmd  = g:vimtex_view_general_viewer
+  let l:cmd .= ' ' . g:vimtex_view_general_options
 
-  " Construct the command
-  let exe = {}
-  let exe.cmd = g:vimtex_view_general_viewer . ' ' . opts
-  call vimtex#util#execute(exe)
-  let self.cmd_view = exe.cmd
+  " Substitute magic patterns
+  let l:cmd = substitute(l:cmd, '@line', line('.'), 'g')
+  let l:cmd = substitute(l:cmd, '@col', col('.'), 'g')
+  let l:cmd = substitute(l:cmd, '@tex',
+        \ vimtex#util#shellescape(expand('%:p')), 'g')
+  let l:cmd = substitute(l:cmd, '@pdf', vimtex#util#shellescape(outfile), 'g')
+
+  " Start the view process
+  let self.process = vimtex#process#start(l:cmd)
 
   if has_key(self, 'hook_view')
     call self.hook_view()
@@ -90,7 +75,7 @@ function! s:general.latexmk_append_argument() dict " {{{1
       let l:option .= substitute(g:vimtex_view_general_options_latexmk,
             \                    '@line', line('.'), 'g')
     endif
-    return vimtex#latexmk#add_option('pdf_previewer', l:option)
+    return vimtex#compiler#latexmk#wrap_option('pdf_previewer', l:option)
   endif
 endfunction
 

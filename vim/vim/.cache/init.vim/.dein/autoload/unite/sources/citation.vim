@@ -34,19 +34,21 @@ call unite#util#set_default('g:citation_vim_mode', "zotero")
 call unite#util#set_default('g:citation_vim_zotero_version', 4)
 call unite#util#set_default('g:citation_vim_zotero_path', "~/Zotero")
 call unite#util#set_default('g:citation_vim_zotero_attachment_path', "~/Zotero/library")
+call unite#util#set_default('g:citation_vim_key_title_banned_regex', "\\b(a|an|the|some|from|on|in|to|of|do|with|der|die|das|ein|eine|einer|eines|einem|einen|un|une|la|le|l|el|las|los|al|uno|una|unos|unas|de|des|del|d)\\W")
+call unite#util#set_default('g:citation_vim_key_clean_regex', "[^A-Za-z0-9\!\$\&\*\+\-\.\/\:\;\<\>\?\[\]\^\_\`\|]+")
 call unite#util#set_default('g:citation_vim_et_al_limit', 5)
 call unite#util#set_default('g:citation_vim_collection', "")
 call unite#util#set_default('g:citation_vim_outer_prefix', "[")
 call unite#util#set_default('g:citation_vim_inner_prefix', "@")
 call unite#util#set_default('g:citation_vim_suffix', "]")
-call unite#util#set_default('g:citation_vim_description_format', "{type}∶ {key} ˝{title}˝ ☆{author}☆ ₍{date}₎")
+call unite#util#set_default('g:citation_vim_description_format',  "{}∶ {} ‴{}‴ ₋{}₋ ₍{}₎") 
 call unite#util#set_default('g:citation_vim_description_fields', ["type", "key", "title", "author", "date"])
 call unite#util#set_default('g:citation_vim_key_format', "")
 call unite#util#set_default('g:citation_vim_highlight_dash', "‾⁻−₋‐⋯┄–—―∼┈─▭▬┉━┅₌⁼‗")
 call unite#util#set_default('g:citation_vim_highlight_bar', "‖│┃┆∥┇┊┋")
 call unite#util#set_default('g:citation_vim_highlight_bracket', "⊂〔₍⁽⊃〕₎⁾")
 call unite#util#set_default('g:citation_vim_highlight_arrow', "◀◁<‹▶▷>›")
-call unite#util#set_default('g:citation_vim_source_wrap', "【】")
+call unite#util#set_default('g:citation_vim_source_wrap', "||")
 call unite#util#set_default('g:citation_vim_highlight_colon', "∶∷→⇒≫")
 call unite#util#set_default('g:citation_vim_highlight_blob', "♯♡◆◇◊○◎●◐◑∗∙⊙⊚⌂★☺☻▪■□▢▣▤▥▦▧▨▩")
 call unite#util#set_default('g:citation_vim_highlight_tiny', "、。‸₊⁺∘♢☆☜☞♢☼")
@@ -94,9 +96,11 @@ let s:citation_collection_source = {
 let s:sub_sources = [
 \ "abstract",
 \ "author",
+\ "collection",
 \ "combined",
 \ "date",
 \ "doi",
+\ "duplicate_keys",
 \ "file",
 \ "isbn",
 \ "publication",
@@ -111,7 +115,8 @@ let s:sub_sources = [
 \ "title",
 \ "type",
 \ "url",
-\ "volume"
+\ "volume",
+\ "zotero_key"
 \ ]
 
 "-----------------------------------------------------------------------}}}
@@ -165,8 +170,32 @@ endfunction
 "-----------------------------------------------------------------------}}}
 " {{{ List sources
 function! s:citation_source.gather_candidates(args, context)
+let l:sub_sources = [
+\ "abstract",
+\ "author",
+\ "combined",
+\ "date",
+\ "doi",
+\ "duplicate_keys",
+\ "file",
+\ "isbn",
+\ "publication",
+\ "key",
+\ "key_inner",
+\ "key_raw",
+\ "language",
+\ "issue",
+\ "notes",
+\ "pages",
+\ "publisher",
+\ "tags",
+\ "title",
+\ "type",
+\ "url",
+\ "volume"
+\ ]
     call unite#print_message('[Citation] citation sources')
-    return map(s:sub_sources, '{
+    return map(l:sub_sources, '{
   \   "word"   : v:val,
   \   "source" : s:citation_source.name,
   \   "kind"   : "source",
@@ -241,8 +270,7 @@ function! s:citation_source_key_inner.gather_candidates(args,context)
     \ }')
 endfunction
 
-
-function! s:citation_source_url_gather_candidates(args, context)
+function! s:citation_source_url.gather_candidates(args, context)
     return map(s:get_source('citation', "url", a:args),'{
     \   "word": v:val[1],
     \   "source": "citation/url",
@@ -263,14 +291,14 @@ endfunction
 " {{{ Return source and sub-sources to Unite.
 function! unite#sources#citation#define()
     let l:sources = [s:citation_source, s:citation_collection_source]
-    for sub_source in s:sub_sources
-        let l:sources += [s:citation_source_{sub_source}]
+    for l:sub_source in s:sub_sources
+        let l:sources += [s:citation_source_{l:sub_source}]
     endfor
     return l:sources
 endfunction
 
 "-----------------------------------------------------------------------}}}
-" {{{ Syntax
+" {{{ Syntax Highlighting
 let s:hooks = {}
 function! s:hooks.syntax()
   let arrow = g:citation_vim_highlight_arrow
@@ -287,12 +315,16 @@ function! s:hooks.syntax()
         \ contains=uniteSource__Citation_Field,uniteSource__Citation_Split
         \ ,uniteSource__Citation_Arrow, uniteSource__Citation_Bar,uniteSource__Citation_Bracket
         \ containedin=uniteSource__Citation"
+  syntax match uniteSource__Citation_Key "\<[\S-]\+\d\{4}[\S-]*\>\|\<\S*\d\{4}\S\+\>" contained
+			        \ containedin=uniteSource__Citation
+              \ contains=uniteSource__Citation_Year
+  syntax match uniteSource__Citation_Split "\.\{2}" contained
+			        \ containedin=uniteSource__Citation
+  syntax match uniteSource__Citation_Year "\d\{4}" contained
   execute "syntax region uniteSource__Citation_Source start=/[" . source_field . "]/ end=/[" . source_field . "]/
 	 		        \ containedin=uniteSource__Citation"
   execute 'syntax match uniteSource__Citation_Colon "\<\w*[' . colon . ']"
 			        \ contained containedin=uniteSource__Citation'
-  execute "syntax region uniteSource__Citation_Bracket start=/[" . bracket . "]/ end=/[" . bracket . "]/
-			        \ containedin=uniteSource__Citation"
   execute "syntax region uniteSource__Citation_Arrow start=/[" . arrow . "]/ end=/[" . arrow . "]/
 			        \ containedin=uniteSource__Citation"
   execute "syntax region uniteSource__Citation_Blob start=/[" . blob . "]/ end=/[" . blob . "]/
@@ -303,12 +335,8 @@ function! s:hooks.syntax()
 			        \ containedin=uniteSource__Citation"
   execute "syntax region uniteSource__Citation_Dash start=/[" . dash . "]/ end=/[" . dash . "]/
 			        \ containedin=uniteSource__Citation"
-  syntax match uniteSource__Citation_Key "\<[\S-]\+\d\{4}[\S-]*\>\|\<\S*\d\{4}\S\+\>" contained
-			        \ containedin=uniteSource__Citation
-              \ contains=uniteSource__Citation_Year
-  syntax match uniteSource__Citation_Split "\.\{2}" contained
-			        \ containedin=uniteSource__Citation
-  syntax match uniteSource__Citation_Year "\d\{4}" contained
+  execute "syntax region uniteSource__Citation_Bracket start=/[" . bracket . "]/ end=/[" . bracket . "]/
+			        \ containedin=uniteSource__Citation"
 
   highlight default link uniteSource__Citation_Colon Type
   highlight default link uniteSource__Citation_Text Comment

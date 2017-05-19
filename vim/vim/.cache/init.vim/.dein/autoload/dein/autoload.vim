@@ -4,7 +4,7 @@
 " License: MIT license
 "=============================================================================
 
-function! dein#autoload#_source(...) abort "{{{
+function! dein#autoload#_source(...) abort
   let plugins = empty(a:000) ? values(g:dein#_plugins) :
         \ dein#util#_convert2list(a:1)
   if empty(plugins)
@@ -24,7 +24,7 @@ function! dein#autoload#_source(...) abort "{{{
 
   let sourced = []
   for plugin in filter(plugins,
-        \ "!empty(v:val) && !v:val.sourced && v:val.rtp != ''")
+        \ "!empty(v:val) && !v:val.sourced && v:val.rtp !=# ''")
     if s:source_plugin(rtps, index, plugin, sourced)
       return 1
     endif
@@ -55,6 +55,9 @@ function! dein#autoload#_source(...) abort "{{{
             \ && exists('#'.augroup.'#GUIEnter')
         execute 'doautocmd' augroup 'GUIEnter'
       endif
+      if exists('#'.augroup.'#BufRead')
+        execute 'doautocmd' augroup 'BufRead'
+      endif
     endif
   endfor
 
@@ -67,15 +70,15 @@ function! dein#autoload#_source(...) abort "{{{
 
   if is_reset || filetype_before !=# filetype_after
     " Recall FileType autocmd
-    let &l:filetype = &l:filetype
+    let &filetype = &filetype
   endif
 
   if !has('vim_starting')
     call dein#call_hook('post_source', sourced)
   endif
-endfunction"}}}
+endfunction
 
-function! dein#autoload#_on_default_event(event) abort "{{{
+function! dein#autoload#_on_default_event(event) abort
   let lazy_plugins = dein#util#_get_lazy_plugins()
   let plugins = []
 
@@ -99,8 +102,8 @@ function! dein#autoload#_on_default_event(event) abort "{{{
         \  && has_key(v:val, 'on_if') && eval(v:val.on_if)")
 
   call s:source_events(a:event, plugins)
-endfunction"}}}
-function! dein#autoload#_on_event(event, plugins) abort "{{{
+endfunction
+function! dein#autoload#_on_event(event, plugins) abort
   let lazy_plugins = filter(dein#util#_get_plugins(a:plugins),
         \ '!v:val.sourced')
   if empty(lazy_plugins)
@@ -111,8 +114,8 @@ function! dein#autoload#_on_event(event, plugins) abort "{{{
   let plugins = filter(copy(lazy_plugins),
         \ "!has_key(v:val, 'on_if') || eval(v:val.on_if)")
   call s:source_events(a:event, plugins)
-endfunction"}}}
-function! s:source_events(event, plugins) abort "{{{
+endfunction
+function! s:source_events(event, plugins) abort
   if empty(a:plugins)
     return
   endif
@@ -126,9 +129,9 @@ function! s:source_events(event, plugins) abort "{{{
   else
     execute 'doautocmd <nomodeline>' a:event
   endif
-endfunction"}}}
+endfunction
 
-function! dein#autoload#_on_func(name) abort "{{{
+function! dein#autoload#_on_func(name) abort
   let function_prefix = substitute(a:name, '[^#]*$', '', '')
   if function_prefix =~# '^dein#'
         \ || function_prefix =~# '^vital#'
@@ -139,9 +142,9 @@ function! dein#autoload#_on_func(name) abort "{{{
   call dein#autoload#_source(filter(dein#util#_get_lazy_plugins(),
         \  "stridx(function_prefix, v:val.normalized_name.'#') == 0
         \   || (index(get(v:val, 'on_func', []), a:name) >= 0)"))
-endfunction"}}}
+endfunction
 
-function! dein#autoload#_on_pre_cmd(name) abort "{{{
+function! dein#autoload#_on_pre_cmd(name) abort
   call dein#autoload#_source(
         \ filter(dein#util#_get_lazy_plugins(),
         \ "index(map(copy(get(v:val, 'on_cmd', [])),
@@ -149,9 +152,9 @@ function! dein#autoload#_on_pre_cmd(name) abort "{{{
         \  || stridx(tolower(a:name),
         \            substitute(tolower(v:val.normalized_name),
         \                       '[_-]', '', 'g')) == 0"))
-endfunction"}}}
+endfunction
 
-function! dein#autoload#_on_cmd(command, name, args, bang, line1, line2) abort "{{{
+function! dein#autoload#_on_cmd(command, name, args, bang, line1, line2) abort
   call dein#source(a:name)
 
   if !exists(':' . a:command)
@@ -161,7 +164,7 @@ function! dein#autoload#_on_cmd(command, name, args, bang, line1, line2) abort "
 
   let range = (a:line1 == a:line2) ? '' :
         \ (a:line1 == line("'<") && a:line2 == line("'>")) ?
-        \ "'<,'>" : a:line1.",".a:line2
+        \ "'<,'>" : a:line1.','.a:line2
 
   try
     execute range.a:command.a:bang a:args
@@ -169,9 +172,9 @@ function! dein#autoload#_on_cmd(command, name, args, bang, line1, line2) abort "
     " E481: No range allowed
     execute a:command.a:bang a:args
   endtry
-endfunction"}}}
+endfunction
 
-function! dein#autoload#_on_map(mapping, name, mode) abort "{{{
+function! dein#autoload#_on_map(mapping, name, mode) abort
   let cnt = v:count > 0 ? v:count : ''
 
   let input = s:get_input()
@@ -195,7 +198,7 @@ function! dein#autoload#_on_map(mapping, name, mode) abort "{{{
           \ ':<C-U>\zs.*\ze<CR>')
   else
     let mapping = a:mapping
-    while mapping =~ '<[[:alnum:]_-]\+>'
+    while mapping =~# '<[[:alnum:]_-]\+>'
       let mapping = substitute(mapping, '\c<Leader>',
             \ get(g:, 'mapleader', '\'), 'g')
       let mapping = substitute(mapping, '\c<LocalLeader>',
@@ -208,9 +211,9 @@ function! dein#autoload#_on_map(mapping, name, mode) abort "{{{
   endif
 
   return ''
-endfunction"}}}
+endfunction
 
-function! dein#autoload#_dummy_complete(arglead, cmdline, cursorpos) abort "{{{
+function! dein#autoload#_dummy_complete(arglead, cmdline, cursorpos) abort
   let command = matchstr(a:cmdline, '\h\w*')
   if exists(':'.command)
     " Remove the dummy command.
@@ -226,18 +229,27 @@ function! dein#autoload#_dummy_complete(arglead, cmdline, cursorpos) abort "{{{
   endif
 
   return [a:arglead]
-endfunction"}}}
+endfunction
 
-function! s:source_plugin(rtps, index, plugin, sourced) abort "{{{
-  if a:plugin.sourced
+function! s:source_plugin(rtps, index, plugin, sourced) abort
+  if a:plugin.sourced || index(a:sourced, a:plugin) >= 0
     return
   endif
-  let a:plugin.sourced = 1
+
+  call add(a:sourced, a:plugin)
 
   " Load dependencies
   for name in get(a:plugin, 'depends', [])
     if !has_key(g:dein#_plugins, name)
-      call dein#util#_error(printf('Plugin name "%s" is not found.', name))
+      call dein#util#_error(printf(
+            \ 'Plugin name "%s" is not found.', name))
+      return 1
+    endif
+
+    if !a:plugin.lazy && g:dein#_plugins[name].lazy
+      call dein#util#_error(printf(
+            \ 'Not lazy plugin "%s" depends lazy "%s" plugin.',
+            \ a:plugin.name, name))
       return 1
     endif
 
@@ -245,6 +257,8 @@ function! s:source_plugin(rtps, index, plugin, sourced) abort "{{{
       return 1
     endif
   endfor
+
+  let a:plugin.sourced = 1
 
   for on_source in filter(dein#util#_get_lazy_plugins(),
         \ "index(get(v:val, 'on_source', []), a:plugin.name) >= 0")
@@ -270,13 +284,11 @@ function! s:source_plugin(rtps, index, plugin, sourced) abort "{{{
   if !a:plugin.merged || get(a:plugin, 'local', 0)
     call insert(a:rtps, a:plugin.rtp, a:index)
     if isdirectory(a:plugin.rtp.'/after')
-      call add(a:rtps, a:plugin.rtp.'/after')
+      call dein#util#_add_after(a:rtps, a:plugin.rtp.'/after')
     endif
   endif
-
-  call add(a:sourced, a:plugin)
-endfunction"}}}
-function! s:reset_ftplugin() abort "{{{
+endfunction
+function! s:reset_ftplugin() abort
   let filetype_state = dein#util#_redir('filetype')
 
   if exists('b:did_indent') || exists('b:did_ftplugin')
@@ -290,10 +302,10 @@ function! s:reset_ftplugin() abort "{{{
   if filetype_state =~# 'indent:ON'
     silent! filetype indent on
   endif
-endfunction"}}}
-function! s:get_input() abort "{{{
+endfunction
+function! s:get_input() abort
   let input = ''
-  let termstr = "<M-_>"
+  let termstr = '<M-_>'
 
   call feedkeys(termstr, 'n')
 
@@ -313,10 +325,10 @@ function! s:get_input() abort "{{{
   endwhile
 
   return input
-endfunction"}}}
+endfunction
 
-function! s:is_reset_ftplugin(plugins) abort "{{{
-  if &filetype == ''
+function! s:is_reset_ftplugin(plugins) abort
+  if &filetype ==# ''
     return 0
   endif
 
@@ -328,18 +340,16 @@ function! s:is_reset_ftplugin(plugins) abort "{{{
         \ "filereadable(printf('%s/%s/%s.vim',
         \    plugin.rtp, v:val, &filetype))"))
         \ || isdirectory(ftplugin) || isdirectory(after)
-        \ || glob(ftplugin. '_*.vim') != '' || glob(after . '_*.vim') != ''
+        \ || glob(ftplugin. '_*.vim') !=# '' || glob(after . '_*.vim') !=# ''
       return 1
     endif
   endfor
   return 0
-endfunction"}}}
-function! s:mapargrec(map, mode) abort "{{{
+endfunction
+function! s:mapargrec(map, mode) abort
   let arg = maparg(a:map, a:mode)
-  while maparg(arg, a:mode) != ''
+  while maparg(arg, a:mode) !=# ''
     let arg = maparg(arg, a:mode)
   endwhile
   return arg
-endfunction"}}}
-
-" vim: foldmethod=marker
+endfunction

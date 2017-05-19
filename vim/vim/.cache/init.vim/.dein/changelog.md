@@ -3,6 +3,29 @@ CHANGELOG
 ================================================================================
 This project is using [Semantic Versioning 2.0.0](http://semver.org/)
 
+- v0.9.1
+  - Added `sass` filetype (PR #202) (@toastal)
+  - Fixed NERDTree open/close folder icon bugs (fixes #194)
+  - Fixed airline conflict with file enconding `skip_expected_string` feature (fixes #203)
+  - Fixed possible glyph artifacts on open/close folder glyphs
+- v0.9.0
+  - Added support for [Denite](https://github.com/Shougo/denite.nvim) (PR #191) (@0phoff)
+  - Added symbol for byte order marker (BOM) (utf-8) (PR #199) (@Snaptags)
+  - Added support for `.zshrc`, `.vimrc`, `pp` (Puppet classes extensions), and `Vagrantfile` filetypes (enhancement #200) (@kiyanwang)
+  - Added support for `h`, `hpp`, `hxx` (C/C++ header filetype extensions) (enhancement #190)
+  - Added support for `bash`, `zsh`, `ksh`, `csh`, `awk`, `ps1` (script extensions) (enhancement #196)
+  - Added support for `rmd` (R Markdown) (partially fixes #195)
+  - Fixes opened folders titles padding/spacing offset (fixes #197)
+- v0.8.6
+  - Added support for vimfiler explorer mode (fixes #171)
+  - Added `doc/tags` to `.gitignore` (PR #182) (@doronbehar)
+  - Added warning to readme pertaining to old versions of NERDTree and CtrlP (PR #177, fixes #174) (@Melon-Bread)
+  - Fixes CtrlP buffer names (PR #185) (@HerringtonDarkholme)
+  - Fixes character encoding issue in vim doc (PR #178) (@mhartington)
+  - Fixes extraneous space after glyph in airline (PR #184) (@tbodt)
+  - Fixes errors when NERDTree not present (PR #187) (@blueyed)
+  - Updated Contributor Covenant to `v1.4`
+  - Updated API examples
 - v0.8.5
   - Fixed errors in neovim (E670) (PR #163, fixes #162) (@mhartington)
   - Fixed issue of updating NERDTree window via `CursorHoldUpdate` (PR #166) (@svanharmelen)
