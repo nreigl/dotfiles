@@ -7,12 +7,18 @@
 
 - link:
     ~/.dotfiles: ''
-    ~/.gitconfig: gitconfig
-    ~/.gitignore_global: gitignore_global
+    ~/.gitconfig: git/gitconfig
+    ~/.gitignore_global: git/gitignore_global
     ~/.screenrc: screenrc
-    ~/.tmux.conf: tmux.conf
+    ~/.tmux.conf: tmux/tmux.conf
     # support vim too
-    ~/.vim: vim/vim
-    ~/.vimrc: vim/vim/vimrc
+    # ~/.vim: vim/vim
+    ~/.Brewfile: homebrew/Brewfile
+    ~/.vimrc: vim/vimrc
     ~/.zsh: zsh
-    ~/.zshrc: zshrc
+    ~/.zshrc: zsh/zshrc
+    ~/.config/ranger/rc.conf: ranger/rc.conf
+    ~/.config/ranger/scope.sh: ranger/scope.sh
+    ~/.config/ranger/rifle.conf: ranger/rifle.conf
+    ~/.taskrc: taskr/taskrc
+

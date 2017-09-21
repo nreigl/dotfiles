@@ -1,0 +1,23 @@
+bulkrename 
+nvim
+echo 
+rename 
+rename languages
+w
+rename languages.md
+rename languages.tex
+rename conferences
+re
+rename talks.md
+rename conferences.md
+open_with 
+open_with nvim
+shell  -w it2prof vimnotes
+rename refereeing.tex
+search vimnotes
+search r
+nvim 
+rename presentationnotes.md
+qw
+
+open_with :q

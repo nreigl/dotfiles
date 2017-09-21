@@ -41,11 +41,22 @@ alias ungit="find . -name '.git' -exec rm -rf {} \;"
 
 # alias Dropbox
 alias db="cd ~/Dropbox/"
+
+# alias nvim config
+alias vimconfig="nvim ~/.config/nvim/init.vim"
+
+# alias ranger config
+alias rangerconfig="nvim ~/.config/ranger/rc.conf"
+
+# alias tmux config
+alias tmuxconfig="nvim ~/.tmux.conf"
+
 # quick source
 alias zs="source ~/.zshrc"
+alias aliasconfig="nvim  ~/dotfiles/zsh/aliases.zsh"
 
-alias zshconfig="mate ~/.zshrc"
-alias ohmyzsh="mate ~/.oh-my-zsh"
+alias zshconfig="nvim ~/.zshrc"
+alias ohmyzsh="nvim ~/.oh-my-zsh"
 
 # cd to git root directory
 alias cdgr='cd "$(git root)"'
@@ -214,8 +225,7 @@ alias stata="/usr/bin/stata-mp"
 
 # Julia environments
 alias julia7="/Users/nicolasreigl/github/repos/julia/usr/bin/julia" #  Julia Dev (git)
-alias julia5="/usr/local/opt/julia/bin/julia" #  Julia Stable (homebrew)
-
+alias julia6="/Applications/Julia-0.6.app/Contents/Resources/julia/bin/julia"
 
 # git latex path:
 export PATH=usr/local/Cellar/git/2.10.2/libexec/git-core:$PATH
