@@ -1,15 +1,14 @@
 My Dotfiles
 ========
 
+... optimized for quantitative economic research.
 
-*Really dirty early commit*
-
-Build with [Dotbot](https://git.io/dotbot) for bootstrapping, based on a template from Anish Athalye.
+Build with [Dotbot](https://git.io/dotbot) for bootstrapping. Neovim setup heavily influenced by [Mike Hartington's](https://github.com/mhartington/dotfiles/) and [Keita Nakamura's](https://github.com/KeitaNakamura/dotfiles/blob/master/_vimrc) dotfiles repos.
 
 
-### Work in progress
-- improve zshrc folder structure
-- atom
-- sublime
-- old bash scripts
-- .osx
+*Work in progress*
+ - install script
+ - rework old bashrc
+ - iterm2
+
+
