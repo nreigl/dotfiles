@@ -1,4 +1,4 @@
-    ## Alias ##
+## Alias ##
 ## Use colors in coreutils utilities output
 alias ls='ls -G'
 alias grep='grep --color'
@@ -85,70 +85,70 @@ alias uprstudio="~/.zsh/plugins/ac3934e08d2961285bef/install-rstudio-daily.sh"
 ## Functions ##
 # Update dotfiles
 function dfu() {
-    (
-        cd ~/.dotfiles && git pull --ff-only && ./install -q
-    )
+  (
+  cd ~/.dotfiles && git pull --ff-only && ./install -q
+  )
 }
 
 # Use pip without requiring virtualenv
 function syspip() {
-    PIP_REQUIRE_VIRTUALENV="" pip "$@"
+  PIP_REQUIRE_VIRTUALENV="" pip "$@"
 }
 
 function syspip3() {
-    PIP_REQUIRE_VIRTUALENV="" pip3 "$@@"
+  PIP_REQUIRE_VIRTUALENV="" pip3 "$@@"
 }
 
 
 # Create a directory and cd into it
 function mcd() {
 
-    mkdir "${1}" && cd "${1}"
+  mkdir "${1}" && cd "${1}"
 }
 
 # Jump to directory containing file
 function jump() {
-    cd "$(dirname ${1})"
+  cd "$(dirname ${1})"
 }
 
 # Go up [n] directories
 function up()
 {
-    local cdir="$(pwd)"
-    if [[ "${1}" == "" ]]; then
-        cdir="$(dirname "${cdir}")"
-    elif ! [[ "${1}" =~ ^[0-9]+$ ]]; then
-        echo "Error: argument must be a number"
-    elif ! [[ "${1}" -gt "0" ]]; then
-        echo "Error: argument must be positive"
-    else
-        for i in {1..${1}}; do
-            local ncdir="$(dirname "${cdir}")"
-            if [[ "${cdir}" == "${ncdir}" ]]; then
-                break
-            else
-                cdir="${ncdir}"
-            fi
-        done
-    fi
-    cd "${cdir}"
+  local cdir="$(pwd)"
+  if [[ "${1}" == "" ]]; then
+    cdir="$(dirname "${cdir}")"
+  elif ! [[ "${1}" =~ ^[0-9]+$ ]]; then
+    echo "Error: argument must be a number"
+  elif ! [[ "${1}" -gt "0" ]]; then
+    echo "Error: argument must be positive"
+  else
+    for i in {1..${1}}; do
+      local ncdir="$(dirname "${cdir}")"
+      if [[ "${cdir}" == "${ncdir}" ]]; then
+        break
+      else
+        cdir="${ncdir}"
+      fi
+    done
+  fi
+  cd "${cdir}"
 }
 
 # Execute a command in a specific directory
 function in() {
-    (
-        cd ${1} && shift && ${@}
-    )
+  (
+  cd ${1} && shift && ${@}
+  )
 }
 
 # Check if a file contains non-ascii characters
 function nonascii() {
-    LC_ALL=C grep -n '[^[:print:][:space:]]' ${1}
+  LC_ALL=C grep -n '[^[:print:][:space:]]' ${1}
 }
 
 # Fetch pull request
 function fpr() {
-    git fetch "git@github.com:${2}/${1}" "${3}:${2}/${3}"
+  git fetch "git@github.com:${2}/${1}" "${3}:${2}/${3}"
 }
 
 # Change iterm2 profile. Usage it2prof ProfileName (case sensitive)
@@ -156,17 +156,6 @@ it2prof() { echo -e "\033]50;SetProfile=$1\a" }
 
 # Open in PathFinder from the Terminal
 pf () { open -a "Path Finder.app" $1; }
-
-
-google() {
-    search=""
-    echo "Googling: $@"
-    for term in $@; do
-        search="$search%20$term"
-    done
-    xdg-open "http://www.google.com/search?q=$search"
-}
-
 
 # Most recent modified file
 alias latest='\ls -t | head -n 1'
@@ -203,15 +192,98 @@ alias ytdl='youtube-dl --prefer-ffmpeg -o "%(title)s.%(ext)s"'
 # R
 findinRfun() {
 
-if [ -z "$1" ]
- then
+  if [ -z "$1" ]
+  then
     echo "No argument supplied"
- else
+  else
     #search text is passed as argument $1
     find . -type f \( -name "*.R" -o -name "*.Rmd" -o -name "*.r" -o -name "*.rmd" \) -print0 | xargs --null grep --with-filename --line-number --no-messages --color --ignore-case "$1"
-fi
-            }
+  fi
+}
 alias findinR=findinRfun
+
+
+
+# fzf (https://github.com/junegunn/fzf)
+# --------------------------------------------------------------------
+# fe [FUZZY PATTERN] - Open the selected file with the default editor
+#   - Bypass fuzzy finder if there's only one match (--select-1)
+#   - Exit if there's no match (--exit-0)
+fe() {
+  local files
+  IFS=$'\n' files=($(fzf-tmux --query="$1" --multi --select-1 --exit-0))
+  [[ -n "$files" ]] && ${EDITOR:-vim} "${files[@]}"
+}
+
+# Modified version where you can press
+#   - CTRL-O to open with `open` command,
+#   - CTRL-E or Enter key to open with the $EDITOR
+fo() {
+  local out file key
+  IFS=$'\n' out=($(fzf-tmux --query="$1" --exit-0 --expect=ctrl-o,ctrl-e))
+  key=$(head -1 <<< "$out")
+  file=$(head -2 <<< "$out" | tail -1)
+  if [ -n "$file" ]; then
+    [ "$key" = ctrl-o ] && open "$file" || ${EDITOR:-vim} "$file"
+  fi
+}
+
+# fuzzy grep open via ag
+vg() {
+  local file
+
+  file="$(ag --nobreak --noheading $@ | fzf -0 -1 | awk -F: '{print $1 " +" $2}')"
+
+  if [[ -n $file ]]
+  then
+    vim $file
+  fi
+}
+# fd - cd to selected directory
+fd() {
+  local dir
+  dir=$(find ${1:-.} -path '*/\.*' -prune \
+    -o -type d -print 2> /dev/null | fzf +m) &&
+    cd "$dir"
+}
+
+
+
+# fda - including hidden directories
+fda() {
+  local dir
+  dir=$(find ${1:-.} -type d 2> /dev/null | fzf +m) && cd "$dir"
+}
+
+# cdf() {nto the directory of the selected file
+cdf() {
+  local file
+  local dir
+  file=$(fzf +m -q "$1") && dir=$(dirname "$file") && cd "$dir"
+}
+
+
+# tm - create new tmux session, or switch to existing one. Works from within tmux too. (@bag-man)
+# # `tm` will allow you to select your tmux session via fzf.
+# # `tm irc` will attach to the irc session (if it exists), else it will create it.
+tm() {
+  [[ -n "$TMUX" ]] && change="switch-client" || change="attach-session"
+  if [ $1 ]; then
+    tmux $change -t "$1" 2>/dev/null || (tmux new-session -d -s $1 && tmux $change -t "$1"); return
+  fi
+  session=$(tmux list-sessions -F "#{session_name}" 2>/dev/null | fzf --exit-0) &&  tmux $change -t "$session" || echo "No sessions found."
+}
+
+
+# fs [FUZZY PATTERN] - Select selected tmux session
+# #   - Bypass fuzzy finder if there's only one match (--select-1)
+# #   - Exit if there's no match (--exit-0)
+fs() {
+  local session
+  session=$(tmux list-sessions -F "#{session_name}" | \
+    fzf --query="$1" --select-1 --exit-0) &&
+    tmux switch-client -t "$session"
+}
 
 
 ## Export path directions ##

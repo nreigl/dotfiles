@@ -1034,32 +1034,26 @@ let g:pandoc#biblio#bibs = ['/Users/nicolasreigl/Documents/zotero_bib/zotero_lib
 " vimtex {{{
 let g:vimtex_fold_enabled = 1
 let g:vimtex_fold_manual = 1 " improve performance
-let g:vimtex_latexmk_options = '-pdfdvi'
 let g:vimtex_quickfix_mode = 0
 let g:vimtex_indent_enabled = 0
-let g:vimtex_view_general_viewer = 'displayline'
-let g:vimtex_view_general_options = '@line @pdf @tex'
- let g:vimtex_compiler_latexmk = {
- \ 'background' : 1,
- \ 'build_dir' : '',
- \ 'callback' : 1,
- \ 'continuous' : 1,
- \ 'options' : [
- \   '-pdfdvi',
- \   '-verbose',
- \   '-file-line-error',
- \   '-synctex=1',
- \   '-interaction=nonstopmode',
- \ ],
- \}
+"let g:vimtex_view_general_viewer = 'displayline'
+"let g:vimtex_view_general_options = '@line @pdf @tex'
+" let g:vimtex_compiler_latexmk = {
+ "\ 'background' : 1,
+ "\ 'build_dir' : '',
+ "\ 'callback' : 1,
+ "\ 'continuous' : 1,
+ "\ 'options' : [
+ "\   '-pdfdvi',
+ "\   '-verbose',
+ "\   '-file-line-error',
+ "\   '-synctex=1',
+ "\   '-interaction=nonstopmode',
+ "\ ],
+ "\}
 
- " if has('nvim')
-" let g:vimtex_latexmk_progname = 'nvr' " for neovim
-" " Setting of Skim should be following:
-" " Preset: Custom
-" " Command: nvr
-" " Arguments: -c "%line" "%file"
-" endif
+let g:vimtex_view_method = 'general'
+
 "}}}
 
 " Silver surfer - ack --------------------------------------{{{
@@ -1182,3 +1176,6 @@ let g:bullets_enabled_file_types = [
 " vim-Matlab {{{
 let g:matlab_server_launcher = 'tmux' "launch the server in a tmux split
 " }}}
+
+
+
