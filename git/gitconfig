@@ -125,7 +125,7 @@
 	default = upstream
 
 [credential]
-	helper = cache --timeout=3600
+	helper = osxkeychain
 
 [grep]
 	lineNumber = true
@@ -135,7 +135,8 @@
 
 [core]
 	excludesfile = ~/.gitignore_global
-  editor = "nvim"
+	editor = atom-beta --wait
+	autocrlf = input
 
 # Allow local customizations in the .gitconfig_local file
 [include]

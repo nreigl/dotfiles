@@ -6,7 +6,6 @@
 " External: Karabiner Key repeat
 " delay until repeat 400 ms
 
-
 " Setup dein  ---------------------------------------------------------------{{{
 if (!isdirectory(expand("$HOME/.config/nvim/repos/github.com/Shougo/dein.vim")))
   call system(expand("mkdir -p $HOME/.config/nvim/repos/github.com"))
@@ -140,19 +139,37 @@ call dein#add('farseer90718/vim-taskwarrior')
 call dein#add('majutsushi/tagbar')
 call dein#add('suan/vim-instant-markdown', {'on_ft': 'markdown'})
 call dein#add('dkarter/bullets.vim')
+call dein#add('chrisbra/unicode.vim', { 'on': ['<plug>(UnicodeComplete)', '<plug>(UnicodeGA)', 'UnicodeTable'] })
+call dein#add('wellle/tmux-complete.vim')
+call dein#add('mhinz/vim-startify')
+"call dein#add('sheerun/vim-polyglot')
+call dein#add('mileszs/ack.vim')
+call dein#add('yuratomo/w3m.vim')
+" call dein#add('w0rp/ale')
+call dein#add('mbbill/undotree')
+
+" Colors
+call dein#add('KeitaNakamura/neodark.vim')
+call dein#add('joshdick/onedark.vim')
+call dein#add('mhartington/oceanic-next')
+call dein#add('morhetz/gruvbox')
+call dein#add('icymind/NeoSolarized')
+call dein#add('rakr/vim-one')
+call dein#add('lifepillar/vim-solarized8')
+call dein#add('junegunn/seoul256.vim')
 " Latex
 call dein#add('lervag/vimtex',{'for': 'tex'})
 call dein#add('jreybert/vimagit')
 call dein#add('rafaqz/citation.vim')
-call dein#add('xuhdev/vim-latex-live-preview')
+" call dein#add('xuhdev/vim-latex-live-preview')
 call dein#add('reedes/vim-pencil')
 call dein#add('dpelle/vim-LanguageTool')
 call dein#add('ron89/thesaurus_query.vim')
 call dein#add('reedes/vim-lexical')
 call dein#add('reedes/vim-wordy')
-call dein#add('junegunn/seoul256.vim')
-call dein#add('mileszs/ack.vim')
-call dein#add('yuratomo/w3m.vim')
+call dein#local('~/github/forks', {},['vim-wordy'])
+call dein#add('rhysd/vim-grammarous')
+
 " VimLab for Matlab support
 call dein#add('lazywei/vim-matlab')
 call dein#add('daeyun/vim-matlab')
@@ -195,13 +212,28 @@ call dein#end()
 filetype plugin indent on
 " delete plugins that are commented out
 call map(dein#check_clean(), "delete(v:val, 'rf')")
+
 " }}}
 
 " System Settings  ----------------------------------------------------------{{{
 set encoding=utf-8
 " source ~/.local.vim
+"Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
 " Neovim Settings
-set termguicolors
+"If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
+"(see < http://sunaku.github.io/tmux-24bit-color.html#usage > for more information.)
+if (empty($TMUX))
+  if (has("nvim"))
+    "For Neovim 0.1.3 and 0.1.4 < https://github.com/neovim/neovim/pull/2198 >
+    let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+  endif
+  "For Neovim > 0.1.5 and Vim > patch 7.4.1799 < https://github.com/vim/vim/commit/61be73bb0f965a895bfb064ea3e55476ac175162 >
+  "Based on Vim patch 7.4.1770 (`guicolors` option) < https://github.com/vim/vim/commit/8a633e3427b47286869aa4b96f2bfc1fe65b25cd >
+  " < https://github.com/neovim/neovim/wiki/Following-HEAD#20160511 >
+  if (has("termguicolors"))
+    set termguicolors
+  endif
+endif
 let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
 set clipboard+=unnamedplus
 set pastetoggle=<f6>
@@ -241,7 +273,8 @@ set inccommand=nosplit
 set shortmess=atIc
 set isfname-==
 set spell
-
+" speed up
+set lazyredraw
 " }}}
 
 " System mappings  ----------------------------------------------------------{{{
@@ -250,7 +283,7 @@ set spell
 nnoremap Q <nop>
 vnoremap // y/<C-R>"<CR>
 " recording macros is not my thing
-map q <Nop>
+"  map q <Nop>
 " exit insert, dd line, enter insert
 inoremap <c-d> <esc>ddi
 " Navigate between display lines
@@ -342,9 +375,22 @@ command! -range=% HighlightRepeats <line1>,<line2>call HighlightRepeats()
 "}}}"
 
 " Themes, Commands, etc  ----------------------------------------------------{{{
-syntax on
-colorscheme OceanicNext
-let g:OceanicNext_italic = 1
+syntax enable
+let g:neodark#background='#202020'
+let g:neodark#use_custom_terminal_theme=1
+" let g:neodark#use_256color=1
+colorscheme neodark
+
+"syntax on
+  "let g:oceanic_next_terminal_bold = 1
+  "let g:oceanic_next_terminal_italic = 1
+  "colorscheme OceanicNext
+
+
+"colorscheme one
+"set background=dark " for the dark version
+"let g:one_allow_italics = 1 " I love italic for comments
+
 
 "}}}
 
@@ -600,9 +646,15 @@ autocmd TermOpen * set bufhidden=hide
 
 " Vim-Devicons -------------------------------------------------------------0{{{
 
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols = {} " needed
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['js'] = ''
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['vim'] = ''
+set guifont=Droid\ Sans\ Mono\ for\ Powerline\ Plus\ Nerd\ File\ Types:h11
+let g:Powerline_symbols = 'fancy'
+set encoding=utf-8
+set t_Co=256
+set fillchars+=stl:\ ,stlnc:\
+set termencoding=utf-8
+"let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols = {} " needed
+"let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['js'] = ''
+"let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['vim'] = ''
 
 " }}}
 
@@ -637,6 +689,7 @@ smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
 " enable deoplete
 let g:deoplete#enable_at_startup = 1
 let g:echodoc_enable_at_startup=1
+let g:deoplete#auto_complete_delay = 25
 set splitbelow
 set completeopt+=noselect
 set completeopt-=preview
@@ -895,7 +948,7 @@ let g:airline_powerline_fonts = 1
 let g:airline#extensions#neomake#error_symbol='• '
 let g:airline#extensions#neomake#warning_symbol='•  '
 let g:airline_symbols.branch = ''
-let g:airline_theme='oceanicnext'
+" let g:airline_theme='oceanicnext'
 cnoreabbrev <silent> <expr> x getcmdtype() == ":" && getcmdline() == 'x' ? 'Sayonara' : 'x'
 tmap <leader>x <c-\><c-n>:bp! <BAR> bd! #<CR>
 nmap <leader>t :term<cr>
@@ -997,6 +1050,41 @@ let g:instant_markdown_autostart = 0
 
 "}}}
 
+" polylgot {{{
+"
+" let g:polyglot_disabled = ['latex']
+
+"}}}
+
+" vimtex {{{
+""set up default pdf viewer
+let g:vimtex_quickfix_open_on_warning = 0
+let g:vimtex_index_split_pos = 'below'
+let g:vimtex_fold_enabled = 1
+let g:vimtex_toc_fold = 1
+let g:vimtex_toc_hotkeys = {'enabled' : 1}
+let g:vimtex_format_enabled = 1
+
+let g:tex_flavor='latex'
+let g:vimtex_quickfix_latexlog = {
+            \ 'font' : 0,
+            \ 'overfull' : 0,
+            \ 'underfull' : 0,
+            \ 'packages' : {
+            \   'default' : 0,
+            \ },
+            \ }
+let g:vimtex_compiler_progname = 'nvr'
+let g:vimtex_view_method = 'skim'
+let g:vimtex_view_automatic = 1
+
+"setup requires syncsetting in skim:
+"Present: Custom
+"Command: nvr
+"Arguments: +"%line" "%file"
+
+"}}}
+
 " Vimwiki --- {{{
 
 let wiki_1 = {}
@@ -1022,39 +1110,14 @@ let g:pandoc#filetypes#handled = ["pandoc", "markdown"]
 let g:pandoc#filetypes#pandoc_markdown = 1
 let g:pandoc#syntax#conceal#use = 0
 let g:pandoc#folding#fdc = 0
-let g:pandoc#biblio#bibs = ['/Users/nicolasreigl/Documents/zotero_bib/zotero_library.bib']
-" let g:pandoc#completion#bib#mode = 'citeproc'
+let g:pandoc#biblio#bibs = ['/Users/nicolasreigl/Documents/zotero_bib/zotero_betterbiblatex.bib']
+let g:pandoc#completion#bib#mode = 'citeproc'
 "}}}
 
 " vim-pandoc-after {{{
 " let g:pandoc#after#modules#enabled = ['neosnippet', 'ultisnips']
 
 " }}}
-
-" vimtex {{{
-let g:vimtex_fold_enabled = 1
-let g:vimtex_fold_manual = 1 " improve performance
-let g:vimtex_quickfix_mode = 0
-let g:vimtex_indent_enabled = 0
-"let g:vimtex_view_general_viewer = 'displayline'
-"let g:vimtex_view_general_options = '@line @pdf @tex'
-" let g:vimtex_compiler_latexmk = {
- "\ 'background' : 1,
- "\ 'build_dir' : '',
- "\ 'callback' : 1,
- "\ 'continuous' : 1,
- "\ 'options' : [
- "\   '-pdfdvi',
- "\   '-verbose',
- "\   '-file-line-error',
- "\   '-synctex=1',
- "\   '-interaction=nonstopmode',
- "\ ],
- "\}
-
-let g:vimtex_view_method = 'general'
-
-"}}}
 
 " Silver surfer - ack --------------------------------------{{{
 let g:ackprg = 'ag --nogroup --nocolor --column'
@@ -1177,5 +1240,28 @@ let g:bullets_enabled_file_types = [
 let g:matlab_server_launcher = 'tmux' "launch the server in a tmux split
 " }}}
 
+" vim-Rice {{{
+let g:R_app = "rice"
+let g:R_cmd = "R"
+let g:R_hl_term = 0
+" }}}
 
+" Citation -------------------------------------------------------------------{{{
+let g:citation_vim_bibtex_file="/Users/nicolasreigl/Documents/zotero_bib/zotero_bibtex.bib"
+let g:citation_vim_mode="bibtex"
+let g:citation_vim_mode="zotero"
+let g:citation_vim_zotero_path="/Users/nicolasreigl/Zotero"
+let g:citation_vim_key_format="{author}{date}{title}"
+let g:citation_vim_zotero_version=5
+"}}}
 
+" Wordy -------------------------------------------------------------------{{{
+
+"}}}
+
+" Undotree -------------------------------------------------------------------{{{
+if has("persistent_undo")
+    set undodir=~/.undodir/
+    set undofile
+endif
+"}}}

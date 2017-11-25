@@ -20,5 +20,6 @@
     ~/.config/ranger/rc.conf: ranger/rc.conf
     ~/.config/ranger/scope.sh: ranger/scope.sh
     ~/.config/ranger/rifle.conf: ranger/rifle.conf
+    ~/.config/zathura/zathurarc: zathura/zathurarc
     ~/.taskrc: taskr/taskrc
 

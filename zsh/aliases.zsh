@@ -32,7 +32,10 @@ alias cp='cp -i'
 alias mv='mv -i'
 
 # Aliases to use Neovim instead of vim
-# alias vim="nvim"
+alias vim="nvim"
+
+# Hub: Add sugar to git completions
+eval "$(hub alias -s)"
 
 # git related aliases
 alias gag='git exec ag'
@@ -72,6 +75,9 @@ alias cpwd='pwd|tr -d "\n"|pbcopy'
 
 # Get your current public IP
 alias ip="curl icanhazip.com"
+
+# Rice
+alias r="rice"
 
 # Git pull over all subdirectories
 alias uprepos="ls | xargs -P10 -I{} git -C {} pull"
@@ -157,6 +163,11 @@ it2prof() { echo -e "\033]50;SetProfile=$1\a" }
 # Open in PathFinder from the Terminal
 pf () { open -a "Path Finder.app" $1; }
 
+# Url to pdf api
+function urldpf(){
+  curl -o google.pdf https://url-to-pdf-api.herokuapp.com/api/render?url="$1"
+}
+
 # Most recent modified file
 alias latest='\ls -t | head -n 1'
 # nth most recent modified file
@@ -202,6 +213,14 @@ findinRfun() {
 }
 alias findinR=findinRfun
 
+# Tmux {{{1
+tm() {
+    if (( $# )); then
+        tmux has-session -t "$*" && tmux attach -t "$*" || tmux new-session -s "$*"
+    else
+        tmux attach || tmux new-session -s default
+    fi
+}
 
 
 # fzf (https://github.com/junegunn/fzf)
@@ -219,8 +238,8 @@ fe() {
 #   - CTRL-O to open with `open` command,
 #   - CTRL-E or Enter key to open with the $EDITOR
 fo() {
-  local out file key
   IFS=$'\n' out=($(fzf-tmux --query="$1" --exit-0 --expect=ctrl-o,ctrl-e))
+  local out file key
   key=$(head -1 <<< "$out")
   file=$(head -2 <<< "$out" | tail -1)
   if [ -n "$file" ]; then
