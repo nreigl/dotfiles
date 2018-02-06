@@ -54,6 +54,9 @@ alias rangerconfig="nvim ~/.config/ranger/rc.conf"
 # alias tmux config
 alias tmuxconfig="nvim ~/.tmux.conf"
 
+# alias tmuxinator
+alias mux="tmuxinator"
+
 # quick source
 alias zs="source ~/.zshrc"
 alias aliasconfig="nvim  ~/dotfiles/zsh/aliases.zsh"

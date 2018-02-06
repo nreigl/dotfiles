@@ -76,6 +76,20 @@ ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=white'
 autoload -Uz compinit && compinit
 fpath=(~/.zsh/completions $fpath)
 
+# Golang
+export GOPATH=$HOME/golang
+export GOROOT=/usr/local/opt/go/libexec
+export GOBIN=$GOPATH/bin
+export PATH=$PATH:$GOPATH
+export PATH=$PATH:$GOROOT/bin
+
+# direnv
+eval "$(direnv hook zsh)"
+# pyenv-virtualenv
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+
+
 
 # Uncomment this to disable bi-weekly auto-update checks
 DISABLE_AUTO_UPDATE="true"
@@ -137,5 +151,9 @@ fi
 
 # for zsh completions
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# ruby environment
+eval "$(rbenv init -)"
+
 
 export EDITOR=nvim
