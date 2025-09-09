@@ -70,7 +70,7 @@ alias changelog="git log --pretty=format:"%h %ad%x09%an%x09%s" --date=short"
 # push
 alias gp="git push"
 alias gpu="git push -u origin"
-alias undopush="git push -f origin HEAD^:master"
+alias undopush="git push -f origin HEAD^:main"
 
 # rebase
 alias gre="git rebase"
@@ -91,7 +91,12 @@ alias gbi="git browse -- issues"
 alias gpr="git pull-request"
 
 # better ls
-alias ls="echo; colorls -A --group-directories-first"
+# Modern CLI replacements
+alias ls="eza --icons --group-directories-first"
+alias ll="eza -la --icons --group-directories-first"
+alias la="eza -a --icons --group-directories-first"
+alias lt="eza --tree --level=2 --icons"
+alias l="eza -l --icons --group-directories-first"
 
 ###
 # coreutils
@@ -149,14 +154,16 @@ alias printf="gprintf"
 alias tee="gtee"
 
 # the rest
-alias awk="gawk"
-alias grep="ggrep --color"
+# GNU tools (optional - macOS versions work fine for most uses)
+# Uncomment if you specifically need GNU versions
+# alias awk="gawk"
+alias grep="rg"
 
-alias ln="gln"
-alias ln-sym="gln -nsf" # symlinks
+# alias ln="gln"  # Commented - macOS ln works fine
+alias ln-sym="ln -nsf" # symlinks
 
 # findutils
-alias find="gfind"
+alias find="fd"
 alias locate="glocate"
 alias updatedb="gupdatedb"
 alias xargs="gxargs"
@@ -185,7 +192,7 @@ alias sed="gsed"
 # which
 alias which="gwhich"
 
-# npm
+# npm/pnpm/yarn aliases
 alias nin="npm init"
 alias ni="npm i"
 alias nig="npm i -g"
@@ -207,6 +214,12 @@ alias nlsg="npm list -g"
 alias ncc="npm cache clean"
 alias nf="npm cache clean && rm -rf node_modules && npm i"
 
+# Modern shortcuts
+alias tf="terraform"
+alias k="kubectl"
+alias d="docker"
+alias dc="docker-compose"
+
 # shortcuts
 alias md="mkdir"
 alias t="touch"
@@ -225,10 +238,12 @@ alias vi="vim"
 alias reload="source ~/.zshrc"
 
 # use ccat
-alias cat="ccat"
+alias cat="bat"
 
-# python
-alias pip="pip3"
+# python - using UV now
+alias pip="uv pip"
+alias python="python3"
+alias py="python3"
 
 # make a pdf
 alias mergepdf="/System/Library/Automator/Combine\ PDF\ Pages.action/Contents/Resources/join.py"
@@ -290,7 +305,7 @@ create-repo() {
     git commit -m "initial commit" 1>/dev/null
     print_success "initial commit"
     git remote add origin https://github.com/gretzky/$REPONAME.git 1>/dev/null
-    git push -u origin master --force 1>/dev/null
+    git push -u origin main --force 1>/dev/null
 
     sleep 0.5
     print_success "\nRepo created"
