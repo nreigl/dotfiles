@@ -52,17 +52,21 @@ fi
 source "${ZINIT_HOME}/zinit.zsh"
 
 # === Fast Plugin Loading ===
-# Load essential plugins with turbo mode
-zinit wait lucid light-mode for \
-  atinit"zicompinit; zicdreplay" \
-    zdharma-continuum/fast-syntax-highlighting \
-  atload"_zsh_autosuggest_start" \
-    zsh-users/zsh-autosuggestions \
-  blockf atpull'zinit creinstall -q .' \
-    zsh-users/zsh-completions
+# Load essential plugins first (without wait to avoid widget issues)
+zinit light zsh-users/zsh-autosuggestions
+zinit light zsh-users/zsh-completions
+zinit light zsh-users/zsh-history-substring-search
 
-# Additional useful plugins
+# Load syntax highlighting after other plugins
+zinit light zdharma-continuum/fast-syntax-highlighting
+
+# Set key bindings for history-substring-search
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
+
+# Additional useful plugins (loaded async)
 zinit wait lucid for \
+  OMZL::git.zsh \
   OMZP::git \
   OMZP::sudo \
   OMZP::command-not-found
@@ -132,8 +136,7 @@ setopt NOTIFY               # Report status of background jobs immediately
 
 # === Key Bindings ===
 bindkey -e  # Emacs key bindings
-bindkey '^[[A' history-substring-search-up
-bindkey '^[[B' history-substring-search-down
+# These bindings are set after the plugin loads (see below)
 bindkey '^[[3~' delete-char
 bindkey '^[[H' beginning-of-line
 bindkey '^[[F' end-of-line
