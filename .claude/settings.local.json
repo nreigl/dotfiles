@@ -35,7 +35,11 @@
       "Bash(time zsh:*)",
       "Bash(git push:*)",
       "Bash(./scripts/stow-all.sh:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(brew bundle dump:*)",
+      "Bash(rm:*)",
+      "Bash(pgrep:*)",
+      "Bash(jq:*)"
     ],
     "deny": [],
     "ask": []

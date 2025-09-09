@@ -1,69 +1,209 @@
-# dotfiles
+# Modern Dotfiles
 
-Dotfiles for my M1 Macbook Pro 18,1 running macOS Monterey 12.0.1.
+My personal dotfiles for macOS with state-of-the-art tooling and performance optimizations.
 
-![zsh with starship prompt and colorls](https://user-images.githubusercontent.com/15176096/71632895-ff0d0980-2bde-11ea-966f-65e5d564361f.png)
-![vim and tmux](https://user-images.githubusercontent.com/15176096/71633424-2f09dc00-2be2-11ea-9c15-a4f492b7ea68.png)
+![Terminal Setup](https://user-images.githubusercontent.com/15176096/71632895-ff0d0980-2bde-11ea-966f-65e5d564361f.png)
 
--   Terminal: [Alacritty](https://github.com/jwilm/alacritty) using zsh w/ [starship prompt](https://starship.rs/) and [color-ls](https://github.com/athityakumar/colorls)
--   Window management: [yabai](https://github.com/koekeishiya/yabai)
--   Hotkeys: [skhd](https://github.com/koekeishiya/skhd)
--   Vim: [neovim](https://neovim.io/) with [vim-plug](https://github.com/junegunn/vim-plug) to manage plugins
--   Tools: [tmux](https://github.com/tmux/tmux), [z](https://github.com/rupa/z), [fzf](https://github.com/junegunn/fzf)
+## 🚀 Stack
 
-## Installation
+### Core Tools
+- **Terminal**: [WezTerm](https://wezfurlong.org/wezterm/) / [Alacritty](https://alacritty.org/)
+- **Shell**: ZSH with [Zinit](https://github.com/zdharma-continuum/zinit) plugin manager
+- **Prompt**: [Starship](https://starship.rs/) - blazing fast, customizable prompt
+- **Editor**: [Neovim](https://neovim.io/) with [LazyVim](https://www.lazyvim.org/) distribution
 
-**Before you get started** make sure you give full disk access permission to your terminal (for writing macos defaults). `System Preferences -> Privacy -> Full Disk Access`.
+### Modern CLI Replacements
+- `eza` - Better `ls` (with icons and git status)
+- `bat` - Better `cat` (with syntax highlighting)
+- `fd` - Better `find` (faster and user-friendly)
+- `rg` (ripgrep) - Better `grep` (blazingly fast)
+- `zoxide` - Smart `cd` (learns your habits)
+- `delta` - Better `git diff` (side-by-side diffs)
 
-To install:
+### Development
+- **Python**: [UV](https://docs.astral.sh/uv/) - Ultra-fast Python package manager (replaces pip, pipx, poetry, pyenv)
+- **Julia**: [Juliaup](https://github.com/JuliaLang/juliaup) - Official Julia version manager
+- **Version Management**: [mise](https://mise.jdx.dev/) - For Node.js, Ruby, Go, etc.
+- **Formatting**: [Ruff](https://docs.astral.sh/ruff/) - Lightning-fast Python linter/formatter
 
-`curl -L https://git.io/JeA7g | sh`
+### Window Management (Optional)
+- **WM**: [yabai](https://github.com/koekeishiya/yabai) - Tiling window manager
+- **Hotkeys**: [skhd](https://github.com/koekeishiya/skhd) - Simple hotkey daemon
 
-This expands to [run.sh](https://github.com/gretzky/dotfiles/blob/master/run.sh) which will fetch this repo and run the install script.
+## 📦 Installation
 
-## File overview
+### Prerequisites
 
--   Configs for the following tools:
-    -   git
-    -   [Alacritty](./alacritty)
-    -   [colorls](./colorls)
-    -   [fzf](./fzf)
-    -   [neovim](./nvim)
-    -   [skhd](./skhd)
-    -   [starship](./starship)
-    -   [tmux](./tmux)
-    -   [VSCode](./vscode)
-    -   [yabai](./yabai)
-    -   [z](./z)
--   Shell environment configs:
-    -   [Antigen](https://github.com/zsh-users/antigen) for zsh plugin management
-    -   [`.zshrc`](./zsh/.zshrc)
-    -   [`.zlogin.sh`](./zsh/.zlogin.sh)
-    -   [`.zshenv.sh`](./zsh/.zshenv.sh)
-    -   [`.aliases`](./zsh/.aliases)
-    -   [`.exports`](./zsh/.exports)
--   [`Brewfile`](./Brewfile) - contains all homebrew packages, casks, and mac appstore apps
--   [VSCode settings](./vscode/settings.json)
+1. **macOS** (tested on Apple Silicon)
+2. **Homebrew** installed
+3. **Full Disk Access** for Terminal.app (System Settings → Privacy & Security → Full Disk Access)
 
-The install script will also setup Python and Node versions/environments:
+### Quick Install
 
--   [pyenv](https://github.com/pyenv/pyenv) sets the global Python version to 3.10
--   [n](https://github.com/tj/n) sets the global Node version to LTS
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/dotfiles.git ~/dotfiles
+cd ~/dotfiles
 
-### Customization
+# Run installation script
+./scripts/install.sh
+```
 
-####  Git
-- Be sure to update the user name/email values in the global [gitconfig](./git/.gitconfig)
-#### Color Schemes
+### Manual Installation
 
-- Alacritty color scheme is [Snazzy](https://github.com/sindresorhus/terminal-snazzy)
-- VSCode/Vim color scheme is [Ayu](https://github.com/dempfi/ayu)
--   The macOS ['highlight color'](https://github.com/gretzky/dotfiles/blob/main/macos/.macos#L22-L23) (accent color for mac, typically blue) is set to pink. To set it to a different color:
-    -   Pick your desired color and get its RGB value (ex. pink is `255,105,180`)
-    -   Take each value and divide it by 255 (ex. pink is now `1, 0.41176470588, 0.70588235294`)
-    -   Put them into RGB order (ex. pink is `"1 0.41176470588 0.70588235294"`)
-## Acknowledgements
+```bash
+# Install GNU Stow
+brew install stow
 
--   [huyvohcmc/dotfiles](https://github.com/huyvohcmc/dotfiles)
--   [alrra/dotfiles](https://github.com/alrra/dotfiles)
--   [mathiasbynens/dotfiles](https://github.com/mathiasbynens/dotfiles)
+# Link all configurations
+./scripts/stow-all.sh
+
+# Or link individual packages
+stow nvim
+stow zsh
+stow tmux
+# ... etc
+```
+
+## 🗂 Structure
+
+```
+dotfiles/
+├── scripts/           # Installation and management scripts
+│   ├── install.sh    # Main installation script
+│   ├── stow-all.sh   # Link all dotfiles
+│   ├── stow-remove.sh # Remove all symlinks
+│   └── update.sh     # Update all tools
+├── alacritty/        # Terminal emulator config
+├── git/              # Git configuration
+├── julia/            # Julia startup.jl
+├── latex/            # LaTeX/latexmk configuration
+├── mise/             # Version manager config
+├── nvim/             # Neovim/LazyVim configuration
+├── python/           # Python/UV/Ruff configuration
+├── starship/         # Shell prompt
+├── tmux/             # Terminal multiplexer
+├── wezterm/          # WezTerm terminal config
+├── vim/              # Vim fallback config
+└── zsh/              # ZSH shell configuration
+```
+
+## 🛠 Usage
+
+### Update Everything
+```bash
+./scripts/update.sh
+```
+
+### Python Development
+```bash
+# Create new project with UV
+uv init myproject --python 3.12
+cd myproject
+uv add pandas numpy
+uv add --dev pytest ruff mypy
+```
+
+### Julia Development
+```bash
+# Check Julia versions
+juliaup status
+
+# Create new project
+julia -e 'using Pkg; Pkg.generate("MyProject")'
+```
+
+### Version Management (mise)
+```bash
+# Install Node.js
+mise use node@20
+
+# Install Ruby
+mise use ruby@3.2
+
+# List all tools
+mise list
+```
+
+## ⚙️ Configuration
+
+### Environment Variables
+Create `~/.zsh_secrets` for private environment variables:
+```bash
+export GITHUB_TOKEN="your-token"
+export OPENAI_API_KEY="your-key"
+```
+
+### Custom Aliases
+Edit `~/.config/zsh/aliases.zsh` to add your own aliases.
+
+### Neovim
+- Leader key: `<Space>`
+- Config: `~/.config/nvim/`
+- LaTeX compile: `\ll` (with VimTeX)
+- Package manager: Lazy.nvim
+
+## 🔧 Troubleshooting
+
+### Stow Conflicts
+```bash
+# Check what would be stowed (dry run)
+stow -n -v nvim
+
+# Force restow if conflicts
+stow --adopt nvim
+```
+
+### UV/Python Issues
+```bash
+# Ensure UV is in PATH
+source $HOME/.local/bin/env
+
+# Check UV installation
+uv --version
+```
+
+### Zinit/ZSH Plugin Issues
+```bash
+# Update Zinit
+zinit self-update
+
+# Update all plugins
+zinit update --all
+
+# Reinstall plugins
+rm -rf ~/.local/share/zinit
+exec zsh
+```
+
+### Mise Not Available
+```bash
+# Activate mise
+eval "$(mise activate zsh)"
+
+# Check installation
+mise doctor
+```
+
+## 🔐 Security
+
+- Never commit `.zsh_secrets` or `.env` files
+- Use 1Password CLI or similar for secret management
+- Keep sensitive configs in separate, non-tracked files
+- Review git history before pushing (`git log --oneline`)
+
+## 📈 Performance
+
+- ZSH plugins load lazily with Zinit's `wait` ice
+- UV caches packages globally for fast installs
+- Mise uses shims for instant version switching
+- LazyVim loads plugins on-demand
+- Starship prompt is async and minimal
+
+## 📝 License
+
+MIT
+
+## 🙏 Acknowledgments
+
+Inspired by many amazing dotfile repositories in the community.

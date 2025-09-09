@@ -52,22 +52,30 @@ fi
 source "${ZINIT_HOME}/zinit.zsh"
 
 # === Fast Plugin Loading ===
-# Load essential plugins first (without wait to avoid widget issues)
+# Pre-declare FZF custom widgets to prevent zsh-syntax-highlighting errors
+# These widgets are fully defined in ~/.fzf-functions (loaded at line 241)
+# but must be declared here before syntax highlighting plugin loads
+zle -N fzf-git-files
+zle -N fzf-git-branch
+zle -N fzf-file-preview
+
+# Load essential plugins first
 zinit light zsh-users/zsh-autosuggestions
 zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-history-substring-search
 
-# Load syntax highlighting after other plugins
+# Load syntax highlighting last (requires widgets to be declared first)
 zinit light zdharma-continuum/fast-syntax-highlighting
 
 # Set key bindings for history-substring-search
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
 
+# Load git library first (synchronously to ensure it's available)
+zinit snippet OMZL::git.zsh
+
 # Additional useful plugins (loaded async)
 zinit wait lucid for \
-  OMZL::git.zsh \
-  OMZP::git \
   OMZP::sudo \
   OMZP::command-not-found
 

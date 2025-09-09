@@ -42,10 +42,15 @@ __pycache__/
 .venv/
 venv/
 .python-version
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
 
 # Node
 node_modules/
 npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 
 # Editor
 *.swp
@@ -53,6 +58,47 @@ npm-debug.log*
 *~
 .idea/
 .vscode/
+*.sublime-*
 
 # OS
 Thumbs.db
+
+# Secrets - NEVER commit these!
+.zsh_secrets
+.env
+.env.*
+!.env.example
+!.env.template
+*.pem
+*.key
+*.p12
+*.pfx
+.netrc
+.pypirc
+aws/.aws/credentials
+docker/.docker/config.json
+gh/.config/gh/hosts.yml
+
+# SSH (keep config, ignore keys)
+ssh/.ssh/id_*
+!ssh/.ssh/id_*.pub
+ssh/.ssh/known_hosts
+ssh/.ssh/authorized_keys
+ssh/.ssh/sockets/
+
+# Local overrides
+*.local
+!.claude/settings.local.json
+
+# Backup files
+*.backup
+*.bak
+*.orig
+*.old
+*.tmp
+
+# Build artifacts
+dist/
+build/
+target/
+*.egg-info/

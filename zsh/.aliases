@@ -9,6 +9,15 @@
 
 alias g="git"
 
+# Codex GPT function
+cdx() {
+    if [[ "$1" == "update" ]]; then
+        npm install -g @openai/codex@latest
+    else
+        codex -m gpt-5 -c model_reasoning_effort="high" --search "$@"
+    fi
+}
+
 # one letter aliases w/o options
 alias gb="git branch"
 alias ga="git add"
@@ -378,10 +387,7 @@ alias fp='fzf --preview "bat --style=numbers --color=always --line-range=:500 {}
 #         cd "$dir"
 # }
 #
-# fh - search in your command history and execute selected command
-fh() {
-    eval $( ([ -n "$ZSH_NAME" ] && fc -l 1 || history) | fzf +s --tac | sed 's/ *[0-9]* *//')
-}
+# fh - Removed: This function is now defined in .fzf-functions as fzf-git-history
 
 # fe [FUZZY PATTERN] - Open the selected file with the default editor
 #   - Bypass fuzzy finder if there's only one match (--select-1)

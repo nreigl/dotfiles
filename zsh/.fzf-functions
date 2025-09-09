@@ -71,8 +71,15 @@ fzf-brew-install() {
 }
 
 # === Keybindings ===
-# Only set if in interactive shell
+# Register ZLE widgets and set keybindings
 if [[ $- == *i* ]]; then
+  # Register widgets first
+  zle -N fzf-git-files
+  zle -N fzf-git-branch
+  zle -N fzf-file-preview
+  zle -N fzf-cd-widget
+  
+  # Then bind keys
   bindkey '^g' fzf-git-files
   bindkey '^b' fzf-git-branch
   bindkey '^f' fzf-file-preview
@@ -80,7 +87,7 @@ if [[ $- == *i* ]]; then
 fi
 
 # === Aliases ===
-alias fh='fzf-git-history'
+alias fgh='fzf-git-history'  # Changed from fh to avoid conflict
 alias fkill='fzf-kill-process'
 alias fdocker='fzf-docker'
 alias fbrew='fzf-brew-install'
