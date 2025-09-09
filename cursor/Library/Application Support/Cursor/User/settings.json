@@ -25,8 +25,14 @@
     },
     "javascript.updateImportsOnFileMove.enabled": "always",
     "material-icon-theme.folders.theme": "specific",
-    "python.linting.enabled": false,
-    "python.jediEnabled": false,
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        }
+    },
+    "python.languageServer": "Pylance",
     "telemetry.enableCrashReporter": false,
     "telemetry.enableTelemetry": false,
     "terminal.external.osxExec": "Alacritty",
@@ -34,7 +40,7 @@
     "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
     "window.title": "",
     "workbench.activityBar.visible": false,
-    "workbench.colorTheme": "Ayu Mirage",
+    "workbench.colorTheme": "Catppuccin Mocha",
     "workbench.iconTheme": "material-icon-theme",
     "workbench.statusBar.visible": true,
     "zenMode.centerLayout": false,

@@ -21,6 +21,7 @@ cd "$DOTFILES_DIR"
 # Array of packages to stow
 PACKAGES=(
   "alacritty"
+  "cursor"
   "git"
   "julia"
   "latex"
@@ -30,6 +31,7 @@ PACKAGES=(
   "starship"
   "tmux"
   "vim"
+  "vscode"
   "zsh"
 )
 

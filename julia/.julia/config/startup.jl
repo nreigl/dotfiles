@@ -29,6 +29,5 @@ atreplinit() do repl
     end
 end
 
-# Convenience aliases
-const jl = julia
+# Welcome message
 println("Julia $(VERSION) - Enhanced REPL loaded")

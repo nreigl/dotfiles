@@ -2,7 +2,7 @@
 # Python is now managed by UV, not mise
 
 [tools]
-node = "lts"        # Latest LTS Node.js
+node = "22"         # Node.js v22 LTS
 ruby = "latest"     # Latest stable Ruby
 go = "latest"       # Latest stable Go
 rust = "stable"     # Stable Rust toolchain
@@ -12,7 +12,3 @@ experimental = true
 legacy_version_file = true  # Support .nvmrc, .ruby-version, etc.
 always_keep_download = false
 jobs = 4
-
-[alias.node]
-lts = "lts"
-latest = "latest"
