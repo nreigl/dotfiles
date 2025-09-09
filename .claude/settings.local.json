@@ -32,7 +32,10 @@
       "Bash(eza:*)",
       "Bash(bat:*)",
       "Bash(fd:*)",
-      "Bash(time zsh:*)"
+      "Bash(time zsh:*)",
+      "Bash(git push:*)",
+      "Bash(./scripts/stow-all.sh:*)",
+      "Bash(git reset:*)"
     ],
     "deny": [],
     "ask": []

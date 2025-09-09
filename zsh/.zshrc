@@ -236,6 +236,9 @@ command -v gh &>/dev/null && eval "$(gh copilot alias -- zsh)"
 # Source custom aliases
 [[ -f "$HOME/.aliases" ]] && source "$HOME/.aliases"
 
+# Source FZF functions
+[[ -f "$HOME/.fzf-functions" ]] && source "$HOME/.fzf-functions"
+
 # === Final Setup ===
 # Ensure XDG directories exist
 mkdir -p "$XDG_CONFIG_HOME" "$XDG_DATA_HOME" "$XDG_CACHE_HOME" "$XDG_STATE_HOME/zsh"

@@ -1,0 +1,108 @@
+#!/usr/bin/env zsh
+# FZF Custom Functions and Keybindings
+
+# === Git Integration ===
+# Ctrl-G: Search git files
+fzf-git-files() {
+  local files
+  files=$(git ls-files --others --exclude-standard --cached 2>/dev/null | fzf --multi --preview 'bat --style=numbers --color=always --line-range :500 {}')
+  [[ -n "$files" ]] && ${EDITOR:-nvim} $files
+}
+
+# Ctrl-B: Checkout git branch
+fzf-git-branch() {
+  local branches branch
+  branches=$(git branch --all | grep -v HEAD) &&
+  branch=$(echo "$branches" | fzf -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
+  git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
+}
+
+# Ctrl-H: Search git commit history
+fzf-git-history() {
+  git log --graph --color=always \
+    --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
+  fzf --ansi --no-sort --reverse --tiebreak=index --bind=ctrl-s:toggle-sort \
+    --bind "ctrl-m:execute:
+      (grep -o '[a-f0-9]\{7\}' | head -1 |
+      xargs -I % sh -c 'git show --color=always % | less -R') << 'FZF-EOF'
+      {}
+FZF-EOF"
+}
+
+# === File Search with Preview ===
+# Ctrl-F: Find file with preview
+fzf-file-preview() {
+  fd --type f --hidden --follow --exclude .git |
+    fzf --preview 'bat --style=numbers --color=always --line-range :500 {}' \
+        --bind 'ctrl-/:change-preview-window(down|hidden|)'
+}
+
+# === Directory Navigation ===
+# Alt-C: Enhanced directory navigation
+fzf-cd-widget() {
+  local dir
+  dir=$(fd --type d --hidden --follow --exclude .git 2>/dev/null | fzf --preview 'eza --tree --level=2 --icons {}')
+  [[ -n "$dir" ]] && cd "$dir"
+}
+
+# === Process Management ===
+# Ctrl-P: Kill process
+fzf-kill-process() {
+  local pid
+  pid=$(ps -ef | sed 1d | fzf -m | awk '{print $2}')
+  if [ "x$pid" != "x" ]; then
+    echo $pid | xargs kill -${1:-9}
+  fi
+}
+
+# === Docker Integration ===
+# List and manage Docker containers
+fzf-docker() {
+  local container
+  container=$(docker ps -a | sed 1d | fzf --multi | awk '{print $1}')
+  [[ -n "$container" ]] && docker rm $container
+}
+
+# === Homebrew Integration ===
+# Search and install Homebrew packages
+fzf-brew-install() {
+  local inst=$(brew formulae | fzf --multi --preview 'brew info {}')
+  [[ -n "$inst" ]] && brew install $inst
+}
+
+# === Keybindings ===
+# Only set if in interactive shell
+if [[ $- == *i* ]]; then
+  bindkey '^g' fzf-git-files
+  bindkey '^b' fzf-git-branch
+  bindkey '^f' fzf-file-preview
+  bindkey '\ec' fzf-cd-widget  # Alt-C
+fi
+
+# === Aliases ===
+alias fh='fzf-git-history'
+alias fkill='fzf-kill-process'
+alias fdocker='fzf-docker'
+alias fbrew='fzf-brew-install'
+
+# === Enhanced ripgrep integration ===
+# Search content in files with live preview
+frg() {
+  local result
+  result=$(
+    rg --color=always --line-number --no-heading --smart-case "${*:-}" |
+      fzf --ansi \
+          --color "hl:-1:underline,hl+:-1:underline:reverse" \
+          --delimiter : \
+          --preview 'bat --color=always {1} --highlight-line {2}' \
+          --preview-window 'up,60%,border-bottom,+{2}+3/3,~3'
+  )
+  [[ -n "$result" ]] && ${EDITOR:-nvim} $(echo "$result" | cut -d: -f1) +$(echo "$result" | cut -d: -f2)
+}
+
+# Search and edit files
+fe() {
+  local files
+  files=$(fd "${1:-.}" --type f --hidden --follow --exclude .git | fzf --multi --preview 'bat --style=numbers --color=always {}')
+  [[ -n "$files" ]] && ${EDITOR:-nvim} $files
+}
