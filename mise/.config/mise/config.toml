@@ -1,0 +1,18 @@
+# Mise configuration for universal version management
+# Python is now managed by UV, not mise
+
+[tools]
+node = "lts"        # Latest LTS Node.js
+ruby = "latest"     # Latest stable Ruby
+go = "latest"       # Latest stable Go
+rust = "stable"     # Stable Rust toolchain
+
+[settings]
+experimental = true
+legacy_version_file = true  # Support .nvmrc, .ruby-version, etc.
+always_keep_download = false
+jobs = 4
+
+[alias.node]
+lts = "lts"
+latest = "latest"

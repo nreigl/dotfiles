@@ -111,3 +111,5 @@ autoload -Uz compinit
 compinit
 # End of Docker CLI completions
 eval "$(gh copilot alias -- zsh)"
+
+. "$HOME/.local/bin/env"

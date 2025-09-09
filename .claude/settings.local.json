@@ -8,7 +8,14 @@
       "Bash(julia:*)",
       "Bash(git remote set-url:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(uv python install:*)",
+      "Bash(uv tool install:*)",
+      "Bash(brew install:*)",
+      "Bash(chmod:*)",
+      "Bash(uv:*)",
+      "Bash(/opt/homebrew/bin/julia --version)",
+      "Bash(mise:*)"
     ],
     "deny": [],
     "ask": []

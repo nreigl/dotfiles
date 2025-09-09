@@ -1,0 +1,12 @@
+\.git
+\.gitignore
+README.*
+LICENSE
+\.DS_Store
+Brewfile.*
+install\.sh
+run\.sh
+scripts/
+\.stowrc
+\.stow-local-ignore
+CLAUDE\.md
