@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(stow:*)",
+      "Read(//Users/nicolasreigl/**)",
+      "Bash(brew list:*)",
+      "WebSearch",
+      "Bash(julia:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

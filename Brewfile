@@ -7,8 +7,10 @@ tap "homebrew/services"
 tap "koekeishiya/formulae"
 tap "wix/brew"
 
-cask_args appdir: "/Applications"
 
+brew "bat" # better cat
+brew "cloc" # lines of code counter
+brew "git-delta" # a better git diff
 brew "ack"
 brew "applesimutils"
 brew "binutils"
@@ -56,6 +58,9 @@ brew "youtube-dl"
 brew "zlib"
 brew "zplug"
 brew "zsh"
+brew "zsh-autosuggestions"
+brew "zsh-completions"
+brew "zsh-syntax-highlighting"
 brew "koekeishiya/formulae/skhd"
 brew "koekeishiya/formulae/yabai"
 
@@ -64,6 +69,7 @@ cask "adoptopenjdk8"
 cask "adoptopenjdk8-jre"
 cask "airpass"
 cask "alacritty"
+cask "hammerspoon"
 cask "alfred"
 cask "android-studio"
 cask "dozer"

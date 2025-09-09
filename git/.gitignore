@@ -30,4 +30,46 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+# Temp files
+*.swp
+*.swo
+.cache/
+tmp/
+scratch/
+
+# Windows
+*.dll
+*.exe
+
+# Python
+__pycache__/
+*.pyc
+*.pkl
+.mypy_cache/
+/venv/
+.coverage
+.ipynb_checkpoints
+pip-wheel-metadata/
+
+# OSX
+.DS_Store*
+Thumbs.db
+Icon?
+.Trashes
+
+# Office Temp Files
+~$*
+
+# Latex
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.run.xml
+*.synctex.gz
+*.toc
+*.nav
+*.snm
+*.vrb
+
 # End of https://www.gitignore.io/api/macos

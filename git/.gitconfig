@@ -27,9 +27,14 @@
 [pager]
   branch = false
 [user]
-	name = gretzky
-	email = sfed617@gmail.com
+	name = Nicolas Reigl
+	email = nicolas.reigl@gmail.com
 [pull]
 	rebase = false
 [init]
 	defaultBranch = main
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true

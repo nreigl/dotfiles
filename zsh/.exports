@@ -18,11 +18,17 @@ export GPG_TTY=$(tty)
 PATH=$PATH:/opt/homebrew/bin
 
 # configure ruby
-source /opt/homebrew/opt/chruby/share/chruby/chruby.sh
-source /opt/homebrew/opt/chruby/share/chruby/auto.sh
+if [ -d "/opt/homebrew/opt/ruby/bin" ]; then
+    export PATH=/opt/homebrew/opt/ruby/bin:$PATH
+    export PATH=$(gem environment gemdir)/bin:$PATH
+fi
+source $(dirname $(gem which colorls))/tab_complete.sh
 
 # Make Python use UTF-8 encoding for output to stdin, stdout, and stderr.
 export PYTHONIOENCODING='UTF-8'
+
+# go
+export PATH="$HOME/go/bin:$PATH"
 
 # npm global
 export NPM_PACKAGES="/usr/local/npm_packages"
@@ -36,8 +42,13 @@ export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --smart-case --glob "!.git/*" --glob "!node_modules/*"'
 
-# z
-. ~/z.sh
+# latex
+# export PATH="usr/local/bin/latexmk/:$PATH"
+# export PATH="/usr/local/texlive/2023/bin/:$PATH"
+export PATH=$PATH:/usr/local/texlive/2023/bin/universal-darwin
+
+# R compilers
+export PATH=$PATH:/opt/R/arm64/gfortran/bin
 
 # depot tools
 export PATH=$PATH:$HOME/depot_tools
