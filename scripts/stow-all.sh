@@ -20,9 +20,10 @@ cd "$DOTFILES_DIR"
 
 # Array of packages to stow
 PACKAGES=(
-  "alacritty"
+  "aws"
   "cursor"
   "fzf"
+  "gh"
   "git"
   "julia"
   "latex"

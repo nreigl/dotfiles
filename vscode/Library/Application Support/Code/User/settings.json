@@ -1,5 +1,5 @@
 {
-    "editor.cursorSmoothCaretAnimation": true,
+    "editor.cursorSmoothCaretAnimation": "on",
     "editor.fontSize": 13,
     "editor.fontFamily": "Hack Nerd Font",
     "editor.fontLigatures": true,
@@ -39,11 +39,31 @@
     "typescript.updateImportsOnFileMove.enabled": "always",
     "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
     "window.title": "",
-    "workbench.activityBar.visible": false,
     "workbench.colorTheme": "Catppuccin Mocha",
     "workbench.iconTheme": "material-icon-theme",
     "workbench.statusBar.visible": true,
     "zenMode.centerLayout": false,
     "zenMode.fullScreen": false,
-    "zenMode.restore": true
+    "zenMode.restore": true,
+    "workbench.activityBar.location": "hidden",
+    "r.lsp.enabled": true,
+    "r.lsp.path": "/usr/local/bin/R",
+    "r.rterm.mac": "/usr/local/bin/R",
+    "r.bracketedPaste": true,
+    "r.plot.useHttpgd": true,
+    "[r]": {
+        "editor.defaultFormatter": "REditorSupport.r",
+        "editor.formatOnSave": false,
+        "editor.tabSize": 2
+    },
+    "[rmd]": {
+        "editor.defaultFormatter": "REditorSupport.r",
+        "editor.tabSize": 2
+    },
+    "matlab.mlintpath": "/Applications/MATLAB_R2024b.app/bin/maca64/mlint",
+    "matlab.matlabpath": "/Applications/MATLAB_R2024b.app/bin/matlab",
+    "[matlab]": {
+        "files.encoding": "utf8",
+        "editor.tabSize": 4
+    }
 }

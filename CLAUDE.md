@@ -1,182 +1,117 @@
-# Claude/AI Assistant Configuration Hints
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
-Modern dotfiles repository with state-of-the-art tooling for macOS development environment.
+Modern dotfiles repository with state-of-the-art tooling for macOS development environment using GNU Stow for symlink management.
 
-## Directory Structure
-```
-dotfiles/
-├── scripts/           # Installation and management scripts
-├── alacritty/        # Terminal emulator config
-├── git/              # Git configuration
-├── julia/            # Julia language config (startup.jl)
-├── latex/            # LaTeX/latexmk configuration
-├── mise/             # Universal version manager
-├── nvim/             # Neovim/LazyVim configuration
-├── python/           # Python/UV/Ruff configuration
-├── starship/         # Modern shell prompt
-├── tmux/             # Terminal multiplexer
-├── vim/              # Vim fallback config
-└── zsh/              # ZSH shell configuration
-```
+## Commands
 
-## Key Technologies
-
-### Python Development
-- **UV**: Ultra-fast Python package manager (replaces pip, pipx, poetry, pyenv)
-- **Ruff**: Lightning-fast Python linter/formatter (Rust-based)
-- **Python 3.12**: Latest stable Python via UV
-- Command: `uv init project --python 3.12`
-
-### Julia Development
-- **Juliaup**: Official Julia version manager
-- **Julia 1.11**: Latest stable version
-- **Julia 1.10**: LTS version
-- Command: `juliaup status` to see versions
-
-### Version Management
-- **mise**: Replaces nvm, rbenv, pyenv for non-Python tools
-- Config: `~/.config/mise/config.toml`
-- Command: `mise list` to see installed tools
-
-### Editor
-- **Neovim** with **LazyVim** distribution
-- **VimTeX** for LaTeX editing with Skim PDF viewer
-- LaTeX compile: `\ll` in Neovim
-- Config: `~/.config/nvim/`
-
-### Shell
-- **ZSH** with **Zinit** plugin manager
-- **Starship** prompt for beautiful, fast prompt
-- **Zoxide** for smart directory jumping
-- Modern aliases: `eza` (ls), `bat` (cat), `fd` (find), `rg` (grep)
-
-## Common Tasks
-
-### Update Everything
+### Essential Scripts
 ```bash
-./scripts/update.sh
+./scripts/install.sh      # Initial setup - installs Homebrew, tools, and stows dotfiles
+./scripts/update.sh       # Update all tools (Homebrew, UV, Julia, mise, Neovim plugins, ZSH plugins)
+./scripts/stow-all.sh     # Link all dotfile configurations
+./scripts/stow-remove.sh  # Remove all symlinks
 ```
 
-### Stow Management
+### Development Commands
+
+#### Python (UV)
 ```bash
-./scripts/stow-all.sh     # Link all configs
-./scripts/stow-remove.sh  # Remove all links
-stow nvim                 # Link single package
+uv init myproject --python 3.12      # Create new project
+uv add pandas numpy matplotlib        # Add dependencies
+uv add --dev pytest ruff mypy        # Add dev dependencies
+uv run python script.py              # Run Python with project dependencies
+uv tool install <package>            # Install Python CLI tools globally
+uv tool upgrade --all                # Update all UV tools
 ```
 
-### Python Project
+#### Julia
 ```bash
-uv init myproject --python 3.12
-cd myproject
-uv add pandas numpy matplotlib
-uv add --dev pytest ruff mypy
+juliaup status                                          # Show installed Julia versions
+julia -e 'using Pkg; Pkg.generate("MyProject")'        # Create new project
+julia --project=. -e 'using Pkg; Pkg.add("DataFrames")'  # Add package to project
 ```
 
-### Julia Project
+#### Version Management (mise)
 ```bash
-julia -e 'using Pkg; Pkg.generate("MyProject")'
-cd MyProject
-julia --project=. -e 'using Pkg; Pkg.add("DataFrames")'
+mise list                  # List all installed tools
+mise use node@20          # Install and set Node.js version
+mise use ruby@3.2         # Install and set Ruby version
 ```
 
-### LaTeX Compilation
-1. Open .tex file in Neovim
-2. Press `\ll` to start continuous compilation
-3. Press `\lv` to view PDF in Skim
-4. Save file to auto-recompile
+#### LaTeX in Neovim
+- `\ll` - Start continuous compilation
+- `\lv` - View PDF in Skim
+- `\lk` - Stop compilation
 
-## Testing Commands
-
-### Verify Installations
+### Testing/Verification
 ```bash
-uv --version           # Should show UV version
-julia --version        # Should show 1.11.x
-mise --version         # Should show mise version
-nvim --version         # Should show Neovim version
-ruff --version         # Should show Ruff version
+# Verify key tools
+uv --version
+julia --version
+mise --version
+nvim --version
+ruff --version
 ```
 
-### Test Python
+## Code Architecture
+
+### Stow Package Structure
+Each directory at the root level is a "stow package" containing configs:
+- `alacritty/`, `wezterm/` - Terminal emulators (configs symlinked to `~/.config/`)
+- `nvim/` - Neovim/LazyVim config (→ `~/.config/nvim/`)
+- `zsh/` - Shell config with `.zshrc`, aliases, functions (→ `~/`)
+- `git/` - Global git config and gitignore (→ `~/`)
+- `mise/` - Version manager config (→ `~/`)
+- `tmux/` - Terminal multiplexer config (→ `~/`)
+- `ssh/`, `aws/` - Security configs (→ `~/.ssh/`, `~/.aws/`)
+
+### Key Configuration Files
+- `Brewfile` - Homebrew package manifest (480+ packages)
+- `scripts/install.sh` - Main installer (lines 1-198)
+- `scripts/update.sh` - Update all tools (lines 1-158)
+- `scripts/stow-all.sh` - Links 22 stow packages (lines 22-43)
+- `mise.toml` - Global Node.js version (currently v22)
+
+### Tool Stack
+- **Package Management**: Homebrew (system), UV (Python), Juliaup (Julia), mise (Node/Ruby/Go)
+- **Shell**: ZSH + Zinit + Starship prompt
+- **Editor**: Neovim with LazyVim distribution
+- **Terminal**: WezTerm/Alacritty
+- **Window Management**: yabai + skhd (optional)
+
+## Important Notes
+
+### Stow Behavior
+- GNU Stow creates symlinks from home directory to this repo
+- Running `stow <package>` links all files in `<package>/` to `~/`
+- Subdirectories like `.config/` are preserved in the symlink structure
+- Use `stow -n -v <package>` to preview what will be linked
+- Conflicts occur when target files already exist - remove them first
+
+### Tool Precedence
+- **Python**: Always use UV, never pip/conda/pyenv
+- **Node/Ruby/Go**: Use mise, not nvm/rbenv/gvm
+- **Julia**: Use juliaup for version management
+- **Shell**: ZSH with Zinit (not oh-my-zsh/prezto)
+
+### Common Fixes
 ```bash
-uv run python -c "import sys; print(sys.version)"
-```
-
-### Test Julia
-```bash
-julia -e 'println("Julia $(VERSION) working!")'
-```
-
-### Test LaTeX
-```bash
-latexmk --version
-which lualatex
-```
-
-## Troubleshooting
-
-### If Stow fails
-- Check for existing files/links in home directory
-- Use `stow -n -v package` to dry-run
-- Remove conflicts manually then restow
-
-### If UV not found
-```bash
+# UV not in PATH
 source $HOME/.local/bin/env
-```
 
-### If mise tools not available
-```bash
+# Mise tools not available
 eval "$(mise activate zsh)"
-```
 
-### If Neovim plugins not loading
-```bash
+# Neovim plugins issues
 nvim --headless "+Lazy! sync" +qa
+
+# ZSH plugin issues
+zinit self-update && zinit update --all
+
+# Stow conflicts (preview first)
+stow -n -v <package>
+stow --adopt <package>  # Careful: moves existing files into repo
 ```
-
-### If ZSH plugins not working
-```bash
-zinit self-update
-zinit update --all
-```
-
-## File Locations
-
-- Python: `~/.local/share/uv/`
-- Julia: `~/.julia/`
-- Mise: `~/.local/share/mise/`
-- Neovim: `~/.config/nvim/`
-- ZSH History: `~/.local/state/zsh/history`
-- Starship: `~/.config/starship.toml`
-
-## Best Practices
-
-1. **Always use UV for Python** - Don't use pip directly
-2. **Use mise for Node/Ruby/Go** - Not for Python (UV handles that)
-3. **Commit dotfile changes regularly** - Keep repo in sync
-4. **Run update.sh weekly** - Keep tools current
-5. **Use modern CLI replacements** - eza, bat, fd, rg, etc.
-
-## Security Notes
-
-- Never commit secrets to dotfiles
-- Use 1Password CLI or similar for secrets
-- Keep `.zsh_secrets` file local only
-- Don't track `.env` files
-
-## Performance Tips
-
-- ZSH loads plugins lazily with `zinit wait`
-- UV caches packages globally
-- Mise uses shims for fast switching
-- LazyVim lazy-loads plugins
-- Starship is async and fast
-
-## Additional Resources
-
-- UV Docs: https://docs.astral.sh/uv/
-- LazyVim: https://www.lazyvim.org/
-- Mise: https://mise.jdx.dev/
-- Juliaup: https://github.com/JuliaLang/juliaup
-- VimTeX: https://github.com/lervag/vimtex

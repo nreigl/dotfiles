@@ -1,5 +1,5 @@
 {
-    "editor.cursorSmoothCaretAnimation": true,
+    "editor.cursorSmoothCaretAnimation": "on",
     "editor.fontSize": 13,
     "editor.fontFamily": "Hack Nerd Font",
     "editor.fontLigatures": true,
@@ -39,11 +39,11 @@
     "typescript.updateImportsOnFileMove.enabled": "always",
     "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
     "window.title": "",
-    "workbench.activityBar.visible": false,
     "workbench.colorTheme": "Catppuccin Mocha",
     "workbench.iconTheme": "material-icon-theme",
     "workbench.statusBar.visible": true,
     "zenMode.centerLayout": false,
     "zenMode.fullScreen": false,
-    "zenMode.restore": true
+    "zenMode.restore": true,
+    "workbench.activityBar.location": "hidden"
 }

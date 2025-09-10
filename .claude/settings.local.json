@@ -39,7 +39,10 @@
       "Bash(brew bundle dump:*)",
       "Bash(rm:*)",
       "Bash(pgrep:*)",
-      "Bash(jq:*)"
+      "Bash(jq:*)",
+      "Bash(test:*)",
+      "Bash(R:*)",
+      "Read(//Applications/MATLAB_R2024b.app/**)"
     ],
     "deny": [],
     "ask": []

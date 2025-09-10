@@ -25,6 +25,7 @@ My personal dotfiles for macOS with state-of-the-art tooling and performance opt
 - **Julia**: [Juliaup](https://github.com/JuliaLang/juliaup) - Official Julia version manager
 - **Version Management**: [mise](https://mise.jdx.dev/) - For Node.js, Ruby, Go, etc.
 - **Formatting**: [Ruff](https://docs.astral.sh/ruff/) - Lightning-fast Python linter/formatter
+- **LaTeX**: Full TeXLive distribution with VimTeX integration
 
 ### Window Management (Optional)
 - **WM**: [yabai](https://github.com/koekeishiya/yabai) - Tiling window manager
@@ -42,7 +43,7 @@ My personal dotfiles for macOS with state-of-the-art tooling and performance opt
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/dotfiles.git ~/dotfiles
+git clone https://github.com/nreigl/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 
 # Run installation script
@@ -75,16 +76,26 @@ dotfiles/
 │   ├── stow-remove.sh # Remove all symlinks
 │   └── update.sh     # Update all tools
 ├── alacritty/        # Terminal emulator config
+├── aws/              # AWS CLI configuration
+├── cursor/           # Cursor IDE settings
+├── fzf/              # Fuzzy finder configuration
+├── gh/               # GitHub CLI config
 ├── git/              # Git configuration
 ├── julia/            # Julia startup.jl
 ├── latex/            # LaTeX/latexmk configuration
+├── lazygit/          # LazyGit configuration
 ├── mise/             # Version manager config
 ├── nvim/             # Neovim/LazyVim configuration
 ├── python/           # Python/UV/Ruff configuration
+├── ripgrep/          # Ripgrep configuration
+├── ssh/              # SSH configuration
 ├── starship/         # Shell prompt
 ├── tmux/             # Terminal multiplexer
+├── vscode/           # VS Code settings
 ├── wezterm/          # WezTerm terminal config
 ├── vim/              # Vim fallback config
+├── yabai/            # Tiling window manager config
+├── skhd/             # Hotkey daemon config
 └── zsh/              # ZSH shell configuration
 ```
 
@@ -188,6 +199,9 @@ mise doctor
 ## 🔐 Security
 
 - Never commit `.zsh_secrets` or `.env` files
+- SSH keys use strong Ed25519 algorithm
+- AWS credentials stored securely in `~/.aws/`
+- GitHub tokens managed via `gh auth`
 - Use 1Password CLI or similar for secret management
 - Keep sensitive configs in separate, non-tracked files
 - Review git history before pushing (`git log --oneline`)
@@ -195,10 +209,12 @@ mise doctor
 ## 📈 Performance
 
 - ZSH plugins load lazily with Zinit's `wait` ice
-- UV caches packages globally for fast installs
+- UV caches packages globally for fast installs (10-100x faster than pip)
 - Mise uses shims for instant version switching
 - LazyVim loads plugins on-demand
 - Starship prompt is async and minimal
+- Ripgrep for blazing fast code search
+- FZF with optimized preview settings
 
 ## 📝 License
 
@@ -207,3 +223,9 @@ MIT
 ## 🙏 Acknowledgments
 
 Inspired by many amazing dotfile repositories in the community.
+
+---
+
+**Last Updated**: January 2025
+**macOS Compatibility**: Sequoia 15.2+
+**Architecture**: Apple Silicon (M1/M2/M3) optimized
