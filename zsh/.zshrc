@@ -64,6 +64,9 @@ zinit light zsh-users/zsh-autosuggestions
 zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-history-substring-search
 
+# Load alias-tips to show available aliases
+zinit light djui/alias-tips
+
 # Load syntax highlighting last (requires widgets to be declared first)
 zinit light zdharma-continuum/fast-syntax-highlighting
 
@@ -112,7 +115,14 @@ export FZF_DEFAULT_OPTS='
 '
 
 # === LaTeX Configuration ===
-export PATH="$PATH:/usr/local/texlive/2023/bin/universal-darwin"
+# Add the latest TeXLive installation to PATH
+if [[ -d "/usr/local/texlive" ]]; then
+  # Find the latest year directory
+  LATEST_TEXLIVE=$(ls -d /usr/local/texlive/20* 2>/dev/null | sort -r | head -1)
+  if [[ -n "$LATEST_TEXLIVE" && -d "$LATEST_TEXLIVE/bin/universal-darwin" ]]; then
+    export PATH="$PATH:$LATEST_TEXLIVE/bin/universal-darwin"
+  fi
+fi
 
 # === Completion System ===
 autoload -Uz compinit
@@ -150,45 +160,7 @@ bindkey '^[[H' beginning-of-line
 bindkey '^[[F' end-of-line
 
 # === Aliases ===
-# Modern replacements
-alias ls='eza --icons --group-directories-first'
-alias ll='eza -la --icons --group-directories-first'
-alias la='eza -la --icons --group-directories-first'
-alias lt='eza --tree --level=2 --icons'
-alias cat='bat --style=plain'
-alias grep='rg'
-alias find='fd'
-alias du='dust'
-alias df='duf'
-alias top='btop'
-alias htop='btop'
-alias vim='nvim'
-alias vi='nvim'
-
-# Git aliases
-alias g='git'
-alias gs='git status'
-alias ga='git add'
-alias gc='git commit'
-alias gp='git push'
-alias gl='git log --oneline --graph'
-alias gd='git diff'
-
-# Python
-alias py='python3'
-alias pip='uv pip'
-
-# Navigation
-alias ..='cd ..'
-alias ...='cd ../..'
-alias ....='cd ../../..'
-alias ~='cd ~'
-alias -- -='cd -'
-
-# Safety nets
-alias rm='rm -i'
-alias cp='cp -i'
-alias mv='mv -i'
+# Aliases are loaded from ~/.config/zsh/aliases.zsh via zinit
 
 # === Functions ===
 # Make directory and cd into it
@@ -243,6 +215,9 @@ command -v gh &>/dev/null && eval "$(gh copilot alias -- zsh)"
 # === Additional Aliases ===
 # Source custom aliases
 [[ -f "$HOME/.aliases" ]] && source "$HOME/.aliases"
+
+# Source ZSH aliases from config directory
+[[ -f "$XDG_CONFIG_HOME/zsh/aliases.zsh" ]] && source "$XDG_CONFIG_HOME/zsh/aliases.zsh"
 
 # Source FZF functions
 [[ -f "$HOME/.fzf-functions" ]] && source "$HOME/.fzf-functions"

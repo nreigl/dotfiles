@@ -60,9 +60,7 @@
   autosquash = true
 [pager]
   branch = false
-[user]
-	name = Nicolas Reigl
-	email = nicolas.reigl@gmail.com
+# User configuration is in ~/.gitconfig.local (not tracked)
 [pull]
 	rebase = false
 [init]

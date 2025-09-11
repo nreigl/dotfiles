@@ -66,6 +66,14 @@ alias ....='cd ../../..'
 alias .....='cd ../../../..'
 alias ~='cd ~'
 alias -- -='cd -'
+# Zoxide interactive mode with automatic cd
+unalias zz 2>/dev/null || true
+zz() {
+    local result=$(zoxide query -i "$@")
+    [ -n "$result" ] && cd "$result"
+}
+# For zinit, use explicit name
+alias zinit-update='zinit update --all'
 
 # === Safety nets ===
 alias rm='rm -i'

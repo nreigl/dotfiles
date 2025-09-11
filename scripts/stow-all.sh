@@ -21,7 +21,9 @@ cd "$DOTFILES_DIR"
 # Array of packages to stow
 PACKAGES=(
   "aws"
+  "claude"
   "cursor"
+  "docker"
   "fzf"
   "gh"
   "git"

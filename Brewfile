@@ -10,7 +10,7 @@ tap "jesseduffield/lazygit"
 tap "koekeishiya/formulae"
 tap "mgmeyers/pdfannots2json"
 tap "nikitabobko/tap"
-tap "sambadevi/powerlevel9k"
+# tap "sambadevi/powerlevel9k" # Removed: Using Starship prompt instead
 tap "sass/sass"
 tap "wix/brew"
 # Search tool like grep, but optimized for programmers
@@ -158,15 +158,15 @@ brew "php", restart_service: :changed
 # Execute binaries from Python packages in isolated environments
 brew "pipx"
 # Theme for zsh
-brew "powerlevel10k"
+# brew "powerlevel10k" # Removed: Using Starship prompt instead
 # Show ps output as a tree
 brew "pstree"
 # Python version management
-brew "pyenv"
+# brew "pyenv" # Removed: Using UV for Python management
 # Interpreted, interactive, object-oriented programming language
 brew "python@3.9"
 # Ruby version manager
-brew "rbenv"
+# brew "rbenv" # Removed: Using mise for Ruby version management
 # Perl-powered file rename script with many helpful built-ins
 brew "rename"
 # Search tool like grep and The Silver Searcher
@@ -258,7 +258,7 @@ brew "koekeishiya/formulae/yabai"
 # Extract annotations from PDFs and convert them to JSON
 brew "mgmeyers/pdfannots2json/pdfannots2json"
 # A badass zsh theme with more power than a normal earthling
-brew "sambadevi/powerlevel9k/powerlevel9k"
+# brew "sambadevi/powerlevel9k/powerlevel9k" # Removed: Using Starship prompt instead
 # Stylesheet Preprocessor
 brew "sass/sass/sass"
 # Apple simulator utilities
