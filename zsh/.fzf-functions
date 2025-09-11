@@ -113,3 +113,131 @@ fe() {
   files=$(fd "${1:-.}" --type f --hidden --follow --exclude .git | fzf --multi --preview 'bat --style=numbers --color=always {}')
   [[ -n "$files" ]] && ${EDITOR:-nvim} $files
 }
+
+# === Enhanced History Search ===
+# Search command history with preview showing when command was run
+fh() {
+  local cmd
+  cmd=$(history -n 1 | fzf --tac --no-sort --query="$1" \
+    --preview 'echo {} | sed "s/^[ ]*[0-9]*[ ]*//" | bat --language=sh --style=plain --color=always' \
+    --preview-window='up:3:wrap' \
+    --bind='ctrl-y:execute-silent(echo {} | pbcopy)+abort' \
+    --header='Press CTRL-Y to copy command')
+  [[ -n "$cmd" ]] && print -z "$cmd"
+}
+
+# === Environment Variables ===
+# Search and edit environment variables
+fenv() {
+  local var
+  var=$(printenv | fzf --preview 'echo {1} | cut -d= -f2' --preview-window=up:3:wrap)
+  [[ -n "$var" ]] && echo "$var" | cut -d= -f1
+}
+
+# === NPM/Yarn Scripts ===
+# Run npm/yarn scripts with FZF
+fnpm() {
+  if [[ -f package.json ]]; then
+    local script
+    script=$(cat package.json | jq -r '.scripts | keys[]' 2>/dev/null | \
+      fzf --preview "cat package.json | jq -r '.scripts.\"{}\"'" \
+          --preview-window=up:3:wrap \
+          --header='Select npm script to run')
+    [[ -n "$script" ]] && npm run "$script"
+  else
+    echo "No package.json found"
+  fi
+}
+
+# === SSH Host Selector ===
+# Quick SSH into hosts from ~/.ssh/config
+fssh() {
+  local host
+  host=$(grep "^Host " ~/.ssh/config 2>/dev/null | \
+    grep -v "*" | \
+    cut -d" " -f2- | \
+    fzf --preview 'grep -A 5 "^Host {}" ~/.ssh/config' \
+        --preview-window=up:10:wrap)
+  [[ -n "$host" ]] && ssh "$host"
+}
+
+# === Tmux Session Manager ===
+# Switch or create tmux sessions
+ftmux() {
+  local session
+  session=$(tmux list-sessions -F "#{session_name}" 2>/dev/null | \
+    fzf --preview 'tmux list-windows -t {} -F "#{window_index}: #{window_name} (#{window_panes} panes)"' \
+        --preview-window=up:10:wrap \
+        --header='Select tmux session (or type new name to create)')
+  
+  if [[ -n "$session" ]]; then
+    if tmux has-session -t "$session" 2>/dev/null; then
+      if [[ -n "$TMUX" ]]; then
+        tmux switch-client -t "$session"
+      else
+        tmux attach-session -t "$session"
+      fi
+    else
+      tmux new-session -s "$session"
+    fi
+  fi
+}
+
+# === Git Stash Manager ===
+# Browse and apply git stashes
+fstash() {
+  local stash
+  stash=$(git stash list | \
+    fzf --preview 'echo {} | cut -d: -f1 | xargs git stash show -p --color=always' \
+        --preview-window=up:60% \
+        --bind='ctrl-d:execute(echo {} | cut -d: -f1 | xargs git stash drop)+reload(git stash list)' \
+        --header='Enter: apply, Ctrl-D: drop')
+  
+  [[ -n "$stash" ]] && git stash apply $(echo "$stash" | cut -d: -f1)
+}
+
+# === Git Diff Explorer ===
+# Browse changed files with diff preview
+fgd() {
+  local file
+  file=$(git diff --name-only | \
+    fzf --preview 'git diff --color=always {}' \
+        --preview-window=up:60% \
+        --bind='ctrl-s:execute(git add {})+reload(git diff --name-only)' \
+        --header='Enter: edit, Ctrl-S: stage')
+  
+  [[ -n "$file" ]] && ${EDITOR:-nvim} "$file"
+}
+
+# === Port Process Finder ===
+# Find what's running on a port
+fport() {
+  local port="${1:-}"
+  if [[ -z "$port" ]]; then
+    lsof -iTCP -sTCP:LISTEN -n -P | \
+      fzf --header-lines=1 \
+          --preview 'echo {} | awk "{print \$2}" | xargs ps -p' \
+          --preview-window=up:10:wrap
+  else
+    lsof -iTCP:$port -sTCP:LISTEN -n -P
+  fi
+}
+
+# === Zoxide Integration ===
+# Enhanced directory jumping with fzf
+# Unlike 'zi' (zoxide interactive), this enables fuzzy matching and customization
+# Usage: z [query] - fuzzy search through frecent directories
+# Example: z dot -> search for directories containing "dot"
+z() {
+  local dir=$(
+    zoxide query --list --score |  # Get all directories with scores
+    fzf --height 40% --layout reverse --info inline \
+        --nth 2.. \        # Search from 2nd field onward (skip score)
+        --tac \            # Reverse order (highest score first)
+        --no-sort \        # Preserve zoxide's scoring order
+        --query "$*" \     # Pre-populate search with arguments
+        --preview 'eza --tree --level=2 --icons {2..}' \
+        --preview-window 'right:40%' \
+        --bind 'enter:become:echo {2..}'  # Output path on enter
+  ) && cd "$dir"
+}

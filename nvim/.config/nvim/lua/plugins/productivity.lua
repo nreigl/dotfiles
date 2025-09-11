@@ -95,20 +95,24 @@ return {
     },
   },
 
-  -- Improved code folding
+  -- UFO: Modern code folding using Treesitter
+  -- Provides smart, context-aware code folding with visual indicators
   {
     "kevinhwang91/nvim-ufo",
     dependencies = "kevinhwang91/promise-async",
     event = "BufReadPost",
     opts = {
+      -- Use treesitter as primary provider, indent as fallback
       provider_selector = function()
         return { "treesitter", "indent" }
       end,
     },
     init = function()
-      vim.o.fillchars = [[eob: ,fold: ,foldopen:,foldsep: ,foldclose:]]
-      vim.o.foldcolumn = "1"
-      vim.o.foldlevel = 99
+      -- Configure fold appearance
+      -- fillchars requires exactly 1 character for foldopen/foldclose
+      vim.o.fillchars = [[eob: ,fold: ,foldopen:▾,foldsep: ,foldclose:▸]]
+      vim.o.foldcolumn = "1" -- Show fold indicators in sign column
+      vim.o.foldlevel = 99 -- Start with all folds open
       vim.o.foldlevelstart = 99
       vim.o.foldenable = true
     end,
