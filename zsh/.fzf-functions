@@ -226,18 +226,21 @@ fport() {
 # === Zoxide Integration ===
 # Enhanced directory jumping with fzf
 # Unlike 'zi' (zoxide interactive), this enables fuzzy matching and customization
-# Usage: z [query] - fuzzy search through frecent directories
-# Example: z dot -> search for directories containing "dot"
-z() {
-  local dir=$(
-    zoxide query --list --score |  # Get all directories with scores
-    fzf --height 40% --layout reverse --info inline \
-        --nth 2.. \        # Search from 2nd field onward (skip score)
-        --tac \            # Reverse order (highest score first)
-        --no-sort \        # Preserve zoxide's scoring order
-        --query "$*" \     # Pre-populate search with arguments
+# Usage: zz [query] - fuzzy search through frecent directories
+# Example: zz dot -> search for directories containing "dot"
+zz() {
+  local dir
+  dir=$(zoxide query --list --score | \
+    sed 's/^ *//' | \
+    fzf --height 40% \
+        --layout reverse \
+        --info inline \
+        --nth 2.. \
+        --tac \
+        --no-sort \
+        --query "$*" \
         --preview 'eza --tree --level=2 --icons {2..}' \
         --preview-window 'right:40%' \
-        --bind 'enter:become:echo {2..}'  # Output path on enter
-  ) && cd "$dir"
+        --bind 'enter:become:echo {2..}')
+  [[ -n "$dir" ]] && cd "$dir"
 }

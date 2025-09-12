@@ -42,7 +42,19 @@
       "Bash(jq:*)",
       "Bash(test:*)",
       "Bash(R:*)",
-      "Read(//Applications/MATLAB_R2024b.app/**)"
+      "Read(//Applications/MATLAB_R2024b.app/**)",
+      "Bash(curl:*)",
+      "Bash(exec zsh)",
+      "Bash(zinit update:*)",
+      "Bash(z:*)",
+      "Bash(alias zz)",
+      "Bash(/usr/bin/grep -E \"(zz|zoxide|zi)\")",
+      "Bash(echo $ZDOTDIR)",
+      "Bash(find:*)",
+      "Bash(fzf:*)",
+      "Bash(functions z)",
+      "Bash(xargs cd:*)",
+      "Bash(unfunction z)"
     ],
     "deny": [],
     "ask": []

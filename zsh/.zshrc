@@ -108,10 +108,17 @@ export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
 export FZF_DEFAULT_OPTS='
-  --height 40% --layout=reverse --border
+  --height 40% --layout=reverse --border=rounded
   --color=bg+:#363a4f,bg:#24273a,spinner:#f4dbd6,hl:#ed8796
   --color=fg:#cad3f5,header:#ed8796,info:#c6a0f6,pointer:#f4dbd6
   --color=marker:#f4dbd6,fg+:#cad3f5,prompt:#c6a0f6,hl+:#ed8796
+  --bind="ctrl-d:preview-down,ctrl-u:preview-up"
+  --bind="ctrl-f:preview-page-down,ctrl-b:preview-page-up"
+  --bind="ctrl-/:toggle-preview"
+  --bind="alt-a:select-all,alt-d:deselect-all"
+  --bind="ctrl-y:execute-silent(echo {} | pbcopy)"
+  --preview-window="right:50%:hidden"
+  --cycle
 '
 
 # === LaTeX Configuration ===
@@ -222,6 +229,8 @@ command -v gh &>/dev/null && eval "$(gh copilot alias -- zsh)"
 # Source FZF functions
 [[ -f "$HOME/.fzf-functions" ]] && source "$HOME/.fzf-functions"
 
+# Function will be redefined at end of file
+
 # === Final Setup ===
 # Ensure XDG directories exist
 mkdir -p "$XDG_CONFIG_HOME" "$XDG_DATA_HOME" "$XDG_CACHE_HOME" "$XDG_STATE_HOME/zsh"
@@ -229,3 +238,30 @@ mkdir -p "$XDG_CONFIG_HOME" "$XDG_DATA_HOME" "$XDG_CACHE_HOME" "$XDG_STATE_HOME/
 # Welcome message (optional - comment out for faster startup)
 # echo "🚀 ZSH loaded with modern tooling (UV, Mise, Starship, Zoxide)"
 # echo "📦 Python: $(python3 --version 2>&1 | cut -d' ' -f2) | Julia: $(julia --version 2>&1 | cut -d' ' -f3)"
+
+# Fix for z function (must be at end to override Claude snapshot)
+# First unfunction any broken z, then create working version
+unfunction z 2>/dev/null || true
+
+# Simple working z function - directly uses zoxide for quick jumps
+z() {
+  if [[ $# -eq 0 ]]; then
+    # No args - show interactive fzf selector
+    local dir
+    dir=$(zoxide query --list --score | \
+      sed 's/^ *//' | \
+      fzf --height 40% \
+          --layout reverse \
+          --info inline \
+          --nth 2.. \
+          --tac \
+          --no-sort \
+          --preview 'eza --tree --level=2 --icons {2..}' \
+          --preview-window 'right:40%' \
+          --bind 'enter:become:echo {2..}')
+    [[ -n "$dir" ]] && cd "$dir"
+  else
+    # With args - use zoxide directly for speed
+    cd "$(zoxide query "$@")"
+  fi
+}

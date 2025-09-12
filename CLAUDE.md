@@ -114,4 +114,10 @@ zinit self-update && zinit update --all
 # Stow conflicts (preview first)
 stow -n -v <package>
 stow --adopt <package>  # Careful: moves existing files into repo
+
+# Fix z function in Claude Code (if getting "bad pattern" error)
+unfunction z; source ~/dotfiles/zsh/.zshrc.local
+# Note: Claude Code resets working directory after each command
+# The z function works but directory changes don't persist in Claude Code
+# Use absolute paths or cd commands within scripts instead
 ```
