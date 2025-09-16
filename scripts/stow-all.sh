@@ -48,10 +48,19 @@ PACKAGES=(
 # Function to stow a package
 stow_package() {
   local package="$1"
+  local -a FLAGS=("--restow")
+  if [[ "${STOW_ADOPT:-0}" == "1" ]]; then
+    FLAGS=("--adopt" "--restow")
+  fi
+  if [[ "${STOW_DRY_RUN:-0}" == "1" ]]; then
+    FLAGS=("-n" "-v" "${FLAGS[@]}")
+  else
+    FLAGS=("-v" "${FLAGS[@]}")
+  fi
   
   if [ -d "$package" ]; then
     echo -e "${YELLOW}Stowing $package...${NC}"
-    stow -v --restow "$package" 2>&1 | grep -v "BUG in find_stowed_path" || true
+    stow "${FLAGS[@]}" "$package" 2>&1 | grep -v "BUG in find_stowed_path" || true
     echo -e "${GREEN}✓ $package stowed${NC}"
   else
     echo -e "${RED}✗ $package directory not found${NC}"

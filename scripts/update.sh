@@ -80,10 +80,12 @@ update_neovim() {
 update_zsh() {
   echo -e "${YELLOW}⚡ Updating ZSH plugins...${NC}"
   
-  # Update Zinit
+  # Update Zinit (run in an interactive zsh so zinit is available)
   if [ -d "${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git" ]; then
-    zinit self-update
-    zinit update --all
+    zsh -i -c 'zinit self-update && zinit update --all' || {
+      echo -e "${YELLOW}⚠️  Unable to update via interactive zsh; sourcing directly...${NC}"
+      zsh -c "source '${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.zsh'; zinit self-update; zinit update --all" || true
+    }
     echo -e "${GREEN}✓ ZSH plugins updated${NC}"
   else
     echo -e "${RED}✗ Zinit not found${NC}"

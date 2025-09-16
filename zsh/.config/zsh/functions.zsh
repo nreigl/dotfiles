@@ -155,14 +155,19 @@ fe() {
   file=$(fzf --preview 'bat --style=numbers --color=always --line-range=:500 {}') && ${EDITOR:-nvim} "$file"
 }
 
-# Kill process
-fkill() {
+# Kill process (simple fallback; avoided name clash with fzf alias)
+fkill_simple() {
   local pid
   pid=$(ps -ef | sed 1d | fzf -m | awk '{print $2}')
   if [ "x$pid" != "x" ]; then
     echo "$pid" | xargs kill -9
   fi
 }
+
+# If no fkill alias/function exists, provide a default binding
+if ! alias fkill >/dev/null 2>&1 && ! typeset -f fkill >/dev/null 2>&1; then
+  alias fkill='fkill_simple'
+fi
 
 # Git branch selection
 fbr() {
@@ -185,6 +190,8 @@ dclean() {
 
 # === Utility ===
 # Weather for a city
+# Ensure any existing alias doesn't break function definition during reload
+unalias weather 2>/dev/null || true
 weather() {
   curl "wttr.in/${1:-}"
 }

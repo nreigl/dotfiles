@@ -20,6 +20,11 @@ My personal dotfiles for macOS with state-of-the-art tooling and performance opt
 - `zoxide` - Smart `cd` (learns your habits)
 - `delta` - Better `git diff` (side-by-side diffs)
 
+### XDG Layout
+- Most configs live under `~/.config/...` (fzf, ripgrep, starship, wezterm, nvim, etc.).
+- FZF custom config: `~/.config/fzf/fzf.zsh`
+- FZF/ZLE functions: `~/.config/zsh/fzf-functions.zsh`
+
 ### Development
 - **Python**: [UV](https://docs.astral.sh/uv/) - Ultra-fast Python package manager (replaces pip, pipx, poetry, pyenv)
 - **Julia**: [Juliaup](https://github.com/JuliaLang/juliaup) - Official Julia version manager
@@ -80,7 +85,7 @@ dotfiles/
 ├── cursor/           # Cursor IDE settings
 ├── fzf/              # Fuzzy finder configuration
 ├── gh/               # GitHub CLI config
-├── git/              # Git configuration
+├── git/              # Git configuration (XDG: ~/.config/git)
 ├── julia/            # Julia startup.jl
 ├── latex/            # LaTeX/latexmk configuration
 ├── lazygit/          # LazyGit configuration
@@ -143,6 +148,26 @@ Create `~/.zsh_secrets` for private environment variables:
 ```bash
 export GITHUB_TOKEN="your-token"
 export OPENAI_API_KEY="your-key"
+```
+
+### Ripgrep
+- Uses XDG config at `~/.config/ripgrep/config` (set via `RIPGREP_CONFIG_PATH`).
+- The config includes smart-case, hidden file handling with safe VCS exclusions, and useful type aliases.
+
+### Git (XDG)
+- Global config at `~/.config/git/config`. A minimal `~/.gitconfig` includes this file for compatibility with tools expecting it.
+- Global ignore file at `~/.config/git/ignore`.
+
+### Node and Python
+- Node is managed by `mise` (see `mise.toml`), so `brew install node` is not required.
+- Python is managed by `UV` (ultra-fast), so separate Homebrew Python or Conda are optional.
+
+### Aliases
+- Primary aliases live in `~/.config/zsh/aliases.zsh` and only activate when the underlying tools are installed.
+- Legacy aggressive GNU/coreutils overrides in `~/.aliases` are disabled by default to avoid breaking scripts and muscle memory. To enable them explicitly:
+
+```bash
+export ENABLE_LEGACY_GNU_ALIASES=1
 ```
 
 ### Custom Aliases
@@ -215,6 +240,14 @@ mise doctor
 - Starship prompt is async and minimal
 - Ripgrep for blazing fast code search
 - FZF with optimized preview settings
+
+## 🧹 Brewfile Notes
+- Replaced `youtube-dl` with `yt-dlp`.
+- Switched AdoptOpenJDK casks to `temurin8`.
+- Prefer `zoxide` over `autojump` (autojump commented out).
+- Prefer `eza` over `lsd` (lsd commented out).
+- Prefer `tmux` over `screen` (screen commented out).
+- Python managed by UV; `python@3.9` commented out to reduce conflicts.
 
 ## 📝 License
 

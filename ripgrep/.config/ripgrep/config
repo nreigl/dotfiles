@@ -1,19 +1,17 @@
-# Ripgrep Configuration File
-# Set RIPGREP_CONFIG_PATH=~/.rgrc in your shell
+# Ripgrep configuration (XDG)
+# Path: ~/.config/ripgrep/config
 
-# Smart case search (case-insensitive unless pattern has uppercase)
+# Smart case: case-insensitive unless pattern has uppercase
 --smart-case
 
-# Follow symlinks
+# Follow symlinks and include hidden files, but exclude VCS dirs
 --follow
-
-# Search hidden files and directories (but still respect .gitignore)
 --hidden
+--glob=!**/.git/
 
-# Respect .gitignore, .ignore, and .rgignore files
---glob=!.git/
+# Respect ignore files (.gitignore, .ignore, .rgignore) by default
 
-# Add custom file types
+# File types
 --type-add=web:*.{html,css,scss,sass,less,js,jsx,ts,tsx,vue,svelte}
 --type-add=config:*.{json,yaml,yml,toml,ini,conf,config}
 --type-add=docs:*.{md,mdx,rst,txt,adoc}
@@ -22,8 +20,7 @@
 --type-add=julia:*.{jl}
 --type-add=data:*.{csv,tsv,parquet,feather,arrow}
 
-# Exclude common directories
---glob=!**/.git/
+# Exclusions
 --glob=!**/.svn/
 --glob=!**/.hg/
 --glob=!**/node_modules/
@@ -60,14 +57,11 @@
 --glob=!**/poetry.lock
 --glob=!**/Pipfile.lock
 
-# Set max columns for better readability
+# Output and formatting
 --max-columns=150
 --max-columns-preview
-
-# Add line numbers
 --line-number
 
-# Use colors
 --colors=line:style:bold
 --colors=line:fg:cyan
 --colors=path:style:bold
@@ -75,3 +69,4 @@
 --colors=match:style:bold
 --colors=match:fg:red
 --colors=match:bg:yellow
+

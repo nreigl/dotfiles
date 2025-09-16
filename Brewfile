@@ -1,4 +1,4 @@
-tap "adoptopenjdk/openjdk"
+tap "homebrew/cask-versions"
 tap "bramstein/webfonttools"
 tap "dart-lang/dart"
 tap "epk/epk"
@@ -19,8 +19,7 @@ brew "ack"
 brew "libpng"
 # Library for command-line editing
 brew "readline"
-# Shell extension to jump to frequently used directories
-brew "autojump"
+# Shell extension to jump to frequently used directories (using zoxide instead)
 # Tool for generating GNU Standards-compliant Makefiles
 brew "automake"
 # Bourne-Again SHell, a UNIX command interpreter
@@ -115,8 +114,7 @@ brew "libyaml"
 brew "jrnl"
 # Julia installer and version multiplexer
 brew "juliaup"
-# Platform built on V8 to build network applications
-brew "node"
+# Platform built on V8 to build network applications (managed via mise)
 # Swiss-army knife of markup format conversion
 brew "pandoc"
 # Interactive environments for writing and running code
@@ -129,8 +127,7 @@ brew "latexindent"
 brew "lazygit"
 # Portable Foreign Function Interface library
 brew "libffi"
-# Clone of ls with colorful output, file type icons, and more
-brew "lsd"
+# Clone of ls with colorful output (using eza instead of lsd)
 # Package manager for the Lua programming language
 brew "luarocks"
 # Mac App Store command-line interface
@@ -161,10 +158,7 @@ brew "pipx"
 # brew "powerlevel10k" # Removed: Using Starship prompt instead
 # Show ps output as a tree
 brew "pstree"
-# Python version management
-# brew "pyenv" # Removed: Using UV for Python management
-# Interpreted, interactive, object-oriented programming language
-brew "python@3.9"
+# Python version management (handled by UV)
 # Ruby version manager
 # brew "rbenv" # Removed: Using mise for Ruby version management
 # Perl-powered file rename script with many helpful built-ins
@@ -183,8 +177,7 @@ brew "ruby"
 brew "ruby-install"
 # Safe, concurrent, practical language
 brew "rust"
-# Terminal multiplexer with VT100/ANSI terminal emulation
-brew "screen"
+# Terminal multiplexer with VT100/ANSI terminal emulation (use tmux instead)
 # 7-Zip is a file archiver with a high compression ratio
 brew "sevenzip"
 # Terminal-based client for Spotify
@@ -209,8 +202,7 @@ brew "tasksh"
 brew "tealdeer"
 # Implementation of the Language Server Protocol for LaTeX
 brew "texlab"
-# Code-search similar to ack
-brew "the_silver_searcher"
+# Code-search similar to ack (prefer ripgrep over The Silver Searcher)
 # Programmatically correct mistyped console commands
 brew "thefuck"
 # Command-line time tracking application
@@ -239,16 +231,15 @@ brew "woff2"
 brew "xdotool"
 # Blazing fast terminal file manager written in Rust, based on async I/O
 brew "yazi"
-# Download YouTube videos from the command-line
-brew "youtube-dl"
+# Download videos from the command-line (actively maintained)
+brew "yt-dlp"
 # Pluggable terminal workspace, with terminal multiplexer as the base feature
 brew "zellij"
 # General-purpose lossless data-compression library
 brew "zlib"
 # Shell extension to navigate your filesystem faster
 brew "zoxide"
-# Next-generation plugin manager for zsh
-brew "zplug"
+# Using zinit for zsh plugins
 # UNIX shell (command interpreter)
 brew "zsh"
 # Simple hotkey-daemon for macOS.
@@ -266,9 +257,8 @@ brew "wix/brew/applesimutils"
 # Password manager that keeps all passwords secure behind one password
 cask "1password", args: { appdir: "/Applications" }
 # AdoptOpenJDK OpenJDK (Java) Development Kit
-cask "adoptopenjdk8", args: { appdir: "/Applications" }
-# AdoptOpenJDK OpenJDK (Java) Development Kit
-cask "adoptopenjdk8-jre", args: { appdir: "/Applications" }
+# Modern JDK (Temurin/OpenJDK 8)
+cask "temurin8"
 # AeroSpace is an i3-like tiling window manager for macOS
 cask "aerospace"
 # Status bar app to overcome time-constrained WiFi networks
@@ -371,8 +361,7 @@ cask "keka"
 cask "kicad", args: { appdir: "/Applications" }
 # Extensible two-pane file manager
 cask "marta"
-# Minimal installer for conda
-cask "miniconda", args: { appdir: "/Applications" }
+# Conda is optional; Python is managed via UV
 # Knowledge base that works on top of a local folder of plain text Markdown files
 cask "obsidian"
 # Calculate the overall performance of an investment portfolio

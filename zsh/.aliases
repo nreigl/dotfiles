@@ -99,8 +99,15 @@ alias gbi="git browse -- issues"
 # pull-request
 alias gpr="git pull-request"
 
-# better ls
-# Modern CLI replacements
+# --- Optional legacy coreutils/ripgrep overrides ---
+# Prefer modern, guarded aliases in ~/.config/zsh/aliases.zsh.
+# To enable the legacy aggressive overrides below, export:
+#   ENABLE_LEGACY_GNU_ALIASES=1
+if [[ "${ENABLE_LEGACY_GNU_ALIASES:-0}" != "1" ]]; then
+    return
+fi
+
+# better ls (requires eza)
 alias ls="eza --icons --group-directories-first"
 alias ll="eza -la --icons --group-directories-first"
 alias la="eza -a --icons --group-directories-first"

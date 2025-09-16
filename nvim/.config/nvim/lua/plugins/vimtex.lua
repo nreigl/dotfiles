@@ -13,8 +13,8 @@ return {
       
       -- Modern compiler settings with LuaLaTeX
       vim.g.vimtex_compiler_latexmk = {
-        aux_dir = ".build",
-        out_dir = ".build",
+        aux_dir = "build",
+        out_dir = "build",
         callback = 1,
         continuous = 1,
         executable = "latexmk",

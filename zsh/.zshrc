@@ -1,11 +1,7 @@
 #!/usr/bin/env zsh
 # Modern, fast ZSH configuration
 
-# === XDG Base Directory Specification ===
-export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
-export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
-export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
-export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+# XDG base directories are defined in ~/.zshenv
 
 # === Core Environment ===
 export EDITOR="nvim"
@@ -53,7 +49,7 @@ source "${ZINIT_HOME}/zinit.zsh"
 
 # === Fast Plugin Loading ===
 # Pre-declare FZF custom widgets to prevent zsh-syntax-highlighting errors
-# These widgets are fully defined in ~/.fzf-functions (loaded at line 241)
+# These widgets are fully defined in $XDG_CONFIG_HOME/zsh/fzf-functions.zsh (loaded later)
 # but must be declared here before syntax highlighting plugin loads
 zle -N fzf-git-files
 zle -N fzf-git-branch
@@ -89,11 +85,14 @@ zinit wait lucid for \
 # Mise (Universal version manager)
 eval "$(mise activate zsh 2>/dev/null || true)"
 
+# direnv (per-directory env)
+command -v direnv >/dev/null 2>&1 && eval "$(direnv hook zsh)"
+
 # Starship prompt
-eval "$(starship init zsh)"
+command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
 
 # Zoxide (smart cd)
-eval "$(zoxide init zsh)"
+command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
 
 # FZF
 if [[ -f /opt/homebrew/opt/fzf/shell/completion.zsh ]]; then
@@ -102,6 +101,8 @@ fi
 if [[ -f /opt/homebrew/opt/fzf/shell/key-bindings.zsh ]]; then
   source /opt/homebrew/opt/fzf/shell/key-bindings.zsh
 fi
+# Optional user FZF config
+[[ -f "$XDG_CONFIG_HOME/fzf/fzf.zsh" ]] && source "$XDG_CONFIG_HOME/fzf/fzf.zsh"
 
 # === FZF Configuration ===
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
@@ -133,11 +134,10 @@ fi
 
 # === Completion System ===
 autoload -Uz compinit
-if [[ -n ${ZDOTDIR}/.zcompdump(#qNmh+24) ]]; then
-  compinit
-else
-  compinit -C
-fi
+# Ensure ZDOTDIR fallback and use a stable dump path
+ZDOTDIR=${ZDOTDIR:-$HOME}
+local zcompdump="$ZDOTDIR/.zcompdump"
+compinit -d "$zcompdump"
 
 # Completion styling
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
@@ -170,37 +170,8 @@ bindkey '^[[F' end-of-line
 # Aliases are loaded from ~/.config/zsh/aliases.zsh via zinit
 
 # === Functions ===
-# Make directory and cd into it
-mkcd() {
-  mkdir -p "$1" && cd "$1"
-}
-
-# Extract archives
-extract() {
-  if [ -f $1 ]; then
-    case $1 in
-      *.tar.bz2)   tar xjf $1     ;;
-      *.tar.gz)    tar xzf $1     ;;
-      *.bz2)       bunzip2 $1     ;;
-      *.rar)       unrar e $1     ;;
-      *.gz)        gunzip $1      ;;
-      *.tar)       tar xf $1      ;;
-      *.tbz2)      tar xjf $1     ;;
-      *.tgz)       tar xzf $1     ;;
-      *.zip)       unzip $1       ;;
-      *.Z)         uncompress $1  ;;
-      *.7z)        7z x $1        ;;
-      *)     echo "'$1' cannot be extracted" ;;
-    esac
-  else
-    echo "'$1' is not a valid file"
-  fi
-}
-
-# Quick backup
-backup() {
-  cp "$1" "$1.bak.$(date +%Y%m%d_%H%M%S)"
-}
+# Load shared functions to avoid duplication
+[[ -f "$XDG_CONFIG_HOME/zsh/functions.zsh" ]] && source "$XDG_CONFIG_HOME/zsh/functions.zsh"
 
 # === Load Additional Configs ===
 # Load local machine-specific config if it exists
@@ -227,7 +198,7 @@ command -v gh &>/dev/null && eval "$(gh copilot alias -- zsh)"
 [[ -f "$XDG_CONFIG_HOME/zsh/aliases.zsh" ]] && source "$XDG_CONFIG_HOME/zsh/aliases.zsh"
 
 # Source FZF functions
-[[ -f "$HOME/.fzf-functions" ]] && source "$HOME/.fzf-functions"
+[[ -f "$XDG_CONFIG_HOME/zsh/fzf-functions.zsh" ]] && source "$XDG_CONFIG_HOME/zsh/fzf-functions.zsh"
 
 # Function will be redefined at end of file
 
@@ -257,7 +228,6 @@ z() {
           --tac \
           --no-sort \
           --preview 'eza --tree --level=2 --icons {2..}' \
-          --preview-window 'right:40%' \
           --bind 'enter:become:echo {2..}')
     [[ -n "$dir" ]] && cd "$dir"
   else

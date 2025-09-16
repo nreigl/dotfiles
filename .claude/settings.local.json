@@ -54,7 +54,12 @@
       "Bash(fzf:*)",
       "Bash(functions z)",
       "Bash(xargs cd:*)",
-      "Bash(unfunction z)"
+      "Bash(unfunction z)",
+      "Bash(cat:*)",
+      "Bash(cp:*)",
+      "Bash(ping:*)",
+      "Bash(git fetch:*)",
+      "Bash(./scripts/update.sh:*)"
     ],
     "deny": [],
     "ask": []

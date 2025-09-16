@@ -5,7 +5,8 @@
 # Ctrl-G: Search git files
 fzf-git-files() {
   local files
-  files=$(git ls-files --others --exclude-standard --cached 2>/dev/null | fzf --multi --preview 'bat --style=numbers --color=always --line-range :500 {}')
+  files=$(git ls-files --others --exclude-standard --cached 2>/dev/null | \
+    fzf --multi --preview 'command -v bat >/dev/null 2>&1 && bat --style=numbers --color=always --line-range :500 {} || sed -n "1,200p" {}')
   [[ -n "$files" ]] && ${EDITOR:-nvim} $files
 }
 
@@ -32,8 +33,9 @@ FZF-EOF"
 # === File Search with Preview ===
 # Ctrl-F: Find file with preview
 fzf-file-preview() {
-  fd --type f --hidden --follow --exclude .git |
-    fzf --preview 'bat --style=numbers --color=always --line-range :500 {}' \
+  (command -v fd >/dev/null 2>&1 && fd --type f --hidden --follow --exclude .git || \
+    rg --files --hidden --follow -g '!*.git/*') |
+    fzf --preview 'command -v bat >/dev/null 2>&1 && bat --style=numbers --color=always --line-range :500 {} || sed -n "1,200p" {}' \
         --bind 'ctrl-/:change-preview-window(down|hidden|)'
 }
 
@@ -41,7 +43,9 @@ fzf-file-preview() {
 # Alt-C: Enhanced directory navigation
 fzf-cd-widget() {
   local dir
-  dir=$(fd --type d --hidden --follow --exclude .git 2>/dev/null | fzf --preview 'eza --tree --level=2 --icons {}')
+  dir=$( (command -v fd >/dev/null 2>&1 && fd --type d --hidden --follow --exclude .git || \
+    find . -type d -not -path '*/.git/*' 2>/dev/null) | \
+    fzf --preview 'command -v eza >/dev/null 2>&1 && eza --tree --level=2 --icons {} || ls -lah {}')
   [[ -n "$dir" ]] && cd "$dir"
 }
 
@@ -83,7 +87,7 @@ if [[ $- == *i* ]]; then
   bindkey '^g' fzf-git-files
   bindkey '^b' fzf-git-branch
   bindkey '^f' fzf-file-preview
-  bindkey '\ec' fzf-cd-widget  # Alt-C
+  bindkey '\\ec' fzf-cd-widget  # Alt-C
 fi
 
 # === Aliases ===
@@ -101,7 +105,7 @@ frg() {
       fzf --ansi \
           --color "hl:-1:underline,hl+:-1:underline:reverse" \
           --delimiter : \
-          --preview 'bat --color=always {1} --highlight-line {2}' \
+          --preview 'command -v bat >/dev/null 2>&1 && bat --color=always {1} --highlight-line {2} || sed -n "1,200p" {1}' \
           --preview-window 'up,60%,border-bottom,+{2}+3/3,~3'
   )
   [[ -n "$result" ]] && ${EDITOR:-nvim} $(echo "$result" | cut -d: -f1) +$(echo "$result" | cut -d: -f2)
@@ -110,7 +114,8 @@ frg() {
 # Search and edit files
 fe() {
   local files
-  files=$(fd "${1:-.}" --type f --hidden --follow --exclude .git | fzf --multi --preview 'bat --style=numbers --color=always {}')
+  files=$( ( (command -v fd >/dev/null 2>&1 && fd "${1:-.}" --type f --hidden --follow --exclude .git) || \
+    rg --files --hidden --follow -g '!*.git/*') | fzf --multi --preview 'command -v bat >/dev/null 2>&1 && bat --style=numbers --color=always {} || sed -n "1,200p" {}')
   [[ -n "$files" ]] && ${EDITOR:-nvim} $files
 }
 
@@ -119,7 +124,7 @@ fe() {
 fh() {
   local cmd
   cmd=$(history -n 1 | fzf --tac --no-sort --query="$1" \
-    --preview 'echo {} | sed "s/^[ ]*[0-9]*[ ]*//" | bat --language=sh --style=plain --color=always' \
+    --preview 'echo {} | sed "s/^[ ]*[0-9]*[ ]*//" | (bat --language=sh --style=plain --color=always 2>/dev/null || cat)' \
     --preview-window='up:3:wrap' \
     --bind='ctrl-y:execute-silent(echo {} | pbcopy)+abort' \
     --header='Press CTRL-Y to copy command')
@@ -140,7 +145,7 @@ fnpm() {
   if [[ -f package.json ]]; then
     local script
     script=$(cat package.json | jq -r '.scripts | keys[]' 2>/dev/null | \
-      fzf --preview "cat package.json | jq -r '.scripts.\"{}\"'" \
+      fzf --preview "cat package.json | jq -r '.scripts.\\"{}\\"'" \
           --preview-window=up:3:wrap \
           --header='Select npm script to run')
     [[ -n "$script" ]] && npm run "$script"
@@ -239,7 +244,7 @@ zz() {
         --tac \
         --no-sort \
         --query "$*" \
-        --preview 'eza --tree --level=2 --icons {2..}' \
+        --preview 'command -v eza >/dev/null 2>&1 && eza --tree --level=2 --icons {2..} || ls -lah {2..}' \
         --preview-window 'right:40%' \
         --bind 'enter:become:echo {2..}')
   [[ -n "$dir" ]] && cd "$dir"

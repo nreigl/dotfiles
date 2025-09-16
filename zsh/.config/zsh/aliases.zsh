@@ -105,7 +105,6 @@ alias kdel='kubectl delete'
 alias klog='kubectl logs'
 
 # === Misc ===
-alias weather='curl wttr.in'
 alias speedtest='curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -'
 alias week='date +%V'
 alias timer='echo "Timer started. Stop with Ctrl-D." && date && time cat && date'
