@@ -94,10 +94,11 @@ command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
 # Zoxide (smart cd)
 command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
 
+# Atuin (smart, syncable shell history + Ctrl-R UI)
+command -v atuin >/dev/null 2>&1 && eval "$(atuin init zsh)"
+
 # FZF
-if [[ -f /opt/homebrew/opt/fzf/shell/completion.zsh ]]; then
-  source /opt/homebrew/opt/fzf/shell/completion.zsh
-fi
+# Use fzf key-bindings only; skip fzf's completion (fzf-tab handles completion)
 if [[ -f /opt/homebrew/opt/fzf/shell/key-bindings.zsh ]]; then
   source /opt/homebrew/opt/fzf/shell/key-bindings.zsh
 fi
@@ -145,6 +146,29 @@ zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 zstyle ':completion:*' menu select
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*:descriptions' format '%F{green}-- %d --%f'
+
+# fzf-tab: FZF-powered completion UI (load after compinit)
+zinit light Aloxaf/fzf-tab
+# Minimal but useful fzf-tab styles
+zstyle ':fzf-tab:*' use-fzf-default-opts yes
+zstyle ':fzf-tab:*' extended-search yes
+zstyle ':fzf-tab:*' switch-group '<' '>'
+zstyle ':fzf-tab:*' show-group auto
+zstyle ':fzf-tab:*' fzf-flags --preview-window='right:60%:wrap,border'
+
+# Generic file preview
+zstyle ':fzf-tab:complete:*' fzf-preview 'bat --style=numbers --color=always --line-range=:500 -- {1} 2>/dev/null || sed -n "1,200p" -- {1}'
+
+# Directory preview for cd/ls/eza
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -a --icons --group-directories-first -1 -- {1} 2>/dev/null || ls -la -- {1}'
+zstyle ':fzf-tab:complete:ls:*' fzf-preview 'eza -a --icons --group-directories-first -1 -- {1} 2>/dev/null || ls -la -- {1}'
+zstyle ':fzf-tab:complete:eza:*' fzf-preview 'eza -a --icons --group-directories-first -1 -- {1} 2>/dev/null || ls -la -- {1}'
+
+# Useful previews for common tools
+zstyle ':fzf-tab:complete:git-(add|restore):*' fzf-preview 'git diff --color=always -- {1} 2>/dev/null | sed -n "1,200p"'
+zstyle ':fzf-tab:complete:git-checkout:*' fzf-preview 'git log --color=always --oneline --graph --decorate {1} -n 30 2>/dev/null'
+zstyle ':fzf-tab:complete:brew-(install|info|upgrade):*' fzf-preview 'brew info --color=always {1} 2>/dev/null | sed -n "1,200p"'
+zstyle ':fzf-tab:complete:man:*' fzf-preview 'man -P cat {1} 2>/dev/null | col -bx | sed -n "1,120p"'
 
 # === Shell Options ===
 setopt AUTO_CD              # cd by typing directory name
@@ -235,3 +259,5 @@ z() {
     cd "$(zoxide query "$@")"
   fi
 }
+
+. "$HOME/.local/share/../bin/env"

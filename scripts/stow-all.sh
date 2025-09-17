@@ -20,6 +20,7 @@ cd "$DOTFILES_DIR"
 
 # Array of packages to stow
 PACKAGES=(
+  "atuin"
   "aws"
   "claude"
   "cursor"

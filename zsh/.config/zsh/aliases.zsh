@@ -86,6 +86,25 @@ alias reload='source ~/.zshrc'
 alias path='echo -e ${PATH//:/\\n}'
 alias ports='netstat -tulanp'
 alias myip='curl http://ipecho.net/plain; echo'
+## Open current directory in Finder (Marta if installed)
+# Keep this here (modern aliases) so it works even when ~/.aliases is
+# disabled by the legacy guard. Accepts optional path arg, defaults to '.'
+o() {
+  local target
+  target="${1:-.}"
+  if [[ "$OSTYPE" == darwin* ]]; then
+    if /usr/bin/open -Ra "Marta" >/dev/null 2>&1; then
+      /usr/bin/open -a Marta "$target"
+    else
+      /usr/bin/open "$target"
+    fi
+  else
+    command -v xdg-open >/dev/null 2>&1 && xdg-open "$target" || {
+      echo "No system opener found for '$target'" >&2
+      return 1
+    }
+  fi
+}
 
 # === Docker ===
 alias d='docker'

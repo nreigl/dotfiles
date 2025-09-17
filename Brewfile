@@ -239,6 +239,7 @@ brew "zellij"
 brew "zlib"
 # Shell extension to navigate your filesystem faster
 brew "zoxide"
+brew "atuin"
 # Using zinit for zsh plugins
 # UNIX shell (command interpreter)
 brew "zsh"

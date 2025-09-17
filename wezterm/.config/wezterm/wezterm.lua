@@ -2,6 +2,26 @@ local wezterm = require("wezterm")
 
 local config = wezterm.config_builder()
 
+-- Launch tmux by default (attach or create a "main" session)
+-- Use absolute Homebrew path if available (GUI apps may not inherit shell PATH)
+local function file_exists(path)
+  local f = io.open(path, "r")
+  if f then f:close() return true end
+  return false
+end
+
+local tmux_path = "tmux"
+if wezterm.target_triple:match("darwin") then
+  if file_exists("/opt/homebrew/bin/tmux") then
+    tmux_path = "/opt/homebrew/bin/tmux"
+  elseif file_exists("/usr/local/bin/tmux") then
+    tmux_path = "/usr/local/bin/tmux"
+  end
+end
+
+-- Every new WezTerm pane/window runs tmux and attaches to session "main"
+config.default_prog = { tmux_path, "new-session", "-A", "-s", "main" }
+
 -- config.font = wezterm.font("JetBrainsMono Nerd Font")
 config.font = wezterm.font("JetBrains Mono")
 config.font_size = 15.0
@@ -15,7 +35,10 @@ config.colors = {
 }
 config.window_decorations = "RESIZE"
 config.enable_tab_bar = false
-config.send_composed_key_when_left_alt_is_pressed = true -- Need to use use alt
+-- Make Left Option send ESC-prefix (Meta) for Alt keybindings in shells.
+-- Keep Right Option composing characters for accents/symbols.
+config.send_composed_key_when_left_alt_is_pressed = true
+config.send_composed_key_when_right_alt_is_pressed = true
 
 config.window_background_opacity = 1 -- Default opacity when not fullscreen
 config.macos_window_background_blur = 10

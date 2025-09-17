@@ -7,7 +7,7 @@ return {
     ft = "markdown",
     dependencies = {
       "nvim-lua/plenary.nvim",
-      "hrsh7th/nvim-cmp",
+      -- NOTE: Using blink.cmp in this setup; avoid forcing nvim-cmp.
       "nvim-telescope/telescope.nvim",
       "nvim-treesitter/nvim-treesitter",
     },
@@ -33,7 +33,8 @@ return {
 
       -- Optional, completion of wiki links, local markdown links, and tags
       completion = {
-        nvim_cmp = true,
+        -- Disable nvim-cmp integration since this setup uses blink.cmp
+        nvim_cmp = false,
         min_chars = 2,
       },
 

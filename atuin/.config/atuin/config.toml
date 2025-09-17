@@ -1,0 +1,13 @@
+# Atuin configuration (local, no sync)
+auto_sync = false
+keymap = "emacs"
+style = "auto"
+show_preview = true
+inline_height = 18
+filter_mode = "global"      # search across all history
+search_mode = "fuzzy"       # fuzzy matching for Ctrl-R
+
+# Uncomment to tweak further:
+# # number of results to return
+# max_results = 1000
+# # prefer_builtin_history = false

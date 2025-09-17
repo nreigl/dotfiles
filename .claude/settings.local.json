@@ -59,7 +59,8 @@
       "Bash(cp:*)",
       "Bash(ping:*)",
       "Bash(git fetch:*)",
-      "Bash(./scripts/update.sh:*)"
+      "Bash(./scripts/update.sh:*)",
+      "Bash(brew:*)"
     ],
     "deny": [],
     "ask": []
