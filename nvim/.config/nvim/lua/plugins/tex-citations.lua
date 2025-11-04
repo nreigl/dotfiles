@@ -1,30 +1,41 @@
 return {
-  -- Use nvim-cmp only for TeX to get bibliography completion
+  -- Explicitly install nvim-cmp dependencies for TeX
+  { "hrsh7th/cmp-buffer", lazy = true },
+  { "hrsh7th/cmp-path", lazy = true },
+  { "saadparwaiz1/cmp_luasnip", lazy = true },
+  { "micangl/cmp-vimtex", lazy = true },
+
+  -- Configure nvim-cmp for TeX files to get bibliography completion
   {
     "hrsh7th/nvim-cmp",
     ft = { "tex", "plaintex" },
+    event = "InsertEnter", -- Also load on InsertEnter for better responsiveness
     dependencies = {
       "micangl/cmp-vimtex", -- VimTeX-aware completion (labels, cites, etc.)
       "saadparwaiz1/cmp_luasnip",
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-path",
+      "L3MON4D3/LuaSnip", -- Ensure LuaSnip is available
     },
-    opts = function()
+    config = function()
       local cmp = require("cmp")
-      return {
-        completion = { autocomplete = { cmp.TriggerEvent.TextChanged } },
+      cmp.setup.filetype({ "tex", "plaintex" }, {
+        completion = {
+          autocomplete = { cmp.TriggerEvent.TextChanged, cmp.TriggerEvent.InsertEnter },
+        },
         mapping = cmp.mapping.preset.insert({
           ["<CR>"] = cmp.mapping.confirm({ select = true }),
           ["<Tab>"] = cmp.mapping.select_next_item(),
           ["<S-Tab>"] = cmp.mapping.select_prev_item(),
+          ["<C-Space>"] = cmp.mapping.complete(),
         }),
         sources = cmp.config.sources({
-          { name = "vimtex" },
-          { name = "luasnip" },
-          { name = "buffer" },
-          { name = "path" },
+          { name = "vimtex", priority = 10 },
+          { name = "luasnip", priority = 8 },
+          { name = "buffer", priority = 5 },
+          { name = "path", priority = 3 },
         }),
-      }
+      })
     end,
   },
 
