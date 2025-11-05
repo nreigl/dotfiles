@@ -26,6 +26,21 @@ return {
           },
         },
       })
+
+      -- Trigger bibliography parsing when opening TeX files
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = { "tex", "plaintex" },
+        callback = function()
+          -- Give VimTeX time to initialize and find bibliography files
+          vim.defer_fn(function()
+            local cmp_vimtex = require("cmp_vimtex")
+            if cmp_vimtex.search then
+              -- Force refresh of bibliography database
+              cmp_vimtex.search()
+            end
+          end, 500) -- Wait 500ms for VimTeX to parse \addbibresource
+        end,
+      })
     end,
   },
 

@@ -84,6 +84,9 @@ return {
         simple = 1,
         menu_fmt = '@year @author_short, "@title"',
       }
+
+      -- Parser for bibliography files (helps cmp-vimtex find citations)
+      vim.g.vimtex_parser_bib_backend = 'bibtex'
     end,
     config = function()
       -- Auto-set conceallevel for LaTeX files
