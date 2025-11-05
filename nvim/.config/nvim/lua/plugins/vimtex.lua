@@ -31,14 +31,6 @@ return {
 
       -- Compiler method (use latexmk for continuous compilation)
       vim.g.vimtex_compiler_method = "latexmk"
-
-      -- Prevent multiple compilation processes
-      vim.g.vimtex_compiler_latexmk_engines = {
-        _ = "-lualatex"
-      }
-
-      -- Better handling of compilation callbacks
-      vim.g.vimtex_compiler_progname = "nvr"
       
       -- Disable mappings that conflict with LazyVim
       vim.g.vimtex_mappings_disable = { ["n"] = { "K" } }
