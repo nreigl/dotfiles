@@ -24,8 +24,21 @@ return {
           "-synctex=1",
           "-interaction=nonstopmode",
           "-lualatex", -- Use LuaLaTeX for modern Unicode/font support
+          "-pv-", -- Disable preview to avoid multiple processes
+          "-shell-escape",
         },
       }
+
+      -- Compiler method (use latexmk for continuous compilation)
+      vim.g.vimtex_compiler_method = "latexmk"
+
+      -- Prevent multiple compilation processes
+      vim.g.vimtex_compiler_latexmk_engines = {
+        _ = "-lualatex"
+      }
+
+      -- Better handling of compilation callbacks
+      vim.g.vimtex_compiler_progname = "nvr"
       
       -- Disable mappings that conflict with LazyVim
       vim.g.vimtex_mappings_disable = { ["n"] = { "K" } }
@@ -68,6 +81,16 @@ return {
         [[Underfull \\hbox (badness [0-9]*) in paragraph at lines]],
         "Package hyperref Warning: Token not allowed in a PDF string",
         [[Overfull \\hbox ([0-9]*.[0-9]*pt too wide) in paragraph at lines]],
+      }
+
+      -- Enable completion for bibliography and labels
+      vim.g.vimtex_complete_enabled = 1
+      vim.g.vimtex_complete_close_braces = 1
+
+      -- Bibliography completion settings
+      vim.g.vimtex_complete_bib = {
+        simple = 1,
+        menu_fmt = '@year @author_short, "@title"',
       }
     end,
     config = function()
