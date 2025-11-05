@@ -59,6 +59,24 @@ return {
 
       return opts
     end,
+    config = function()
+      local cmp = require("cmp")
+
+      -- Setup filetype-specific config for TeX files to ensure citation completion triggers
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = { "tex", "plaintex" },
+        callback = function()
+          cmp.setup.buffer({
+            sources = cmp.config.sources({
+              { name = "vimtex", priority = 1000 },
+              { name = "luasnip" },
+              { name = "buffer" },
+              { name = "path" },
+            }),
+          })
+        end,
+      })
+    end,
   },
 
   -- Disable blink.cmp in TeX files to avoid conflicts
