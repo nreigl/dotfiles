@@ -11,10 +11,8 @@ return {
       vim.g.vimtex_view_skim_sync = 1
       vim.g.vimtex_view_skim_activate = 1
       
-      -- Modern compiler settings with LuaLaTeX
+      -- Compiler settings (respects project .latexmkrc)
       vim.g.vimtex_compiler_latexmk = {
-        aux_dir = "build",
-        out_dir = "build",
         callback = 1,
         continuous = 1,
         executable = "latexmk",
@@ -23,8 +21,6 @@ return {
           "-file-line-error",
           "-synctex=1",
           "-interaction=nonstopmode",
-          "-lualatex", -- Use LuaLaTeX for modern Unicode/font support
-          "-pv-", -- Disable preview to avoid multiple processes
           "-shell-escape",
         },
       }
@@ -85,8 +81,8 @@ return {
         menu_fmt = '@year @author_short, "@title"',
       }
 
-      -- Parser for bibliography files (helps cmp-vimtex find citations)
-      vim.g.vimtex_parser_bib_backend = 'bibtex'
+      -- Parser for bibliography files (bibparser works with both bibtex and biber)
+      vim.g.vimtex_parser_bib_backend = 'bibparser'
     end,
     config = function()
       -- Auto-set conceallevel for LaTeX files
