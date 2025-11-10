@@ -365,23 +365,6 @@ emptytrash() {
 
 }
 
-pyenv() {
-    local command
-    command="${1:-}"
-    if [ "$#" -gt 0 ]; then
-        shift
-    fi
-
-    case "$command" in
-    rehash | shell)
-        eval "$(pyenv "sh-$command" "$@")"
-        ;;
-    *)
-        command pyenv "$command" "$@"
-        ;;
-    esac
-}
-
 # FZF
 
 alias fp='fzf --preview "bat --style=numbers --color=always --line-range=:500 {}" --preview-window=right:60% --height=40% --layout=reverse --border --bind "ctrl-o:execute(v{})"'
@@ -402,17 +385,6 @@ alias fp='fzf --preview "bat --style=numbers --color=always --line-range=:500 {}
 fe() {
     IFS=$'\n' files=($(fzf-tmux --query="$1" --multi --select-1 --exit-0 --preview="bat --color=always {}"))
     [[ -n "$files" ]] && ${EDITOR:-vim} "${files[@]}"
-}
-
-# Searches files using ag, lets you fuzzy-pick a result with fzf, and opens the matched file in Vim.
-vg() {
-    local file
-
-    file="$(ag --nobreak --noheading $@ | fzf -0 -1 | awk -F: '{print $1}')"
-
-    if [[ -n $file ]]; then
-        vim $file
-    fi
 }
 
 # fdr - cd to selected parent directory

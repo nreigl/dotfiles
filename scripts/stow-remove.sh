@@ -20,12 +20,14 @@ cd "$DOTFILES_DIR"
 
 # Array of packages to unstow
 PACKAGES=(
+  "atuin"
   "aws"
   "claude"
   "cursor"
   "docker"
   "fzf"
   "gh"
+  "ghostty"
   "git"
   "julia"
   "latex"
@@ -38,7 +40,6 @@ PACKAGES=(
   "ssh"
   "starship"
   "tmux"
-  "vim"
   "vscode"
   "wezterm"
   "yabai"
