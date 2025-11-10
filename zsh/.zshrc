@@ -261,3 +261,4 @@ z() {
 }
 
 . "$HOME/.local/share/../bin/env"
+export PATH="/opt/homebrew/sbin:$PATH"
