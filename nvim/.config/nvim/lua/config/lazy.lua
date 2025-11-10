@@ -17,7 +17,20 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
   spec = {
     -- add LazyVim and import its plugins
-    { "LazyVim/LazyVim", import = "lazyvim.plugins" },
+    {
+      "LazyVim/LazyVim",
+      import = "lazyvim.plugins",
+      opts = {
+        extras = {
+          "lazyvim.extras.ai.claudecode",
+        },
+      },
+      -- You can set your Claude API key here, or preferably, set the CLAUDE_API_KEY environment variable.
+      -- Example: vim.g.claudecode_api_key = "YOUR_CLAUDE_API_KEY"
+      init = function()
+        vim.g.claudecode_api_key = os.getenv("CLAUDE_API_KEY") or "YOUR_CLAUDE_API_KEY"
+      end,
+    },
     -- import/override with your plugins
     { import = "plugins" },
   },
