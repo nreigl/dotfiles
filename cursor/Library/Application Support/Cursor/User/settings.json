@@ -65,5 +65,6 @@
         "editor.fontFamily"
     ],
     "chatgpt.openOnStartup": true,
-    "workbench.activityBar.orientation": "vertical"
+    "workbench.activityBar.orientation": "vertical",
+    "claudeCode.selectedModel": "default"
 }
