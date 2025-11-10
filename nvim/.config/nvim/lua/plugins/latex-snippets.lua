@@ -17,17 +17,28 @@ return {
       -- Custom LaTeX snippets focused on your requested triggers
       ls.add_snippets("tex", {
         -- Citations
-        -- Common triggers
+        -- Basic
         s("cite", fmt("\\cite{{{}}}", { i(1) })),
+        s("ref", fmt("\\ref{{{}}}", { i(1) })),
+
+        -- Biblatex commands (modern)
+        s("parencite", fmt("\\parencite{{{}}}", { i(1) })),
+        s("textcite", fmt("\\textcite{{{}}}", { i(1) })),
+        s("footcite", fmt("\\footcite{{{}}}", { i(1) })),
+        s("autocite", fmt("\\autocite{{{}}}", { i(1) })),
+
+        -- Natbib commands (legacy)
         s("citet", fmt("\\citet{{{}}}", { i(1) })),
         s("citep", fmt("\\citep{{{}}}", { i(1) })),
-        -- Short aliases
-        s("cit", fmt("\\cite{{{}}}", { i(1) })),
-        s("citt", fmt("\\citet{{{}}}", { i(1) })),
-        s("citp", fmt("\\citep{{{}}}", { i(1) })),
+
+        -- Short aliases for biblatex
+        s("pc", fmt("\\parencite{{{}}}", { i(1) })),
+        s("tc", fmt("\\textcite{{{}}}", { i(1) })),
+        s("ac", fmt("\\autocite{{{}}}", { i(1) })),
+
+        -- Cross-references
         s("cref", fmt("\\cref{{{}}}", { i(1) })),
         s("aref", fmt("\\autoref{{{}}}", { i(1) })),
-        s("ref", fmt("\\ref{{{}}}", { i(1) })),
 
         -- Environments (using <> delimiters to avoid conflicts with LaTeX braces)
         s(
