@@ -369,7 +369,7 @@ cask "portfolioperformance"
 # Collaboration platform for API development
 cask "postman", args: { appdir: "/Applications" }
 # G-code generator for 3D printers (RepRap, Makerbot, Ultimaker etc.)
-cask "prusaslicer", args: { appdir: "/Applications" }
+# cask "prusaslicer", args: { appdir: "/Applications" } # Disabled: invalid macOS version dependency in upstream cask
 # Instant messaging application focusing on security
 cask "signal"
 # Digital design and prototyping platform

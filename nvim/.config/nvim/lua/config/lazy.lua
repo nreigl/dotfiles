@@ -23,12 +23,13 @@ require("lazy").setup({
       opts = {
         extras = {
           "lazyvim.extras.ai.claudecode",
+          "lazyvim.extras.ai.supermaven",
         },
       },
-      -- You can set your Claude API key here, or preferably, set the CLAUDE_API_KEY environment variable.
-      -- Example: vim.g.claudecode_api_key = "YOUR_CLAUDE_API_KEY"
+      -- Set Claude API key from environment variable
+      -- To use: export CLAUDE_API_KEY="your-key-here" in your shell
       init = function()
-        vim.g.claudecode_api_key = os.getenv("CLAUDE_API_KEY") or "YOUR_CLAUDE_API_KEY"
+        vim.g.claudecode_api_key = os.getenv("CLAUDE_API_KEY")
       end,
     },
     -- import/override with your plugins

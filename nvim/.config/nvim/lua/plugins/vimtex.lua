@@ -98,8 +98,6 @@ return {
       { "<localleader>l", "", desc = "+vimtex", ft = "tex" },
       { "<localleader>ll", "<cmd>VimtexCompile<cr>", desc = "Compile", ft = "tex" },
       { "<localleader>lv", "<cmd>VimtexView<cr>", desc = "View PDF", ft = "tex" },
-      { "<leader>lc", "<cmd>VimtexCompile<cr>", desc = "Compile (VimTeX)", ft = "tex" },
-      { "<leader>lv", "<cmd>VimtexView<cr>", desc = "View PDF (VimTeX)", ft = "tex" },
       { "<localleader>lk", "<cmd>VimtexStop<cr>", desc = "Stop compilation", ft = "tex" },
       { "<localleader>lc", "<cmd>VimtexClean<cr>", desc = "Clean aux files", ft = "tex" },
       { "<localleader>lt", "<cmd>VimtexTocToggle<cr>", desc = "Toggle TOC", ft = "tex" },

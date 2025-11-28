@@ -20,6 +20,7 @@ return {
         javascript = true,
         typescript = true,
         sh = true,
+        tex = true, -- Enable for LaTeX files
         ["*"] = false, -- disable by default
       },
     })

@@ -57,11 +57,13 @@ return {
     end,
   },
 
-  -- Setup TeX-specific completion
+  -- Setup TeX-specific completion autocmd
+  -- Note: Main VimTeX configuration is in vimtex.lua
   {
-    "lervag/vimtex",
-    ft = { "tex", "plaintex" },
-    config = function()
+    "hrsh7th/nvim-cmp",
+    optional = true,
+    opts = function()
+      -- Setup buffer-specific completion for TeX files
       vim.api.nvim_create_autocmd("FileType", {
         pattern = { "tex", "plaintex" },
         callback = function()
@@ -82,8 +84,5 @@ return {
         end,
       })
     end,
-    keys = {
-      { "<C-Space>", "<C-x><C-o>", mode = "i", ft = "tex", desc = "VimTeX Omni complete" },
-    },
   },
 }

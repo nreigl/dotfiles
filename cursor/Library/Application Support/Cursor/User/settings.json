@@ -66,5 +66,6 @@
     ],
     "chatgpt.openOnStartup": true,
     "workbench.activityBar.orientation": "vertical",
-    "claudeCode.selectedModel": "default"
+    "claudeCode.selectedModel": "claude-opus-4-5-20251101",
+    "workbench.sideBar.location": "right"
 }

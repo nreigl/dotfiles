@@ -84,7 +84,16 @@
       "Bash(for key in r P p O X)",
       "Bash(do echo -n \"$key: \" tmux list-keys -T prefix $key)",
       "Bash(git rm:*)",
-      "Bash(git check-ignore:*)"
+      "Bash(git check-ignore:*)",
+      "Bash(wezterm --version:*)",
+      "Bash(wezterm)",
+      "Bash(wezterm ls-fonts:*)",
+      "Bash(open:*)",
+      "Bash(log show --predicate 'process == \"\"\"\"wezterm-gui\"\"\"\"' --last 1m)",
+      "Bash(/usr/bin/tail -30)",
+      "Bash(pkill:*)",
+      "Bash(/opt/homebrew/bin/tmux list-sessions:*)",
+      "Bash(wezterm show-keys:*)"
     ],
     "deny": [],
     "ask": []
