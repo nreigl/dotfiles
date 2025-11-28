@@ -262,3 +262,11 @@ z() {
 
 . "$HOME/.local/share/../bin/env"
 export PATH="/opt/homebrew/sbin:$PATH"
+
+# Added by Antigravity
+export PATH="/Users/nicolasreigl/.antigravity/antigravity/bin:$PATH"
+
+# === Auto-attach to tmux (WezTerm only) ===
+if [[ "$TERM_PROGRAM" == "WezTerm" && -z "$TMUX" ]]; then
+  /opt/homebrew/bin/tmux new-session -A -s main
+fi

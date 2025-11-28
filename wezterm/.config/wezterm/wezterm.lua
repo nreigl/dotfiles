@@ -7,28 +7,8 @@ local config = wezterm.config_builder()
 -- Read globals for dynamic configuration
 local G = globals.readGlobals()
 
--- Launch tmux by default (attach or create a "main" session)
--- Use absolute Homebrew path if available (GUI apps may not inherit shell PATH)
-local function file_exists(path)
-	local f = io.open(path, "r")
-	if f then
-		f:close()
-		return true
-	end
-	return false
-end
-
-local tmux_path = "tmux"
-if wezterm.target_triple:match("darwin") then
-	if file_exists("/opt/homebrew/bin/tmux") then
-		tmux_path = "/opt/homebrew/bin/tmux"
-	elseif file_exists("/usr/local/bin/tmux") then
-		tmux_path = "/usr/local/bin/tmux"
-	end
-end
-
--- Every new WezTerm pane/window runs tmux and attaches to session "main"
-config.default_prog = { tmux_path, "new-session", "-A", "-s", "main" }
+-- Note: tmux auto-attach is handled in .zshrc instead of here
+-- (WezTerm's default_prog with tmux causes TTY issues)
 
 -- Font configuration from globals
 config.font = wezterm.font(G.font_family or "JetBrains Mono")
@@ -53,34 +33,28 @@ config.send_composed_key_when_right_alt_is_pressed = true
 config.window_background_opacity = G.opacity or 0.95
 config.macos_window_background_blur = 10
 
--- Background with dynamic opacity from globals
-config.background = {
-	{
-		source = {
-			File = wezterm.config_dir .. "/images/pexels-eberhardgross-572897.jpg",
+-- Background configuration based on solid_background setting
+if not G.solid_background then
+	-- Background with dynamic opacity from globals
+	config.background = {
+		{
+			source = {
+				File = wezterm.config_dir .. "/images/pexels-eberhardgross-572897.jpg",
+			},
+			opacity = G.bg_image_opacity or 0.5,
+			width = "100%",
+			height = "100%",
 		},
-		opacity = G.bg_image_opacity or 0.5, -- Adjust the image opacity
-	},
-	{
-		source = {
-			Color = "#000000",
+		{
+			source = {
+				Color = "#000000",
+			},
+			opacity = G.bg_overlay_opacity or 0.9,
+			width = "100%",
+			height = "100%",
 		},
-		opacity = G.bg_overlay_opacity or 0.9, -- Adjust the overlay opacity
-	},
-}
-
-config.window_background_gradient = {
-	orientation = "Vertical",
-
-	colors = {
-		"#223343",
-		"#000000",
-	},
-
-	interpolation = "Linear",
-
-	blend = "Rgb",
-}
+	}
+end
 
 -- Setup keybindings from keys module
 keys.setup(config)
