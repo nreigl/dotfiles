@@ -6,6 +6,14 @@ export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 BOOKMARKS_FILE="${HOME}/.tmux/bookmarks"
 FZF="/opt/homebrew/bin/fzf"
 
+# Get the tmux socket from environment (set by tmux when running in popup)
+if [[ -n "${TMUX:-}" ]]; then
+  TMUX_SOCKET="${TMUX%%,*}"
+  TMUX_CMD="/opt/homebrew/bin/tmux -S ${TMUX_SOCKET}"
+else
+  TMUX_CMD="/opt/homebrew/bin/tmux"
+fi
+
 # Collect selection using fzf; each non-empty, non-comment line is a path
 if [[ ! -f "$BOOKMARKS_FILE" ]]; then
   echo "No bookmarks file at $BOOKMARKS_FILE"
@@ -50,11 +58,10 @@ fi
 # Create session name from directory basename
 name=$(basename "$path" | tr -cs '[:alnum:]_-' '-' | tr '[:upper:]' '[:lower:]')
 
-# If session exists, switch; otherwise create it rooted at the path
-if tmux has-session -t "=${name}" 2>/dev/null; then
-  tmux switch-client -t "=${name}"
-else
-  tmux new-session -ds "$name" -c "$path"
-  tmux switch-client -t "=${name}"
+# If session doesn't exist, create it
+if ! $TMUX_CMD has-session -t "=${name}" 2>/dev/null; then
+  $TMUX_CMD new-session -ds "$name" -c "$path"
 fi
 
+# Switch to the session directly
+$TMUX_CMD switch-client -t "${name}"
