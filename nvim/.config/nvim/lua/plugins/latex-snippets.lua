@@ -77,6 +77,46 @@ return {
           )
         ),
         s(
+          "eq*",
+          fmt(
+            "\\begin{equation*}\n\t<>\n\\end{equation*}",
+            { i(1) },
+            { delimiters = "<>" }
+          )
+        ),
+        s(
+          "align",
+          fmt(
+            "\\begin{align}\n\t<> &= <> \\\\\n\\end{align}",
+            { i(1), i(2) },
+            { delimiters = "<>" }
+          )
+        ),
+        s(
+          "align*",
+          fmt(
+            "\\begin{align*}\n\t<> &= <> \\\\\n\\end{align*}",
+            { i(1), i(2) },
+            { delimiters = "<>" }
+          )
+        ),
+        s(
+          "tab",
+          fmt(
+            "\\begin{table}[<>]\n\t\\centering\n\t\\begin{tabular}{<>}\n\t\t\\toprule\n\t\t<> \\\\\n\t\t\\midrule\n\t\t<> \\\\\n\t\t\\bottomrule\n\t\\end{tabular}\n\t\\caption{<>}\n\t\\label{<>}\n\\end{table}",
+            { i(1, "htbp"), i(2, "lcc"), i(3, "Header"), i(4, "Data"), i(5, "caption"), i(6, "tab:label") },
+            { delimiters = "<>" }
+          )
+        ),
+        s(
+          "tabular",
+          fmt(
+            "\\begin{tabular}{<>}\n\t<>\n\\end{tabular}",
+            { i(1, "lcc"), i(2) },
+            { delimiters = "<>" }
+          )
+        ),
+        s(
           "fig",
           fmt(
             "\\begin{figure}[<>]\n\t\\centering\n\t\\includegraphics[width=<>\\textwidth]{<>}\n\t\\caption{<>}\n\t\\label{<>}\n\\end{figure}",

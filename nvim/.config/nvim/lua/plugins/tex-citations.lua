@@ -2,15 +2,19 @@ return {
   -- Add VimTeX-specific completion source to nvim-cmp
   {
     "micangl/cmp-vimtex",
-    ft = { "tex", "plaintex" },
+    ft = { "tex", "plaintex", "bib" },
+    dependencies = {
+      "hrsh7th/nvim-cmp",
+      "hrsh7th/cmp-omni",
+    },
     config = function()
       require("cmp_vimtex").setup({
         additional_information = {
-          info_in_menu = true,
-          info_in_window = true,
-          info_max_length = 60,
-          match_against_info = true,
-          symbols_in_menu = true,
+          info_in_menu = false,
+          info_in_window = false,
+          info_max_length = 20,
+          match_against_info = false,
+          symbols_in_menu = false,
         },
         bibtex_parser = {
           enabled = true,
@@ -26,62 +30,17 @@ return {
           },
         },
       })
-    end,
-  },
 
-  -- Add LuaSnip and its adapter
-  {
-    "L3MON4D3/LuaSnip",
-    dependencies = {
-      "saadparwaiz1/cmp_luasnip",
-    },
-  },
-
-  -- Configure nvim-cmp with all sources including vimtex and luasnip
-  {
-    "hrsh7th/nvim-cmp",
-    dependencies = {
-      "micangl/cmp-vimtex",
-      "L3MON4D3/LuaSnip",
-      "saadparwaiz1/cmp_luasnip",
-      "hrsh7th/cmp-omni", -- Fallback omnifunc
-    },
-    opts = function(_, opts)
-      -- Add vimtex and luasnip to global sources
-      opts.sources = opts.sources or {}
-      table.insert(opts.sources, { name = "vimtex", priority = 1000 })
-      table.insert(opts.sources, { name = "luasnip" })
-      table.insert(opts.sources, { name = "omni" })
-
-      return opts
-    end,
-  },
-
-  -- Setup TeX-specific completion autocmd
-  -- Note: Main VimTeX configuration is in vimtex.lua
-  {
-    "hrsh7th/nvim-cmp",
-    optional = true,
-    opts = function()
-      -- Setup buffer-specific completion for TeX files
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = { "tex", "plaintex" },
-        callback = function()
-          -- Set VimTeX omnifunc as fallback
-          vim.bo.omnifunc = "vimtex#complete#omnifunc"
-
-          -- Configure buffer-specific completion with proper priority
-          local cmp = require("cmp")
-          cmp.setup.buffer({
-            sources = cmp.config.sources({
-              { name = "vimtex", priority = 1000 },
-              { name = "luasnip", priority = 900 },
-              { name = "omni", priority = 800 },
-              { name = "buffer", priority = 700 },
-              { name = "path", priority = 600 },
-            }),
-          })
-        end,
+      -- Setup filetype-specific cmp sources for TeX files only
+      local cmp = require("cmp")
+      cmp.setup.filetype({ "tex", "plaintex", "bib" }, {
+        sources = cmp.config.sources({
+          { name = "vimtex", priority = 1000 },
+          { name = "luasnip", priority = 750 },
+          { name = "omni", priority = 500 },
+          { name = "buffer", priority = 250 },
+          { name = "path", priority = 100 },
+        }),
       })
     end,
   },

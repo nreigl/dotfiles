@@ -33,8 +33,6 @@ vim.api.nvim_create_autocmd("User", {
 
           -- Reinitialize cmp with updated config
           cmp.setup(config)
-
-          vim.notify("Buffer completion forcefully enabled", vim.log.levels.INFO)
         end
       end)
     end

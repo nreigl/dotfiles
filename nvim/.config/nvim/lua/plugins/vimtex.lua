@@ -3,9 +3,8 @@ return {
     "lervag/vimtex",
     lazy = false, -- CRITICAL: Never lazy load VimTeX!
     init = function()
-      -- Set local leader for VimTeX commands
-      vim.g.maplocalleader = "\\"
-      
+      -- Note: maplocalleader is set in init.lua
+
       -- Use Skim on macOS (you have it installed)
       vim.g.vimtex_view_method = "skim"
       vim.g.vimtex_view_skim_sync = 1
@@ -71,15 +70,13 @@ return {
         [[Overfull \\hbox ([0-9]*.[0-9]*pt too wide) in paragraph at lines]],
       }
 
-      -- Enable completion for bibliography and labels
+      -- Enable VimTeX completion (cmp-vimtex uses VimTeX's parser)
+      -- The popup issue was from texlab LSP, which is stopped on attach
       vim.g.vimtex_complete_enabled = 1
       vim.g.vimtex_complete_close_braces = 1
 
-      -- Bibliography completion settings
-      vim.g.vimtex_complete_bib = {
-        simple = 1,
-        menu_fmt = '@year @author_short, "@title"',
-      }
+      -- Use simple ref completion to avoid large preview windows
+      vim.g.vimtex_complete_ref = { simple = 1 }
 
       -- Parser for bibliography files (bibparser works with both bibtex and biber)
       vim.g.vimtex_parser_bib_backend = 'bibparser'
@@ -91,6 +88,25 @@ return {
         pattern = { "bib", "tex" },
         callback = function()
           vim.wo.conceallevel = 2
+        end,
+      })
+
+      -- Disable LSP for TeX files (texlab can cause large preview popups)
+      -- Use LspAttach event to catch clients when they actually attach
+      vim.api.nvim_create_autocmd("LspAttach", {
+        group = vim.api.nvim_create_augroup("disable_tex_lsp", { clear = true }),
+        callback = function(args)
+          local client = vim.lsp.get_client_by_id(args.data.client_id)
+          if client then
+            local ft = vim.bo[args.buf].filetype
+            if ft == "tex" or ft == "plaintex" or ft == "bib" then
+              -- Stop LSP clients that interfere with VimTeX
+              -- Note: copilot.lua is disabled for tex via filetypes config, not LSP
+              if client.name == "texlab" or client.name == "ltex" or client.name == "textlsp" then
+                vim.lsp.stop_client(client.id)
+              end
+            end
+          end
         end,
       })
     end,
