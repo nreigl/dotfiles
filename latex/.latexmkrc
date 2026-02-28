@@ -9,7 +9,9 @@ $postscript_mode = 0;
 $bibtex_use = 2;  # 2 = biber
 
 # Continuous preview settings
-$preview_continuous_mode = 1;
+# Note: VimTeX handles continuous preview mode, so disable it here
+# to prevent multiple processes racing and corrupting .aux files
+$preview_continuous_mode = 0;
 $pdf_previewer = 'open -a Skim';
 
 # Clean up auxiliary files

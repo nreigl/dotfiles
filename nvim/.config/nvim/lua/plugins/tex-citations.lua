@@ -36,7 +36,7 @@ return {
       cmp.setup.filetype({ "tex", "plaintex", "bib" }, {
         sources = cmp.config.sources({
           { name = "vimtex", priority = 1000 },
-          { name = "luasnip", priority = 750 },
+          { name = "snippets", priority = 750 },
           { name = "omni", priority = 500 },
           { name = "buffer", priority = 250 },
           { name = "path", priority = 100 },

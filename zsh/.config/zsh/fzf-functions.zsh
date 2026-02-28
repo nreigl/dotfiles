@@ -228,6 +228,16 @@ fport() {
   fi
 }
 
+# === Open in Default Application ===
+# Find file with fzf and open in default macOS application
+fo() {
+  local file
+  file=$( (command -v fd >/dev/null 2>&1 && fd --type f --hidden --follow --exclude .git || \
+    rg --files --hidden --follow -g '!*.git/*') | \
+    fzf --preview 'command -v bat >/dev/null 2>&1 && bat --style=numbers --color=always --line-range :500 {} || file {}')
+  [[ -n "$file" ]] && open "$file"
+}
+
 # === Zoxide Integration ===
 # Enhanced directory jumping with fzf
 # Unlike 'zi' (zoxide interactive), this enables fuzzy matching and customization

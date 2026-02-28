@@ -80,9 +80,10 @@ configure_mise() {
   echo -e "${YELLOW}🔧 Configuring mise...${NC}"
   
   if command -v mise &>/dev/null; then
-    mise install node@lts
-    mise use node@lts --global
-    echo -e "${GREEN}✓ Mise configured with Node.js LTS${NC}"
+    # Keep in sync with mise config (node = "22")
+    mise install node@22
+    mise use node@22 --global
+    echo -e "${GREEN}✓ Mise configured with Node.js 22${NC}"
   else
     echo -e "${RED}✗ Mise not found${NC}"
   fi

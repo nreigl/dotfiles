@@ -20,6 +20,7 @@ return {
           "-file-line-error",
           "-synctex=1",
           "-interaction=nonstopmode",
+          "-pv-",  -- Disable preview spawning to prevent race conditions with .aux files
           "-shell-escape",
         },
       }
@@ -71,7 +72,7 @@ return {
       }
 
       -- Enable VimTeX completion (cmp-vimtex uses VimTeX's parser)
-      -- The popup issue was from texlab LSP, which is stopped on attach
+      -- texlab LSP provides go-to-definition and diagnostics for LaTeX
       vim.g.vimtex_complete_enabled = 1
       vim.g.vimtex_complete_close_braces = 1
 
@@ -88,25 +89,6 @@ return {
         pattern = { "bib", "tex" },
         callback = function()
           vim.wo.conceallevel = 2
-        end,
-      })
-
-      -- Disable LSP for TeX files (texlab can cause large preview popups)
-      -- Use LspAttach event to catch clients when they actually attach
-      vim.api.nvim_create_autocmd("LspAttach", {
-        group = vim.api.nvim_create_augroup("disable_tex_lsp", { clear = true }),
-        callback = function(args)
-          local client = vim.lsp.get_client_by_id(args.data.client_id)
-          if client then
-            local ft = vim.bo[args.buf].filetype
-            if ft == "tex" or ft == "plaintex" or ft == "bib" then
-              -- Stop LSP clients that interfere with VimTeX
-              -- Note: copilot.lua is disabled for tex via filetypes config, not LSP
-              if client.name == "texlab" or client.name == "ltex" or client.name == "textlsp" then
-                vim.lsp.stop_client(client.id)
-              end
-            end
-          end
         end,
       })
     end,
