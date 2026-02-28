@@ -87,17 +87,17 @@ function M.setup(config)
     -- Background Image Controls
     {
       key = "=",
-      mods = "OPT",
+      mods = "OPT|CMD",
       action = wezterm.action_callback(features.lightenBgImage),
     },
     {
       key = "-",
-      mods = "OPT",
+      mods = "OPT|CMD",
       action = wezterm.action_callback(features.darkenBgImage),
     },
     {
       key = "0",
-      mods = "OPT",
+      mods = "OPT|CMD",
       action = wezterm.action_callback(features.resetBgImage),
     },
 

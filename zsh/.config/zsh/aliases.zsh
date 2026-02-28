@@ -85,7 +85,7 @@ alias mkdir='mkdir -pv'
 alias reload='source ~/.zshrc'
 alias path='echo -e ${PATH//:/\\n}'
 alias ports='netstat -tulanp'
-alias myip='curl http://ipecho.net/plain; echo'
+alias myip='curl -s https://ipecho.net/plain; echo'
 ## Open current directory in Finder (Marta if installed)
 # Keep this here (modern aliases) so it works even when ~/.aliases is
 # disabled by the legacy guard. Accepts optional path arg, defaults to '.'
@@ -124,6 +124,9 @@ alias kdel='kubectl delete'
 alias klog='kubectl logs'
 
 # === Misc ===
-alias speedtest='curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -'
+alias speedtest='speedtest-cli'
 alias week='date +%V'
 alias timer='echo "Timer started. Stop with Ctrl-D." && date && time cat && date'
+
+# === Taskwarrior ===
+alias twsync='tw_gtasks_sync -l "Taskwarrior" --all'

@@ -1,7 +1,0 @@
-colorscheme = "Dracula"
-opacity = 0.95
-font_family = "JetBrains Mono"
-font_size = 15.0
-bg_overlay_opacity = 0.9
-bg_image_opacity = 0.5
-solid_background = false

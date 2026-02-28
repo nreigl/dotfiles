@@ -7,7 +7,7 @@ return {
     ft = "markdown",
     dependencies = {
       "nvim-lua/plenary.nvim",
-      -- NOTE: Using blink.cmp in this setup; avoid forcing nvim-cmp.
+      -- NOTE: nvim-cmp is active (enabled via lazyvim.json extras).
       "nvim-telescope/telescope.nvim",
       "nvim-treesitter/nvim-treesitter",
     },
@@ -33,8 +33,7 @@ return {
 
       -- Optional, completion of wiki links, local markdown links, and tags
       completion = {
-        -- Disable nvim-cmp integration since this setup uses blink.cmp
-        nvim_cmp = false,
+        nvim_cmp = true,
         min_chars = 2,
       },
 

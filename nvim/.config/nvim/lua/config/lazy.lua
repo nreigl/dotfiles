@@ -23,7 +23,6 @@ require("lazy").setup({
       opts = {
         extras = {
           "lazyvim.extras.ai.claudecode",
-          "lazyvim.extras.ai.supermaven",
         },
       },
       -- Set Claude API key from environment variable

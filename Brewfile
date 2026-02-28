@@ -1,11 +1,6 @@
-tap "homebrew/cask-versions"
 tap "bramstein/webfonttools"
 tap "dart-lang/dart"
 tap "epk/epk"
-tap "homebrew/bundle"
-tap "homebrew/cask"
-tap "homebrew/core"
-tap "homebrew/services"
 tap "jesseduffield/lazygit"
 tap "koekeishiya/formulae"
 tap "mgmeyers/pdfannots2json"
@@ -49,6 +44,8 @@ brew "direnv"
 # Pack, ship and run any application as a lightweight container
 brew "docker", link: false
 # More intuitive version of du in rust
+brew "btop"
+brew "duf"
 brew "dust"
 # Useful examples at the command-line
 brew "eg-examples"
@@ -80,6 +77,8 @@ brew "gdal"
 brew "gdbm"
 # GitHub command-line tool
 brew "gh"
+# Syntax-highlighting pager for git, diff, and grep output
+brew "git-delta"
 # Distributed revision control system
 brew "git"
 # Render markdown on the CLI
@@ -153,7 +152,7 @@ brew "pdfgrep"
 # General-purpose scripting language
 brew "php", restart_service: :changed
 # Execute binaries from Python packages in isolated environments
-brew "pipx"
+# brew "pipx" # Removed: Using UV tool instead (uv tool install/run)
 # Theme for zsh
 # brew "powerlevel10k" # Removed: Using Starship prompt instead
 # Show ps output as a tree

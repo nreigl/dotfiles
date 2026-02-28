@@ -22,7 +22,6 @@ cd "$DOTFILES_DIR"
 PACKAGES=(
   "atuin"
   "aws"
-  "claude"
   "cursor"
   "docker"
   "fzf"
@@ -43,6 +42,7 @@ PACKAGES=(
   "vscode"
   "wezterm"
   "yabai"
+  "zed"
   "zsh"
 )
 

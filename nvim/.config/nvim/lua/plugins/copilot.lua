@@ -20,7 +20,23 @@ return {
         javascript = true,
         typescript = true,
         sh = true,
-        tex = true, -- Enable for LaTeX files
+        rust = true,
+        go = true,
+        c = true,
+        cpp = true,
+        julia = true,
+        r = true,
+        yaml = true,
+        toml = true,
+        json = true,
+        html = true,
+        css = true,
+        zsh = true,
+        bash = true,
+        vim = true,
+        tex = false, -- Disabled to prevent popup issues with \ref{}
+        plaintex = false,
+        bib = false,
         ["*"] = false, -- disable by default
       },
     })

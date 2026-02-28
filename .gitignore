@@ -97,6 +97,12 @@ ssh/.ssh/sockets/
 *.old
 *.tmp
 
+# WezTerm runtime state
+wezterm/.config/wezterm/globals.json
+
+# Tmux bookmarks (contains personal paths)
+tmux/.tmux/bookmarks
+
 # Build artifacts
 dist/
 build/

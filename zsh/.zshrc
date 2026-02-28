@@ -4,8 +4,7 @@
 # XDG base directories are defined in ~/.zshenv
 
 # === Core Environment ===
-export EDITOR="nvim"
-export VISUAL="nvim"
+# EDITOR and VISUAL are set in .zshenv (always sourced first)
 export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
 
@@ -94,9 +93,6 @@ command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
 # Zoxide (smart cd)
 command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
 
-# Atuin (smart, syncable shell history + Ctrl-R UI)
-command -v atuin >/dev/null 2>&1 && eval "$(atuin init zsh)"
-
 # FZF
 # Use fzf key-bindings only; skip fzf's completion (fzf-tab handles completion)
 if [[ -f /opt/homebrew/opt/fzf/shell/key-bindings.zsh ]]; then
@@ -104,6 +100,10 @@ if [[ -f /opt/homebrew/opt/fzf/shell/key-bindings.zsh ]]; then
 fi
 # Optional user FZF config
 [[ -f "$XDG_CONFIG_HOME/fzf/fzf.zsh" ]] && source "$XDG_CONFIG_HOME/fzf/fzf.zsh"
+
+# Atuin (smart, syncable shell history + Ctrl-R UI)
+# Init after FZF so Atuin's Ctrl-R takes precedence
+command -v atuin >/dev/null 2>&1 && eval "$(atuin init zsh)"
 
 # === FZF Configuration ===
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
@@ -215,16 +215,11 @@ command -v gh &>/dev/null && eval "$(gh copilot alias -- zsh)"
 # [[ -z "$TMUX" ]] && exec tmux
 
 # === Additional Aliases ===
-# Source custom aliases
-[[ -f "$HOME/.aliases" ]] && source "$HOME/.aliases"
-
 # Source ZSH aliases from config directory
 [[ -f "$XDG_CONFIG_HOME/zsh/aliases.zsh" ]] && source "$XDG_CONFIG_HOME/zsh/aliases.zsh"
 
 # Source FZF functions
 [[ -f "$XDG_CONFIG_HOME/zsh/fzf-functions.zsh" ]] && source "$XDG_CONFIG_HOME/zsh/fzf-functions.zsh"
-
-# Function will be redefined at end of file
 
 # === Final Setup ===
 # Ensure XDG directories exist
@@ -234,14 +229,10 @@ mkdir -p "$XDG_CONFIG_HOME" "$XDG_DATA_HOME" "$XDG_CACHE_HOME" "$XDG_STATE_HOME/
 # echo "🚀 ZSH loaded with modern tooling (UV, Mise, Starship, Zoxide)"
 # echo "📦 Python: $(python3 --version 2>&1 | cut -d' ' -f2) | Julia: $(julia --version 2>&1 | cut -d' ' -f3)"
 
-# Fix for z function (must be at end to override Claude snapshot)
-# First unfunction any broken z, then create working version
+# Define z once (built on zoxide) for consistent navigation
 unfunction z 2>/dev/null || true
-
-# Simple working z function - directly uses zoxide for quick jumps
 z() {
   if [[ $# -eq 0 ]]; then
-    # No args - show interactive fzf selector
     local dir
     dir=$(zoxide query --list --score | \
       sed 's/^ *//' | \
@@ -255,16 +246,14 @@ z() {
           --bind 'enter:become:echo {2..}')
     [[ -n "$dir" ]] && cd "$dir"
   else
-    # With args - use zoxide directly for speed
     cd "$(zoxide query "$@")"
   fi
 }
 
-. "$HOME/.local/share/../bin/env"
 export PATH="/opt/homebrew/sbin:$PATH"
 
 # Added by Antigravity
-export PATH="/Users/nicolasreigl/.antigravity/antigravity/bin:$PATH"
+export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
 
 # === Auto-attach to tmux (WezTerm only) ===
 if [[ "$TERM_PROGRAM" == "WezTerm" && -z "$TMUX" ]]; then

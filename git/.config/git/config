@@ -1,7 +1,7 @@
 [include]
   path = ~/.gitconfig.local
 [core]
-  editor = $EDITOR
+  editor = nvim
   excludesfile = ~/.config/git/ignore
   ignorecase = false
   abbrev = 12
@@ -58,12 +58,12 @@
   prune = true
 [rebase]
   autosquash = true
+  autostash = true
 [pager]
   branch = false
 # User configuration is in ~/.gitconfig.local (not tracked)
 [pull]
-	rebase = false
- 	ff = only
+	rebase = true
 [init]
 	defaultBranch = main
 [filter "lfs"]
@@ -87,9 +87,7 @@
 
 [interactive]
   diffFilter = delta --color-only
- [rebase]
-   autostash = true
- [merge]
-   conflictStyle = zdiff3
- [tag]
-   sort = version:refname
+[merge]
+  conflictStyle = zdiff3
+[tag]
+  sort = version:refname
