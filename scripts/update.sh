@@ -18,7 +18,9 @@ echo -e "${BLUE}========================================${NC}"
 update_homebrew() {
   echo -e "${YELLOW}🍺 Updating Homebrew...${NC}"
   brew update
-  brew upgrade
+  brew upgrade --formula
+  # Upgrade casks but never google-chrome (it manages its own updates)
+  brew outdated --cask --quiet | grep -v '^google-chrome$' | xargs -r brew upgrade --cask
   brew cleanup
   echo -e "${GREEN}✓ Homebrew updated${NC}"
 }
