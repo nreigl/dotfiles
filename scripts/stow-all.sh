@@ -22,6 +22,7 @@ cd "$DOTFILES_DIR"
 PACKAGES=(
   "atuin"
   "aws"
+  "claude"
   "cursor"
   "docker"
   "fzf"
