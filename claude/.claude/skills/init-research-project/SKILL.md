@@ -1,4 +1,5 @@
 ---
+name: init-research-project
 description: Scaffold a new empirical research project with spec governance (central config, hash-based staleness detection, Makefile pipeline)
 argument-hint: [project name]
 ---

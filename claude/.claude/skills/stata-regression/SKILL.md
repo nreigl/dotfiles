@@ -1,4 +1,5 @@
 ---
+name: stata-regression
 description: Run regression analyses in Stata with publication-ready esttab output
 ---
 

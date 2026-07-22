@@ -1,4 +1,5 @@
 ---
+name: latex-econ-model
 description: Write and typeset economic models in LaTeX with standard notation
 ---
 

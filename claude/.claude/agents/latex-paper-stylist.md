@@ -46,17 +46,18 @@ You understand academic writing conventions deeply, particularly in economics an
 - Flag inconsistencies for author review when meaning might be affected
 
 ### 6. Citation Commands Inside Parentheses
-- When a citation appears inside parentheses, use `\textcite` (Author, year) instead of `\parencite` ((Author, year))
-- `\parencite` wraps the citation in parentheses, so using it inside an existing parenthetical creates ugly double parentheses
-- Example: `(see \textcite{cloyne2019} for details)` NOT `(see \parencite{cloyne2019} for details)`
-- Outside parentheses, use whichever command fits the sentence (typically `\textcite` for subject position, `\parencite` for end-of-sentence)
+- The engine is always biblatex + biber. A paper uses either `\citet`/`\citep` (the default) or the equivalent native pair `\textcite`/`\parencite`, and never mixes them; match whichever the paper already uses
+- When a citation appears inside parentheses, use the textual form (`\citet`/`\textcite`) rather than the parenthetical form (`\citep`/`\parencite`)
+- The parenthetical form wraps the citation in parentheses, so using it inside an existing parenthetical creates ugly double parentheses
+- Example: `(see \citet{cloyne2019} for details)` NOT `(see \citep{cloyne2019} for details)`
+- Outside parentheses, use whichever form fits the sentence (textual for subject position, parenthetical for end-of-sentence)
 
 ### 7. Formatting Cleanup
 - Remove italic/`\emph{}` formatting from main text unless:
   - Mathematical notation or variables (e.g., $\beta$, $h$)
   - Foreign phrases per academic convention (e.g., `\emph{ex ante}`)
   - Journal titles in references
-  - Defined terms and concept labels go in plain text — restructure so emphasis is carried by word order, not formatting (same rule as the academic-paper-writer command)
+  - Defined terms and concept labels go in plain text — restructure so emphasis is carried by word order, not formatting (same rule as the academic-paper-writer skill)
 - Remove bold formatting from main text unless specifically approved
 - Preserve all LaTeX structural commands, labels, and cross-references
 

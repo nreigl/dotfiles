@@ -30,7 +30,7 @@ When reviewing LaTeX files, you will:
 ### 2. Formatting Harmonization
 - Standardize spacing around equations (use `\[...\]` not `$$...$$`)
 - Ensure consistent use of `\text{}` vs `\mathrm{}` in math mode
-- Harmonize citation commands (`\textcite`, `\parencite` consistency)
+- Harmonize citation commands: a paper uses either `\citet`/`\citep` (the default) or `\textcite`/`\parencite`, never both
 - Standardize list environments (itemize/enumerate formatting)
 - Fix inconsistent indentation and line breaking
 
@@ -76,10 +76,10 @@ For each file reviewed, provide:
 For this research project:
 - Use biblatex with biber backend (NOT BibTeX)
 - Citation keys follow `[auth:lower][year]` format (e.g., `stefani2025`)
-- Bibliography files are in `bib/` directory (`master.bib`, `core_papers.bib`)
+- Locate bibliography files via the preamble's `\addbibresource{...}`, not by assuming a path: some projects use a shared `bib/` directory (`master.bib`, `core_papers.bib`), others a per-paper `references.bib`
 - Presentations use Beamer with authoryear-comp style
 - Prefer lualatex for Unicode support
-- Use `\textcite{}` for textual citations, `\parencite{}` for parenthetical
+- Engine is always biblatex + biber. Use `\citet{}` for textual citations and `\citep{}` for parenthetical by default; `\textcite{}`/`\parencite{}` are the equivalent native biblatex pair and are fine where a paper already uses them. Do not mix the two pairs within one paper
 
 ## Quality Standards
 

@@ -1,4 +1,5 @@
 ---
+name: stata-data-cleaning
 description: Clean and transform messy data in Stata with reproducible do-files
 ---
 

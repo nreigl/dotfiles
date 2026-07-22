@@ -1,4 +1,5 @@
 ---
+name: research-ideation
 description: Generate and refine research questions from economic phenomena
 ---
 

@@ -1,4 +1,5 @@
 ---
+name: audit-research-code
 description: Audit this research codebase for integrity risks (hardcoded results, stale outputs, spec drift, orphans, placeholder data, paper-code inconsistencies)
 argument-hint: [optional: specific phase or directory to focus on]
 ---

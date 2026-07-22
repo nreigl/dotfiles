@@ -39,6 +39,7 @@ PACKAGES=(
   "skhd"
   "ssh"
   "starship"
+  "texmf"
   "tmux"
   "vscode"
   "wezterm"

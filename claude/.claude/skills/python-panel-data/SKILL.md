@@ -1,4 +1,5 @@
 ---
+name: python-panel-data
 description: Panel data analysis in Python with linearmodels and pandas
 ---
 

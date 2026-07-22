@@ -1,4 +1,5 @@
 ---
+name: general-equilibrium-model-builder
 description: Build and numerically solve Walrasian general equilibrium models in Julia
 ---
 

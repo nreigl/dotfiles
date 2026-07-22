@@ -1,4 +1,5 @@
 ---
+name: econ-visualization
 description: Create publication-quality figures for economics papers (ggplot2-first)
 ---
 

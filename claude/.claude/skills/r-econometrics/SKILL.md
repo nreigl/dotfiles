@@ -1,4 +1,5 @@
 ---
+name: r-econometrics
 description: Run IV, DiD, RDD, and panel analyses in R with fixest and proper diagnostics
 ---
 

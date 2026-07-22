@@ -1,4 +1,5 @@
 ---
+name: latex-tables
 description: Generate publication-ready regression and summary tables in LaTeX
 ---
 
