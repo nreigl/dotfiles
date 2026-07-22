@@ -1,0 +1,171 @@
+// LazyVim-parity keybindings for vscode-neovim.
+//
+// These cover the <leader> mappings that VS Code owns rather than Neovim.
+// The ones LazyVim's `vscode` extra already handles inside Neovim
+// (<leader><space>, <leader>/, <leader>ss, <leader>ft, <S-h>, <S-l>) are
+// deliberately NOT duplicated here.
+//
+// Leader is <space>, matching vim.g.mapleader in nvim/.config/nvim/init.lua.
+// Every binding is gated on normal mode so it never eats a space in insert.
+[
+    // ── Files / find ──────────────────────────────────────────────────────
+    {
+        "key": "space f f",
+        "command": "workbench.action.quickOpen",
+        "when": "editorTextFocus && neovim.mode == 'normal'"
+    },
+    {
+        "key": "space f g",
+        "command": "workbench.action.findInFiles",
+        "when": "editorTextFocus && neovim.mode == 'normal'"
+    },
+    {
+        "key": "space f r",
+        "command": "workbench.action.openRecent",
+        "when": "editorTextFocus && neovim.mode == 'normal'"
+    },
+    {
+        "key": "space f n",
+        "command": "workbench.action.files.newUntitledFile",
+        "when": "editorTextFocus && neovim.mode == 'normal'"
+    },
+
+    // ── Explorer ──────────────────────────────────────────────────────────
+    {
+        "key": "space e",
+        "command": "workbench.view.explorer",
+        "when": "editorTextFocus && neovim.mode == 'normal'"
+    },
+    {
+        "key": "space e",
+        "command": "workbench.action.focusActiveEditorGroup",
+        "when": "explorerViewletVisible && filesExplorerFocus"
+    },
+
+    // ── Buffers ───────────────────────────────────────────────────────────
+    {
+        "key": "space b d",
+        "command": "workbench.action.closeActiveEditor",
+        "when": "editorTextFocus && neovim.mode == 'normal'"
+    },
+    {
+        "key": "space b b",
+        "command": "workbench.action.openPreviousRecentlyUsedEditorInGroup",
+        "when": "editorTextFocus && neovim.mode == 'normal'"
+    },
+
+    // ── Git ───────────────────────────────────────────────────────────────
+    {
+        "key": "space g g",
+        "command": "workbench.view.scm",
+        "when": "editorTextFocus && neovim.mode == 'normal'"
+    },
+    {
+        "key": "space g b",
+        "command": "gitlens.toggleFileBlame",
+        "when": "editorTextFocus && neovim.mode == 'normal'"
+    },
+
+    // ── Code ──────────────────────────────────────────────────────────────
+    {
+        "key": "space c r",
+        "command": "editor.action.rename",
+        "when": "editorTextFocus && neovim.mode == 'normal'"
+    },
+    {
+        "key": "space c a",
+        "command": "editor.action.quickFix",
+        "when": "editorTextFocus && neovim.mode == 'normal'"
+    },
+    {
+        "key": "space c f",
+        "command": "editor.action.formatDocument",
+        "when": "editorTextFocus && neovim.mode == 'normal'"
+    },
+    {
+        "key": "space c d",
+        "command": "workbench.actions.view.problems",
+        "when": "editorTextFocus && neovim.mode == 'normal'"
+    },
+    {
+        "key": "space x x",
+        "command": "workbench.actions.view.problems",
+        "when": "editorTextFocus && neovim.mode == 'normal'"
+    },
+
+    // ── Window navigation (LazyVim <C-hjkl>) ──────────────────────────────
+    {
+        "key": "ctrl+h",
+        "command": "workbench.action.navigateLeft",
+        "when": "editorTextFocus && neovim.mode == 'normal'"
+    },
+    {
+        "key": "ctrl+l",
+        "command": "workbench.action.navigateRight",
+        "when": "editorTextFocus && neovim.mode == 'normal'"
+    },
+    {
+        "key": "ctrl+j",
+        "command": "workbench.action.navigateDown",
+        "when": "editorTextFocus && neovim.mode == 'normal'"
+    },
+    {
+        "key": "ctrl+k",
+        "command": "workbench.action.navigateUp",
+        "when": "editorTextFocus && neovim.mode == 'normal'"
+    },
+    {
+        "key": "space w v",
+        "command": "workbench.action.splitEditor",
+        "when": "editorTextFocus && neovim.mode == 'normal'"
+    },
+    {
+        "key": "space w s",
+        "command": "workbench.action.splitEditorDown",
+        "when": "editorTextFocus && neovim.mode == 'normal'"
+    },
+
+    // ── LaTeX (\\l prefix, matching maplocalleader = "\\" + VimTeX) ─────────
+    {
+        "key": "\\ l l",
+        "command": "latex-workshop.build",
+        "when": "editorTextFocus && neovim.mode == 'normal' && editorLangId == 'latex'"
+    },
+    {
+        "key": "\\ l v",
+        "command": "latex-workshop.view",
+        "when": "editorTextFocus && neovim.mode == 'normal' && editorLangId == 'latex'"
+    },
+    {
+        "key": "\\ l k",
+        "command": "latex-workshop.kill",
+        "when": "editorTextFocus && neovim.mode == 'normal' && editorLangId == 'latex'"
+    },
+    {
+        "key": "\\ l c",
+        "command": "latex-workshop.clean",
+        "when": "editorTextFocus && neovim.mode == 'normal' && editorLangId == 'latex'"
+    },
+    {
+        "key": "\\ l t",
+        "command": "latex-workshop.actions",
+        "when": "editorTextFocus && neovim.mode == 'normal' && editorLangId == 'latex'"
+    },
+    {
+        "key": "\\ l e",
+        "command": "workbench.actions.view.problems",
+        "when": "editorTextFocus && neovim.mode == 'normal' && editorLangId == 'latex'"
+    },
+
+    // ── R / Quarto ────────────────────────────────────────────────────────
+    {
+        "key": "space r r",
+        "command": "r.runSource",
+        "when": "editorTextFocus && neovim.mode == 'normal' && editorLangId == 'r'"
+    },
+    {
+        "key": "space r p",
+        "command": "quarto.preview",
+        "when": "editorTextFocus && neovim.mode == 'normal' && editorLangId == 'quarto'"
+    }
+]

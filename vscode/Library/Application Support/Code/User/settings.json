@@ -1,69 +1,298 @@
 {
-    "editor.cursorSmoothCaretAnimation": "on",
-    "editor.fontSize": 13,
-    "editor.fontFamily": "Hack Nerd Font",
-    "editor.fontLigatures": true,
+  // ── Editor ────────────────────────────────────────────────────────────
+  "editor.cursorSmoothCaretAnimation": "on",
+  "editor.fontSize": 13,
+  "editor.fontFamily": "Hack Nerd Font",
+  "editor.fontLigatures": true,
+  "editor.formatOnSave": true,
+  "editor.minimap.enabled": false,
+  "editor.tabCompletion": "on",
+  "editor.suggestSelection": "first",
+  "editor.wordWrap": "wordWrapColumn",
+  "editor.wordWrapColumn": 100,
+  "editor.rulers": [80, 100],
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active",
+  "editor.stickyScroll.enabled": true,
+  "editor.linkedEditing": true,
+  "editor.inlayHints.enabled": "onUnlessPressed",
+  "editor.lineHeight": 2.0,
+  "editor.detectIndentation": false,
+  "diffEditor.ignoreTrimWhitespace": false,
+
+  // ── Minimalist chrome (igorbabko/vscode-setup, moderate variant) ───────
+  "editor.renderWhitespace": "none",
+  "editor.renderLineHighlight": "none",
+  "editor.guides.indentation": false,
+  "editor.showFoldingControls": "never",
+  "editor.scrollbar.horizontal": "hidden",
+  "editor.scrollbar.vertical": "hidden",
+  "editor.overviewRulerBorder": false,
+  "editor.cursorBlinking": "solid",
+  "breadcrumbs.enabled": false,
+  "git.decorations.enabled": false,
+  "scm.diffDecorations": "none",
+  "workbench.tree.renderIndentGuides": "none",
+  "workbench.layoutControl.enabled": false,
+  "workbench.startupEditor": "none",
+  "workbench.tips.enabled": false,
+  "explorer.compactFolders": false,
+  "terminal.integrated.tabs.enabled": false,
+  "terminal.integrated.lineHeight": 1.5,
+
+  // ── Files ─────────────────────────────────────────────────────────────
+  "files.autoSave": "onFocusChange",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/.classpath": true,
+    "**/.project": true,
+    "**/.settings": true,
+    "**/.factorypath": true,
+    "**/Pods": true,
+    "**/.Rproj.user": true,
+    "**/__pycache__": true,
+    "**/.ruff_cache": true,
+    "**/.pytest_cache": true,
+    "**/.venv": true,
+  },
+  "search.exclude": {
+    "**/renv/library": true,
+    "**/.venv": true,
+    "**/build": true,
+    "**/*.rds": true,
+    "**/node_modules": true,
+  },
+  "files.watcherExclude": {
+    "**/renv/library/**": true,
+    "**/.venv/**": true,
+    "**/build/**": true,
+  },
+  "files.associations": {
+    "*.qmd": "quarto",
+    "*.Rmd": "rmd",
+    "Brewfile": "ruby",
+  },
+
+  // ── Workbench / window ────────────────────────────────────────────────
+  "workbench.colorTheme": "Aura Dracula Spirit (Soft)",
+  "workbench.iconTheme": "vscode-icons",
+  "workbench.colorCustomizations": {
+    "editorSuggestWidget.selectedBackground": "#231739",
+    "sideBar.background": "#191521",
+    "list.activeSelectionBackground": "#231739",
+    "list.inactiveSelectionBackground": "#231739",
+    "list.focusBackground": "#231739",
+    "list.hoverBackground": "#231739",
+    "terminalCursor.foreground": "#C45DFF",
+  },
+  "workbench.statusBar.visible": true,
+  "workbench.activityBar.location": "hidden",
+  "workbench.editor.limit.enabled": true,
+  "workbench.editor.limit.value": 12,
+  "workbench.editor.limit.perEditorGroup": true,
+  "window.title": "${rootName}${separator}${activeEditorMedium}",
+  "window.restoreWindows": "all",
+  "zenMode.centerLayout": false,
+  "zenMode.fullScreen": false,
+  "zenMode.restore": true,
+
+  // ── Terminal ──────────────────────────────────────────────────────────
+  "terminal.external.osxExec": "Ghostty.app",
+  "terminal.integrated.fontFamily": "Hack Nerd Font",
+  "terminal.integrated.fontSize": 13,
+  "terminal.integrated.scrollback": 20000,
+  "terminal.integrated.defaultProfile.osx": "zsh",
+
+  // ── Git ───────────────────────────────────────────────────────────────
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+  "git.untrackedChanges": "separate",
+  "gitlens.currentLine.enabled": false,
+  "gitlens.codeLens.enabled": false,
+  "explorer.confirmDelete": false,
+  "explorer.confirmDragAndDrop": false,
+
+  // ── Python (UV + ruff, per global conventions) ─────────────────────────
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.formatOnSave": true,
-    "editor.minimap.enabled": false,
-    "editor.tabCompletion": "on",
-    "editor.suggestSelection": "first",
-    "editor.wordWrap": "wordWrapColumn",
-    "eslint.defaultFormatter": "esbenp.prettier-vscode",
-    "eslint.format.enable": true,
-    "eslint.packageManager": "yarn",
-    "eslint.quiet": true,
-    "eslint.run": "onSave",
-    "explorer.confirmDelete": false,
-    "explorer.confirmDragAndDrop": false,
-    "files.exclude": {
-        "**/node_modules": true,
-        "**/.classpath": true,
-        "**/.project": true,
-        "**/.settings": true,
-        "**/.factorypath": true,
-        "**/Pods": true
+    "editor.codeActionsOnSave": {
+      "source.organizeImports.ruff": "explicit",
+      "source.fixAll.ruff": "explicit",
     },
-    "javascript.updateImportsOnFileMove.enabled": "always",
-    "material-icon-theme.folders.theme": "specific",
-    "[python]": {
-        "editor.defaultFormatter": "charliermarsh.ruff",
-        "editor.formatOnSave": true,
-        "editor.codeActionsOnSave": {
-            "source.organizeImports": "explicit"
-        }
+  },
+  "python.languageServer": "Pylance",
+  "python.analysis.typeCheckingMode": "basic",
+  "python.terminal.activateEnvironment": true,
+  "python.testing.pytestEnabled": true,
+  "ruff.nativeServer": "on",
+  "notebook.formatOnSave.enabled": true,
+  "notebook.codeActionsOnSave": {
+    "notebook.source.organizeImports.ruff": "explicit",
+  },
+  "jupyter.askForKernelRestart": false,
+
+  // ── R (Air formatter) ─────────────────────────────────────────────────
+  "r.lsp.enabled": true,
+  "r.rterm.mac": "/usr/local/bin/R",
+  "r.rpath.mac": "/usr/local/bin/R",
+  "r.bracketedPaste": true,
+  "r.plot.useHttpgd": true,
+  "r.alwaysUseActiveTerminal": true,
+  "r.sessionWatcher": true,
+  "[r]": {
+    "editor.defaultFormatter": "Posit.air-vscode",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2,
+  },
+  "[rmd]": {
+    "editor.defaultFormatter": "REditorSupport.r",
+    "editor.formatOnSave": false,
+    "editor.tabSize": 2,
+  },
+
+  // ── Quarto ────────────────────────────────────────────────────────────
+  "quarto.render.previewType": "internal",
+  "[quarto]": {
+    "editor.wordWrap": "on",
+    "editor.formatOnSave": false,
+  },
+
+  // ── LaTeX (mirrors the nvim/VimTeX setup: latexmk + lualatex + build/) ─
+  "latex-workshop.latex.outDir": "%DIR%/build",
+  "latex-workshop.latex.autoBuild.run": "onSave",
+  "latex-workshop.latex.recipe.default": "first",
+  "latex-workshop.latex.tools": [
+    {
+      "name": "latexmk-lualatex",
+      "command": "latexmk",
+      "args": [
+        "-lualatex",
+        "-shell-escape",
+        "-file-line-error",
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-outdir=%OUTDIR%",
+        "%DOC%",
+      ],
     },
-    "python.languageServer": "Pylance",
-    "telemetry.enableCrashReporter": false,
-    "telemetry.enableTelemetry": false,
-    "terminal.external.osxExec": "Alacritty",
-    "typescript.updateImportsOnFileMove.enabled": "always",
-    "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
-    "window.title": "",
-    "workbench.colorTheme": "Catppuccin Mocha",
-    "workbench.iconTheme": "material-icon-theme",
-    "workbench.statusBar.visible": true,
-    "zenMode.centerLayout": false,
-    "zenMode.fullScreen": false,
-    "zenMode.restore": true,
-    "workbench.activityBar.location": "hidden",
-    "r.lsp.enabled": true,
-    "r.lsp.path": "/usr/local/bin/R",
-    "r.rterm.mac": "/usr/local/bin/R",
-    "r.bracketedPaste": true,
-    "r.plot.useHttpgd": true,
-    "[r]": {
-        "editor.defaultFormatter": "REditorSupport.r",
-        "editor.formatOnSave": false,
-        "editor.tabSize": 2
+  ],
+  "latex-workshop.latex.recipes": [
+    {
+      "name": "latexmk (lualatex)",
+      "tools": ["latexmk-lualatex"],
     },
-    "[rmd]": {
-        "editor.defaultFormatter": "REditorSupport.r",
-        "editor.tabSize": 2
+  ],
+  "latex-workshop.latex.clean.subfolder.enabled": true,
+  // never: cleaning after each build destroys .bcf/.bbl and breaks biber
+  // citation resolution. Clean manually (⇧⌘P → "LaTeX Workshop: Clean").
+  "latex-workshop.latex.autoClean.run": "never",
+  // Root-file resolution for the paper/ + presentation/ + bib/ project layout
+  "latex-workshop.latex.rootFile.doNotPrompt": true,
+  "latex-workshop.latex.search.rootFiles.include": ["**/*.tex"],
+  "latex-workshop.latex.bibDirs": ["${workspaceFolder}/bib"],
+  // Completion — the VimTeX/cmp-vimtex equivalent
+  "latex-workshop.intellisense.citation.label": "authorYearTitle",
+  "latex-workshop.intellisense.package.enabled": true,
+  "latex-workshop.intellisense.unimathsymbols.enabled": true,
+  // Quickfix noise: mirrors vimtex_quickfix_ignore_filters in vimtex.lua
+  "latex-workshop.message.badbox.show": false,
+  "latex-workshop.message.error.show": true,
+  "latex-workshop.bibtex-format.tab": "  ",
+  "latex-workshop.bibtex-format.sort.enabled": true,
+  "latex-workshop.view.pdf.viewer": "external",
+  "latex-workshop.view.pdf.external.viewer.command": "/Applications/Skim.app/Contents/SharedSupport/displayline",
+  "latex-workshop.view.pdf.external.viewer.args": [
+    "-r",
+    "%LINE%",
+    "%PDF%",
+    "%TEX%",
+  ],
+  "latex-workshop.view.pdf.external.synctex.command": "/Applications/Skim.app/Contents/SharedSupport/displayline",
+  "latex-workshop.view.pdf.external.synctex.args": [
+    "-r",
+    "-g",
+    "%LINE%",
+    "%PDF%",
+    "%TEX%",
+  ],
+  "[latex]": {
+    "editor.wordWrap": "on",
+    "editor.formatOnSave": false,
+  },
+  "[bibtex]": {
+    "editor.formatOnSave": false,
+  },
+
+  // ── Julia ─────────────────────────────────────────────────────────────
+  "julia.enableTelemetry": false,
+  "julia.symbolCacheDownload": true,
+  "[julia]": {
+    "editor.tabSize": 4,
+    "editor.formatOnSave": true,
+  },
+
+  // ── MATLAB (official MathWorks LSP extension) ─────────────────────────
+  "MATLAB.installPath": "/Applications/MATLAB_R2024b.app",
+  "MATLAB.indexWorkspace": true,
+  "MATLAB.telemetry": false,
+  "[matlab]": {
+    "files.encoding": "utf8",
+    "editor.tabSize": 4,
+    "editor.defaultFormatter": "MathWorks.language-matlab",
+    "editor.formatOnSave": true,
+  },
+
+  // ── Web / JS (prettier) ───────────────────────────────────────────────
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+
+  // ── Markdown ──────────────────────────────────────────────────────────
+  "[markdown]": {
+    "editor.wordWrap": "on",
+    "editor.quickSuggestions": {
+      "other": true,
     },
-    "matlab.mlintpath": "/Applications/MATLAB_R2024b.app/bin/maca64/mlint",
-    "matlab.matlabpath": "/Applications/MATLAB_R2024b.app/bin/matlab",
-    "[matlab]": {
-        "files.encoding": "utf8",
-        "editor.tabSize": 4
-    }
+    "editor.formatOnSave": false,
+  },
+
+  // ── Neovim (LazyVim config drives VS Code via vscode-neovim) ──────────
+  "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
+  // Required: without a dedicated extension host process, typing lags badly.
+  "extensions.experimental.affinity": {
+    "asvetliakov.vscode-neovim": 1,
+  },
+  "editor.lineNumbers": "relative",
+  "editor.scrollBeyondLastLine": false,
+  "workbench.list.automaticKeyboardNavigation": false,
+
+  // ── Misc ──────────────────────────────────────────────────────────────
+  // todo-tree relies on VS Code's bundled @vscode/ripgrep, which is not
+  // present in 1.129's app bundle — point it at the Homebrew rg instead.
+  "todo-tree.ripgrep.ripgrep": "/opt/homebrew/bin/rg",
+  "todo-tree.general.tags": ["TODO", "FIXME", "HACK", "NOTE", "XXX"],
+  "telemetry.telemetryLevel": "off",
+  "redhat.telemetry.enabled": false,
+  "update.showReleaseNotes": false,
+  "extensions.ignoreRecommendations": true,
+  "claudeCode.preferredLocation": "panel",
 }

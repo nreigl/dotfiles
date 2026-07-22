@@ -14,7 +14,8 @@
     "lazyvim.plugins.extras.lang.r",
     "lazyvim.plugins.extras.lang.tex",
     "lazyvim.plugins.extras.lang.toml",
-    "lazyvim.plugins.extras.lang.yaml"
+    "lazyvim.plugins.extras.lang.yaml",
+    "lazyvim.plugins.extras.vscode"
   ],
   "install_version": 8,
   "news": {

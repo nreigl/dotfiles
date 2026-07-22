@@ -1,0 +1,194 @@
+// LaTeX snippets ported from nvim/.config/nvim/lua/plugins/latex-snippets.lua
+// so the same triggers expand in both editors.
+{
+    // ── Citations (biblatex) ──────────────────────────────────────────────
+    "cite": {
+        "prefix": "cite",
+        "body": "\\cite{$1}$0",
+        "description": "\\cite{}"
+    },
+    "parencite": {
+        "prefix": [
+            "parencite",
+            "pc"
+        ],
+        "body": "\\parencite{$1}$0",
+        "description": "(Author Year)"
+    },
+    "textcite": {
+        "prefix": [
+            "textcite",
+            "tc"
+        ],
+        "body": "\\textcite{$1}$0",
+        "description": "Author (Year)"
+    },
+    "autocite": {
+        "prefix": [
+            "autocite",
+            "ac"
+        ],
+        "body": "\\autocite{$1}$0",
+        "description": "\\autocite{}"
+    },
+    "footcite": {
+        "prefix": "footcite",
+        "body": "\\footcite{$1}$0",
+        "description": "\\footcite{}"
+    },
+
+    // ── Citations (natbib, legacy) ────────────────────────────────────────
+    "citet": {
+        "prefix": "citet",
+        "body": "\\citet{$1}$0",
+        "description": "\\citet{}"
+    },
+    "citep": {
+        "prefix": "citep",
+        "body": "\\citep{$1}$0",
+        "description": "\\citep{}"
+    },
+
+    // ── Cross-references ──────────────────────────────────────────────────
+    "ref": {
+        "prefix": "ref",
+        "body": "\\ref{$1}$0",
+        "description": "\\ref{}"
+    },
+    "cref": {
+        "prefix": "cref",
+        "body": "\\cref{$1}$0",
+        "description": "\\cref{}"
+    },
+    "autoref": {
+        "prefix": [
+            "aref",
+            "autoref"
+        ],
+        "body": "\\autoref{$1}$0",
+        "description": "\\autoref{}"
+    },
+
+    // ── Environments ──────────────────────────────────────────────────────
+    "begin": {
+        "prefix": "beg",
+        "body": [
+            "\\begin{${1:environment}}",
+            "\t$2",
+            "\\end{$1}",
+            "$0"
+        ],
+        "description": "Generic environment"
+    },
+    "itemize": {
+        "prefix": "itemi",
+        "body": [
+            "\\begin{itemize}",
+            "\t\\item $1",
+            "\\end{itemize}",
+            "$0"
+        ],
+        "description": "itemize"
+    },
+    "enumerate": {
+        "prefix": "enum",
+        "body": [
+            "\\begin{enumerate}",
+            "\t\\item $1",
+            "\\end{enumerate}",
+            "$0"
+        ],
+        "description": "enumerate"
+    },
+    "item": {
+        "prefix": "it",
+        "body": "\\item $0",
+        "description": "\\item"
+    },
+
+    // ── Math ──────────────────────────────────────────────────────────────
+    "equation": {
+        "prefix": "eq",
+        "body": [
+            "\\begin{equation}",
+            "\t$1",
+            "\\end{equation}",
+            "$0"
+        ],
+        "description": "Numbered equation"
+    },
+    "equation*": {
+        "prefix": "eq*",
+        "body": [
+            "\\begin{equation*}",
+            "\t$1",
+            "\\end{equation*}",
+            "$0"
+        ],
+        "description": "Unnumbered equation"
+    },
+    "align": {
+        "prefix": "align",
+        "body": [
+            "\\begin{align}",
+            "\t$1 &= $2 \\\\\\\\",
+            "\\end{align}",
+            "$0"
+        ],
+        "description": "align"
+    },
+    "align*": {
+        "prefix": "align*",
+        "body": [
+            "\\begin{align*}",
+            "\t$1 &= $2 \\\\\\\\",
+            "\\end{align*}",
+            "$0"
+        ],
+        "description": "align*"
+    },
+
+    // ── Floats ────────────────────────────────────────────────────────────
+    "table": {
+        "prefix": "tab",
+        "body": [
+            "\\begin{table}[${1:htbp}]",
+            "\t\\centering",
+            "\t\\begin{tabular}{${2:lcc}}",
+            "\t\t\\toprule",
+            "\t\t${3:Header} \\\\\\\\",
+            "\t\t\\midrule",
+            "\t\t${4:Data} \\\\\\\\",
+            "\t\t\\bottomrule",
+            "\t\\end{tabular}",
+            "\t\\caption{${5:caption}}",
+            "\t\\label{${6:tab:label}}",
+            "\\end{table}",
+            "$0"
+        ],
+        "description": "booktabs table"
+    },
+    "tabular": {
+        "prefix": "tabular",
+        "body": [
+            "\\begin{tabular}{${1:lcc}}",
+            "\t$2",
+            "\\end{tabular}",
+            "$0"
+        ],
+        "description": "tabular"
+    },
+    "figure": {
+        "prefix": "fig",
+        "body": [
+            "\\begin{figure}[${1:htbp}]",
+            "\t\\centering",
+            "\t\\includegraphics[width=${2:0.8}\\textwidth]{${3:path/to/image}}",
+            "\t\\caption{${4:caption}}",
+            "\t\\label{${5:fig:label}}",
+            "\\end{figure}",
+            "$0"
+        ],
+        "description": "figure"
+    }
+}
