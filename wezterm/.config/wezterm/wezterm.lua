@@ -24,8 +24,7 @@ config.colors = {
 }
 config.window_decorations = "RESIZE"
 config.enable_tab_bar = false
--- Make Left Option send ESC-prefix (Meta) for Alt keybindings in shells.
--- Keep Right Option composing characters for accents/symbols.
+-- Both Option keys compose characters for accents/symbols (@, \, €, ...).
 config.send_composed_key_when_left_alt_is_pressed = true
 config.send_composed_key_when_right_alt_is_pressed = true
 

@@ -1,4 +1,9 @@
 # NOTE:
+# Lives at the XDG path (~/.config/ghostty/config), NOT the macOS bundle path
+# (~/Library/Application Support/com.mitchellh.ghostty/config). Ghostty.app reads
+# both, but embedded/libghostty hosts (cmux) read ONLY the XDG path — keeping the
+# config here means Option handling (macos-option-as-alt) applies in cmux too.
+#
 # docs:
 # ghostty +show-config --default --docs | nvim
 # examples:
@@ -29,7 +34,9 @@ alpha-blending = linear-corrected
 
 macos-titlebar-style = tabs
 macos-titlebar-proxy-icon = hidden
-macos-option-as-alt = true
+# Both Option keys compose special chars (@, \, €, ...), matching WezTerm's
+# send_composed_key_when_*_alt_is_pressed = true. No terminal Alt/Meta key.
+macos-option-as-alt = false
 
 background-opacity = 0.96
 background-blur-radius = 40
