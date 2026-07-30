@@ -258,6 +258,28 @@ function M.projects()
             return -- cancelled
           end
           local label = id:match("([^/]+)$") or id
+
+          -- Dedupe: focus an existing workspace with this label instead of
+          -- creating a twin. Label = folder basename is the best key the API
+          -- offers (workspace cwd is not exposed), so same-named repos in
+          -- different parents map to one workspace.
+          local pipe = io.popen(HERDR .. " workspace list 2>/dev/null")
+          if pipe then
+            local out = pipe:read("*all")
+            pipe:close()
+            local ok_parse, data = pcall(wezterm.json_parse, out)
+            if ok_parse and data and data.result then
+              for _, w in ipairs(data.result.workspaces or {}) do
+                if w.label == label then
+                  os.execute(
+                    string.format("%s workspace focus %q >/dev/null 2>&1", HERDR, w.workspace_id)
+                  )
+                  return
+                end
+              end
+            end
+          end
+
           -- herdr only. No tmux fallback by choice: nesting herdr inside tmux
           -- swallowed keys (see .zshrc auto-attach note), so a failure here
           -- should surface rather than silently open a different multiplexer.
