@@ -264,12 +264,12 @@ export PATH="/opt/homebrew/sbin:$PATH"
 # Added by Antigravity
 export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
 
-# === Auto-attach to tmux (WezTerm only) ===
-# Skipped inside herdr panes (HERDR_ENV) — herdr is already the multiplexer
-# there, and nesting tmux gave a double status bar / double prefix.
-if [[ "$TERM_PROGRAM" == "WezTerm" && -z "$TMUX" && -z "$HERDR_ENV" ]]; then
-  /opt/homebrew/bin/tmux new-session -A -s main
-fi
+# === Multiplexers: explicit, never auto-attach ===
+# Auto-attaching tmux in WezTerm nested herdr inside tmux (tmux swallowed the
+# ctrl+a prefix). Shells now start plain; pick a multiplexer per window:
+#   tm    -> tmux main session
+#   herdr -> agent workspace manager
+alias tm='/opt/homebrew/bin/tmux new-session -A -s main'
 
 # GitHub MCP server needs GITHUB_PERSONAL_ACCESS_TOKEN in Claude Code's process
 # environment (the plugin's .mcp.json interpolates ${GITHUB_PERSONAL_ACCESS_TOKEN}
