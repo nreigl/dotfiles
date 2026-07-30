@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+
+set -u
+
+file_path="${1:-}"
+if [[ -z "$file_path" || ! -f "$file_path" ]]; then
+  echo "File not found: $file_path"
+  exit 1
+fi
+
+lower_path=$(printf '%s' "$file_path" | tr '[:upper:]' '[:lower:]')
+
+printf 'Path: %s\n' "$file_path"
+printf 'Size: '
+du -h "$file_path" | awk '{print $1}'
+printf '\n'
+
+preview_text() {
+  if command -v bat >/dev/null 2>&1; then
+    bat --paging=never --style=numbers --color=always --line-range=:180 -- "$file_path"
+  else
+    sed -n '1,180p' "$file_path"
+  fi
+}
+
+case "$lower_path" in
+  *.pdf)
+    if command -v pdftotext >/dev/null 2>&1; then
+      pdftotext -f 1 -l 3 -layout "$file_path" - 2>/dev/null | sed -n '1,180p'
+    else
+      file "$file_path"
+    fi
+    ;;
+  *.png|*.jpg|*.jpeg)
+    if command -v chafa >/dev/null 2>&1; then
+      chafa -s 80x40 "$file_path" 2>/dev/null
+    else
+      file "$file_path"
+      command -v sips >/dev/null 2>&1 && sips -g pixelWidth -g pixelHeight "$file_path" 2>/dev/null
+    fi
+    ;;
+  *.svg|*.csv|*.tsv|*.tex|*.md|*.qmd|*.rmd|*.log|*.yaml|*.yml)
+    preview_text
+    ;;
+  *.json)
+    if command -v jq >/dev/null 2>&1; then
+      jq -C . "$file_path" 2>/dev/null | sed -n '1,180p' || preview_text
+    else
+      preview_text
+    fi
+    ;;
+  *.html|*.htm|*.docx)
+    if command -v pandoc >/dev/null 2>&1; then
+      pandoc --to=plain "$file_path" 2>/dev/null | sed -n '1,180p' || preview_text
+    else
+      preview_text
+    fi
+    ;;
+  *.xlsx|*.pptx)
+    file "$file_path"
+    command -v mdls >/dev/null 2>&1 && mdls \
+      -name kMDItemContentType \
+      -name kMDItemFSSize \
+      -name kMDItemNumberOfPages \
+      "$file_path" 2>/dev/null
+    ;;
+  *)
+    file "$file_path"
+    preview_text
+    ;;
+esac
+

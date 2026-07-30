@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "cleanupPeriodDays": 30,
+  "env": {
+    "EDITOR": "nvim",
+    "SHELL": "/bin/zsh",
+    "HOMEBREW_NO_AUTO_UPDATE": "1"
+  },
+  "includeCoAuthoredBy": true,
+  "permissions": {
+    "allow": [
+      "Edit(./**)",
+      "Read(//Users/YOUR_USERNAME/**)",
+      "Bash(git:*)",
+      "Bash(latexmk:*)",
+      "Bash(lualatex:*)",
+      "Bash(pdflatex:*)",
+      "Bash(xelatex:*)",
+      "Bash(biber:*)",
+      "Bash(bibtex:*)",
+      "Bash(makeindex:*)",
+      "Bash(makeglossaries:*)",
+      "Bash(/Library/TeX/texbin/biber:*)",
+      "Bash(/Library/TeX/texbin/pdflatex:*)",
+      "Bash(/usr/local/texlive/2023/bin/universal-darwin/biber:*)",
+      "Bash(/usr/local/texlive/2025/bin/universal-darwin/biber:*)",
+      "Bash(R:*)",
+      "Bash(Rscript:*)",
+      "Bash(R CMD:*)",
+      "Bash(quarto:*)",
+      "Bash(uv:*)",
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(ruff:*)",
+      "Bash(mypy:*)",
+      "Bash(pytest:*)",
+      "Bash(julia:*)",
+      "Bash(juliaup:*)",
+      "Bash(/Applications/MATLAB_RXXXXx.app/bin/matlab:*)",
+      "Bash(mise:*)",
+      "Bash(node:*)",
+      "Bash(npm:*)",
+      "Bash(go:*)",
+      "Bash(cargo:*)",
+      "Bash(rustc:*)",
+      "Bash(brew:*)",
+      "Bash(stow:*)",
+      "Bash(tmux:*)",
+      "Bash(nvim:*)",
+      "Bash(wezterm:*)",
+      "Bash(open:*)",
+      "Bash(pandoc:*)",
+      "Bash(pdfinfo:*)",
+      "Bash(pdftotext:*)",
+      "Bash(./build_paper.sh:*)",
+      "Bash(./build_presentation.sh:*)",
+      "Bash(./compile.sh:*)",
+      "Bash(mkdir:*)",
+      "Bash(rm:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(ln:*)",
+      "Bash(chmod:*)",
+      "Bash(touch:*)",
+      "Bash(ls:*)",
+      "Bash(tree:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)",
+      "Bash(du:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(diff:*)",
+      "Bash(sort:*)",
+      "Bash(awk:*)",
+      "Bash(sed:*)",
+      "Bash(tr:*)",
+      "Bash(xargs:*)",
+      "Bash(perl:*)",
+      "Bash(jq:*)",
+      "Bash(curl:*)",
+      "Bash(timeout:*)",
+      "Bash(env:*)",
+      "Bash(file:*)",
+      "Bash(readlink:*)",
+      "Bash(command:*)",
+      "Bash(test:*)",
+      "Bash(echo:*)",
+      "Bash(bash:*)",
+      "Bash(source:*)",
+      "Bash(eza:*)",
+      "Bash(bat:*)",
+      "Bash(fd:*)",
+      "Bash(fzf:*)",
+      "Bash(starship:*)",
+      "Bash(zinit:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:lazyvim.github.io)",
+      "WebFetch(domain:www.lazyvim.org)",
+      "WebFetch(domain:www.ecb.europa.eu)",
+      "WebFetch(domain:economy-finance.ec.europa.eu)",
+      "WebFetch(domain:ec.europa.eu)",
+      "WebFetch(domain:www.elibrary.imf.org)",
+      "WebFetch(domain:pmc.ncbi.nlm.nih.gov)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:api.github.com)"
+    ],
+    "deny": [
+      "Read(.env*)",
+      "Read(secrets/**)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/credentials)",
+      "Read(~/**/*.pem)",
+      "Read(~/**/*.key)",
+      "Edit(~/.ssh/**)",
+      "Edit(~/.aws/credentials)",
+      "Bash(git push --force:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(rm -rf ~:*)",
+      "Bash(rm -rf /:*)",
+      "Bash(sudo rm:*)"
+    ],
+    "defaultMode": "auto"
+  },
+  "model": "opus",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '🎯 Claude Code session started in $(pwd)'",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '📝 Writing file...'",
+            "timeout": 2
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "github@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
+    "codex@openai-codex": true,
+    "financial-analysis@claude-for-financial-services": true,
+    "pitch-agent@claude-for-financial-services": true,
+    "gl-reconciler@claude-for-financial-services": true,
+    "market-researcher@claude-for-financial-services": true,
+    "investment-banking@claude-for-financial-services": true,
+    "equity-research@claude-for-financial-services": true
+  },
+  "extraKnownMarketplaces": {
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
+      }
+    },
+    "claude-for-financial-services": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/anthropics/financial-services-plugins.git"
+      }
+    }
+  },
+  "alwaysThinkingEnabled": true,
+  "effortLevel": "medium",
+  "tui": "fullscreen",
+  "skipDangerousModePermissionPrompt": true,
+  "theme": "auto",
+  "skipAutoPermissionPrompt": true,
+  "voiceEnabled": true
+}

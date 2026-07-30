@@ -95,6 +95,7 @@ dotfiles/
 ├── ripgrep/          # Ripgrep configuration
 ├── ssh/              # SSH configuration
 ├── starship/         # Shell prompt
+├── television/       # Television channels and UI configuration
 ├── tmux/             # Terminal multiplexer
 ├── vscode/           # VS Code settings
 ├── wezterm/          # WezTerm terminal config
@@ -153,6 +154,12 @@ export OPENAI_API_KEY="your-key"
 ### Ripgrep
 - Uses XDG config at `~/.config/ripgrep/config` (set via `RIPGREP_CONFIG_PATH`).
 - The config includes smart-case, hidden file handling with safe VCS exclusions, and useful type aliases.
+
+### Television
+- `tv pdfs` browses PDFs in the current project; press `Ctrl-S` for both research roots.
+- `tv research-artifacts` browses papers, figures, tables, reports, slides, and logs while excluding data, dependency, and cache trees.
+- `Enter` opens the selected file, `F12` reveals it in Finder, and `Ctrl-Y` uses Television's default copy action.
+- Television shell integration is intentionally disabled so fzf/fzf-tab keep `Ctrl-T` and Atuin keeps `Ctrl-R`.
 
 ### Git (XDG)
 - Global config at `~/.config/git/config`. A minimal `~/.gitconfig` includes this file for compatibility with tools expecting it.

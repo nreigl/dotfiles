@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+kind="${1:-}"
+scope="${2:-current}"
+
+if [[ "$kind" != "pdf" && "$kind" != "artifact" ]]; then
+  echo "Usage: list-research-files {pdf|artifact} {current|all}" >&2
+  exit 2
+fi
+
+roots=()
+if [[ "$scope" == "current" ]]; then
+  roots=(".")
+elif [[ "$scope" == "all" ]]; then
+  for candidate in "$HOME/Documents/research" "$HOME/Documents/r_projects"; do
+    [[ -d "$candidate" ]] && roots+=("$candidate")
+  done
+else
+  echo "Unknown scope: $scope" >&2
+  exit 2
+fi
+
+[[ ${#roots[@]} -gt 0 ]] || exit 0
+
+common_args=(
+  --type f
+  --hidden
+  --no-ignore
+  --exclude .git
+  --exclude .Rproj.user
+  --exclude .cache
+  --exclude .venv
+  --exclude __pycache__
+  --exclude _freeze
+  --exclude _site
+  --exclude build
+  --exclude cache
+  --exclude data
+  --exclude learning_cache
+  --exclude node_modules
+  --exclude renv
+  --exclude target
+  --exclude temp
+  --exclude tmp
+)
+
+if [[ "$kind" == "pdf" ]]; then
+  extensions=(--extension pdf)
+else
+  extensions=(
+    --extension pdf
+    --extension html
+    --extension htm
+    --extension png
+    --extension jpg
+    --extension jpeg
+    --extension svg
+    --extension csv
+    --extension tsv
+    --extension xlsx
+    --extension docx
+    --extension pptx
+    --extension tex
+    --extension md
+    --extension qmd
+    --extension rmd
+    --extension log
+    --extension json
+    --extension yaml
+    --extension yml
+  )
+fi
+
+if [[ "$kind" == "pdf" ]]; then
+  for root in "${roots[@]}"; do
+    fd "${common_args[@]}" --max-depth 10 "${extensions[@]}" . "$root"
+  done
+else
+  artifact_dir_pattern='^(output|outputs|paper|papers|reports|slides|figures|tables|feasibility)$'
+  for root in "${roots[@]}"; do
+    while IFS= read -r artifact_dir; do
+      fd "${common_args[@]}" "${extensions[@]}" . "$artifact_dir"
+    done < <(
+      fd --type d --hidden --no-ignore --max-depth 6 \
+        --exclude .git \
+        --exclude .Rproj.user \
+        --exclude .cache \
+        --exclude .venv \
+        --exclude __pycache__ \
+        --exclude build \
+        --exclude cache \
+        --exclude data \
+        --exclude learning_cache \
+        --exclude node_modules \
+        --exclude renv \
+        --exclude target \
+        --exclude temp \
+        --exclude tmp \
+        "$artifact_dir_pattern" "$root"
+    )
+  done
+fi | LC_ALL=C sort -u

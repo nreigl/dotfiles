@@ -1,0 +1,35 @@
+[metadata]
+name = "research-artifacts"
+description = "Browse papers, figures, tables, reports, slides, and logs"
+requirements = ["fd", "bat"]
+
+[source]
+[[source.command]]
+name = "Current project"
+run = "${XDG_CONFIG_HOME:-$HOME/.config}/television/scripts/list-research-files artifact current"
+
+[[source.command]]
+name = "All research"
+run = "${XDG_CONFIG_HOME:-$HOME/.config}/television/scripts/list-research-files artifact all"
+
+[preview]
+command = "${XDG_CONFIG_HOME:-$HOME/.config}/television/scripts/preview-research-file '{}'"
+
+[ui.preview_panel]
+size = 60
+header = "{}"
+
+[keybindings]
+enter = "actions:open"
+f12 = "actions:reveal"
+
+[actions.open]
+description = "Open the artifact in the default macOS application"
+command = "open '{}'"
+mode = "fork"
+
+[actions.reveal]
+description = "Reveal the artifact in Finder"
+command = "open -R '{}'"
+mode = "fork"
+

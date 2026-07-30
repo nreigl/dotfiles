@@ -19,8 +19,14 @@ update_homebrew() {
   echo -e "${YELLOW}🍺 Updating Homebrew...${NC}"
   brew update
   brew upgrade --formula
-  # Upgrade casks but never google-chrome (it manages its own updates)
-  brew outdated --cask --quiet | grep -v '^google-chrome$' | xargs -r brew upgrade --cask
+  # Upgrade casks but never google-chrome (it manages its own updates).
+  # `|| true` keeps grep's "no match" exit status from tripping `set -euo pipefail`
+  # when the only outdated cask is chrome (or nothing is outdated).
+  local outdated_casks
+  outdated_casks=$(brew outdated --cask --quiet | grep -v '^google-chrome$' || true)
+  if [ -n "$outdated_casks" ]; then
+    echo "$outdated_casks" | xargs brew upgrade --cask
+  fi
   brew cleanup
   echo -e "${GREEN}✓ Homebrew updated${NC}"
 }

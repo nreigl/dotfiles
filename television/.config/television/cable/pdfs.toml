@@ -1,0 +1,38 @@
+[metadata]
+name = "pdfs"
+description = "Browse PDFs in the current project or across research roots"
+requirements = ["fd", "pdftotext"]
+
+[source]
+[[source.command]]
+name = "Current project"
+run = "${XDG_CONFIG_HOME:-$HOME/.config}/television/scripts/list-research-files pdf current"
+
+[[source.command]]
+name = "All research"
+run = "${XDG_CONFIG_HOME:-$HOME/.config}/television/scripts/list-research-files pdf all"
+
+[preview]
+command = "${XDG_CONFIG_HOME:-$HOME/.config}/television/scripts/preview-research-file '{}'"
+
+[ui]
+layout = "portrait"
+
+[ui.preview_panel]
+size = 60
+header = "{}"
+
+[keybindings]
+enter = "actions:open"
+f12 = "actions:reveal"
+
+[actions.open]
+description = "Open the PDF in the default macOS application"
+command = "open '{}'"
+mode = "fork"
+
+[actions.reveal]
+description = "Reveal the PDF in Finder"
+command = "open -R '{}'"
+mode = "fork"
+

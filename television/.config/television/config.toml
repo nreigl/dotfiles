@@ -1,0 +1,42 @@
+# Managed by GNU Stow from the dotfiles repository.
+
+tick_rate = 50
+default_channel = "files"
+history_size = 200
+global_history = false
+
+[ui]
+ui_scale = 100
+orientation = "landscape"
+theme = "default"
+
+[ui.input_bar]
+position = "top"
+prompt = ">"
+border_type = "rounded"
+
+[ui.status_bar]
+separator_open = ""
+separator_close = ""
+hidden = false
+
+[ui.results_panel]
+border_type = "rounded"
+
+[ui.preview_panel]
+size = 50
+scrollbar = true
+border_type = "rounded"
+hidden = false
+
+[ui.help_panel]
+show_categories = true
+hidden = true
+
+[ui.remote_control]
+show_channel_descriptions = true
+sort_alphabetically = true
+
+# Shell integration is intentionally not initialized in zsh. Ctrl-T remains
+# owned by fzf/fzf-tab and Ctrl-R remains owned by Atuin.
+

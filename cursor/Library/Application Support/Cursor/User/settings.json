@@ -69,5 +69,6 @@
     "claudeCode.selectedModel": "claude-opus-4-5-20251101",
     "workbench.sideBar.location": "right",
     "claudeCode.preferredLocation": "panel",
-    "go.toolsManagement.autoUpdate": true
+    "go.toolsManagement.autoUpdate": true,
+    "window.autoDetectColorScheme": false
 }
