@@ -1,0 +1,12 @@
+# markdownlint rules for a low-noise prose editing experience.
+# Referenced explicitly via --config from lua/plugins/prose.lua, because
+# nvim-lint feeds markdownlint-cli2 over stdin and auto-discovery would
+# resolve relative to Neovim's cwd rather than the edited file.
+#
+# All rules off by default; only genuine defects re-enabled.
+default: false
+
+MD011: true # reversed link syntax — (url)[text]
+MD024: true # duplicate headings — breaks anchors and TOC links
+MD042: true # empty links — []()
+MD051: true # broken link fragments — [x](#nonexistent)
