@@ -1,6 +1,8 @@
 # herdr configuration
 # Mirrors tmux conventions from ~/dotfiles/tmux/.tmux.conf
 # Reload with: herdr server reload-config
+#   NOTE: [keys] changes need a full restart (herdr server stop; herdr) —
+#   reload-config applies UI settings only, stale bindings linger otherwise.
 # Validate with: herdr config check
 
 # First-run onboarding already done
@@ -27,10 +29,11 @@ channel = "stable"
 prefix = "ctrl+a"
 
 # Splits like tmux | and -
-# Not backslash: on this layout \ is Option-composed and reaches herdr as an
-# alt-chord escape, never as a clean key (see herdr-client.log warnings).
-split_vertical = "prefix+v"
-split_horizontal = "prefix+minus"
+# herdr's split_vertical stacks DOWN, split_horizontal goes RIGHT.
+# v = side-by-side (tmux |), minus = stacked (tmux -). Not backslash: on this
+# layout \ is Option-composed and reaches herdr as an alt-chord escape.
+split_horizontal = "prefix+v"
+split_vertical = "prefix+minus"
 
 # Vim-style pane navigation (herdr defaults already match tmux prefix+hjkl)
 focus_pane_left = "prefix+h"
@@ -93,23 +96,33 @@ command = "sessionizer.open"
 description = "fuzzy-open project workspace"
 
 [[keys.command]]
-key = "prefix+shift+w"
+# NOT prefix+shift+w — that's the built-in rename_workspace
+key = "prefix+shift+f"
 type = "plugin_action"
 command = "sessionizer.worktree-open"
 description = "fuzzy-open git worktree workspace"
 
 # file-viewer: git-aware read-only tree + diff/markdown/code pane
+# NOT prefix+e — that's the built-in edit_scrollback
 [[keys.command]]
-key = "prefix+e"
+key = "prefix+o"
 type = "shell"
 command = "herdr plugin action invoke open-file-viewer --plugin herdr-file-viewer"
 description = "file viewer (split)"
 
 [[keys.command]]
-key = "prefix+shift+e"
+key = "prefix+shift+o"
 type = "shell"
 command = "herdr plugin action invoke open-file-viewer-tab --plugin herdr-file-viewer"
 description = "file viewer (tab)"
+
+# browser: embedded Chromium pane (CDP screencast over kitty graphics),
+# cmux-style agent-drivable browser. Ctrl+click on localhost links also opens it.
+[[keys.command]]
+key = "prefix+b"
+type = "shell"
+command = '"${HERDR_BIN_PATH}" plugin pane open --plugin official.browser --entrypoint browser --placement split --direction right --focus'
+description = "open browser in right split"
 
 [worktrees]
 # Root for herdr-created git worktrees (prefix+shift+G), kept next to projects in ~/dev
