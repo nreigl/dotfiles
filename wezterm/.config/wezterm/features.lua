@@ -220,7 +220,9 @@ function M.projects()
     for _, path in ipairs(search_paths) do
       table.insert(
         find_commands,
-        string.format("/usr/bin/find '%s' -maxdepth 3 -type d -name .git 2>/dev/null", path)
+        -- -not -path filter: skip repos inside hidden dirs (~/.config/AstroNvim,
+        -- ~/.nvm, ...) — config-manager clones, not projects
+        string.format("/usr/bin/find '%s' -maxdepth 3 -type d -name .git -not -path '*/.*/.git' 2>/dev/null", path)
       )
     end
 
