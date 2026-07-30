@@ -101,7 +101,7 @@ function M.setup(config)
       action = wezterm.action_callback(features.resetBgImage),
     },
 
-    -- Toggle Solid Background (no transparency, no image)
+    -- Toggle solid vs background-image mode (opacity is remembered)
     {
       key = "b",
       mods = "CTRL|SHIFT",

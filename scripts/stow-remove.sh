@@ -29,6 +29,7 @@ PACKAGES=(
   "gh"
   "ghostty"
   "git"
+  "herdr"
   "julia"
   "latex"
   "macos"
@@ -39,12 +40,12 @@ PACKAGES=(
   "skhd"
   "ssh"
   "starship"
+  "television"
   "texmf"
   "tmux"
   "vscode"
   "wezterm"
   "yabai"
-  "zed"
   "zsh"
 )
 

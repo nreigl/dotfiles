@@ -109,3 +109,6 @@ build/
 target/
 *.egg-info/
 tmp/
+
+# Claude Code personal settings (see claude/.claude/settings.example.json)
+claude/.claude/settings.json

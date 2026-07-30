@@ -154,17 +154,20 @@ function M.resetBgImage(window, pane)
   end)
 end
 
--- Toggle Solid Background (no transparency, no image)
+-- Toggle Solid Background (no image) vs background-image mode.
+-- Remembers the opacity tuned in solid mode (saved_solid_opacity) instead of
+-- clobbering it, so toggling back restores your transparent look.
 function M.toggleSolidBackground(window, pane)
   globals.setGlobals(function(g)
     g.solid_background = not (g.solid_background or false)
     if g.solid_background then
-      -- Solid opaque background
-      g.opacity = 1.0
+      -- Back to solid mode: restore the remembered opacity
+      g.opacity = g.saved_solid_opacity or 0.95
       g.bg_overlay_opacity = 1.0
       g.bg_image_opacity = 0.0
     else
-      -- Restore defaults
+      -- Into image mode: remember current opacity first
+      g.saved_solid_opacity = g.opacity
       g.opacity = 0.95
       g.bg_overlay_opacity = 0.9
       g.bg_image_opacity = 0.5
@@ -201,13 +204,15 @@ function M.projects()
     -- Combine all find commands and pipe to fzf with preview
     local projectsCommand = table.concat(find_commands, "; ") .. " | "
 
-    -- Custom action: on selection, switch to project in tmux
+    -- Custom action: on selection, open the project as a herdr workspace
+    -- (falls back to a tmux session if the herdr server isn't running)
     local switchCommand = projectsCommand ..
       "fzf --color=gutter:-1,bg+:-1 --reverse " ..
       "--preview-window=down,60% " ..
       "--preview='lua " .. scriptsPath .. "/switchProject.lua {}' " ..
       "--bind='enter:execute(" ..
-        "tmux new-session -A -s {/} -c {}" ..
+        "herdr workspace create --cwd {} --label {/} --focus 2>/dev/null " ..
+        "|| tmux new-session -A -s {/} -c {}" ..
       ")+abort'"
 
     window:perform_action(

@@ -42,7 +42,8 @@ background-opacity = 0.96
 background-blur-radius = 40
 
 # ghostty +list-themes
-theme = Ayu Mirage
+# Follows macOS appearance automatically (no script/plugin needed)
+theme = dark:Ayu Mirage,light:Ayu Light
 
 mouse-hide-while-typing = true
 

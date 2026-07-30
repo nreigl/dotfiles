@@ -207,7 +207,16 @@ if [[ -d "$HOME/.docker/completions" ]]; then
 fi
 
 # === GitHub Copilot CLI ===
-command -v gh &>/dev/null && eval "$(gh copilot alias -- zsh)"
+# New `gh copilot` is an agentic assistant; it no longer exposes `alias`.
+# Wrap `-p` (one-shot prompt) to reproduce the old ghcs/ghce UX.
+if command -v gh &>/dev/null; then
+  ghcs() {
+    gh copilot -p "Suggest a single shell command for: $*. Reply with the command in a code block, then a one-line explanation."
+  }
+  ghce() {
+    gh copilot -p "Explain this shell command: $*"
+  }
+fi
 
 # === Tmux Autostart (Optional) ===
 # Uncomment to auto-start tmux
@@ -256,6 +265,19 @@ export PATH="/opt/homebrew/sbin:$PATH"
 export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
 
 # === Auto-attach to tmux (WezTerm only) ===
-if [[ "$TERM_PROGRAM" == "WezTerm" && -z "$TMUX" ]]; then
+# Skipped inside herdr panes (HERDR_ENV) — herdr is already the multiplexer
+# there, and nesting tmux gave a double status bar / double prefix.
+if [[ "$TERM_PROGRAM" == "WezTerm" && -z "$TMUX" && -z "$HERDR_ENV" ]]; then
   /opt/homebrew/bin/tmux new-session -A -s main
+fi
+
+# GitHub MCP server needs GITHUB_PERSONAL_ACCESS_TOKEN in Claude Code's process
+# environment (the plugin's .mcp.json interpolates ${GITHUB_PERSONAL_ACCESS_TOKEN}
+# into its Bearer auth header). Rather than globally exporting the gh token into
+# every shell and every child process, scope it to the `claude` process only:
+# `gh auth token` runs just when Claude Code launches, and no other process sees it.
+if command -v gh &>/dev/null; then
+  claude() {
+    GITHUB_PERSONAL_ACCESS_TOKEN="$(gh auth token 2>/dev/null)" command claude "$@"
+  }
 fi

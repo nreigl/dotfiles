@@ -101,6 +101,8 @@ brew "gradle"
 brew "grep"
 # Popular GNU data compression program
 brew "gzip"
+# Terminal workspace manager for AI coding agents
+brew "herdr"
 # Configurable static site generator
 brew "hugo"
 # Tools and libraries to manipulate images in many formats

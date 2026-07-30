@@ -1,0 +1,84 @@
+# herdr configuration
+# Mirrors tmux conventions from ~/dotfiles/tmux/.tmux.conf
+# Reload with: herdr server reload-config
+# Validate with: herdr config check
+
+# First-run onboarding already done
+onboarding = false
+
+[theme]
+# Match tmux/nvim Catppuccin setup; follow terminal light/dark appearance
+name = "catppuccin"
+auto_switch = true
+dark_name = "catppuccin"
+light_name = "catppuccin-latte"
+
+[terminal]
+# Inherit the source pane's working directory (tmux: new-window -c "#{pane_current_path}")
+new_cwd = "follow"
+
+[update]
+channel = "stable"
+
+[keys]
+# Same prefix as tmux (set -g prefix C-a).
+# NOTE: if you ever run herdr *inside* tmux, tmux swallows ctrl+a first —
+# switch this back to "ctrl+b" in that case.
+prefix = "ctrl+a"
+
+# Splits like tmux | and -
+split_vertical = "prefix+backslash"
+split_horizontal = "prefix+minus"
+
+# Vim-style pane navigation (herdr defaults already match tmux prefix+hjkl)
+focus_pane_left = "prefix+h"
+focus_pane_down = "prefix+j"
+focus_pane_up = "prefix+k"
+focus_pane_right = "prefix+l"
+
+# New tab on prefix+c (matches tmux bind c), indexed switching on prefix+1..9
+new_tab = "prefix+c"
+switch_tab = "prefix+1..9"
+
+# Direct Alt+1..9 tab switching without prefix (tmux: bind -n M-1..5)
+[keys.indexed]
+tabs = "alt"
+
+# lazygit popup (analog of the tmux floax floating pane)
+[[keys.command]]
+key = "prefix+alt+g"
+type = "popup"
+command = "lazygit"
+description = "run lazygit"
+width = "80%"
+height = "80%"
+
+[worktrees]
+# Root for herdr-created git worktrees (prefix+shift+G), kept next to projects in ~/dev
+directory = "~/dev/worktrees"
+
+[ui]
+# Show Claude panes with live activity (terminal title) in the sidebar
+[ui.sidebar.agents.rows_by_agent]
+claude = [
+  ["state_icon", "agent", "state_text"],
+  ["terminal_title_stripped"],
+  ["workspace", "tab"],
+]
+
+# In-app toasts when a background agent finishes or needs attention
+[ui.toast]
+delivery = "herdr"
+delay_seconds = 1
+
+# Sounds when agents in background workspaces finish or need attention
+[ui.sound]
+enabled = true
+
+[ui.sound.agents]
+claude = "on"
+
+[session]
+# Resume agent conversations after a server restart
+# (analog of tmux-resurrect/continuum)
+resume_agents_on_restore = true

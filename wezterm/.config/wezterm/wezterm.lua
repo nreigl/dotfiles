@@ -14,14 +14,20 @@ local G = globals.readGlobals()
 config.font = wezterm.font(G.font_family or "JetBrains Mono")
 config.font_size = G.font_size or 15.0
 
--- Color scheme from globals
-config.color_scheme = G.colorscheme or "Dracula"
-config.colors = {
-	cursor_fg = "#282a36",
-	cursor_bg = "#ff79c6",
-	selection_bg = "#44475a",
-	selection_fg = "#f8f8f2",
-}
+-- Color scheme from globals; cursor/selection colors come from the scheme
+config.color_scheme = G.colorscheme or "Tokyo Night"
+
+-- Follow macOS light/dark appearance. Dark mode keeps the globals.json scheme
+-- (fzf theme switcher untouched); light mode overrides with Catppuccin Latte.
+wezterm.on("window-config-reloaded", function(window, _)
+	local overrides = window:get_config_overrides() or {}
+	local is_light = not window:get_appearance():find("Dark")
+	local scheme = is_light and "Catppuccin Latte" or nil
+	if overrides.color_scheme ~= scheme then
+		overrides.color_scheme = scheme
+		window:set_config_overrides(overrides)
+	end
+end)
 config.window_decorations = "RESIZE"
 config.enable_tab_bar = false
 -- Both Option keys compose characters for accents/symbols (@, \, €, ...).
@@ -30,7 +36,7 @@ config.send_composed_key_when_right_alt_is_pressed = true
 
 -- Opacity from globals
 config.window_background_opacity = G.opacity or 0.95
-config.macos_window_background_blur = 10
+config.macos_window_background_blur = 40 -- match ghostty's background-blur-radius
 
 -- Background configuration based on solid_background setting
 if not G.solid_background then
