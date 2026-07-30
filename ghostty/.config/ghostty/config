@@ -38,7 +38,9 @@ macos-titlebar-proxy-icon = hidden
 # send_composed_key_when_*_alt_is_pressed = true. No terminal Alt/Meta key.
 macos-option-as-alt = false
 
-background-opacity = 0.96
+# Matches WezTerm's translucent look (opacity 0.65 + blur 40).
+# cmd+shift+o toggles to fully opaque; applies to new windows only.
+background-opacity = 0.65
 background-blur-radius = 40
 
 # Background image mode (WezTerm-image-mode parity, Ghostty 1.2+).
