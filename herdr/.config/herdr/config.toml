@@ -27,7 +27,9 @@ channel = "stable"
 prefix = "ctrl+a"
 
 # Splits like tmux | and -
-split_vertical = "prefix+backslash"
+# Not backslash: on this layout \ is Option-composed and reaches herdr as an
+# alt-chord escape, never as a clean key (see herdr-client.log warnings).
+split_vertical = "prefix+v"
 split_horizontal = "prefix+minus"
 
 # Vim-style pane navigation (herdr defaults already match tmux prefix+hjkl)
@@ -52,6 +54,62 @@ command = "lazygit"
 description = "run lazygit"
 width = "80%"
 height = "80%"
+
+# --- Plugins ---
+
+# vim-herdr-navigation: Ctrl+hjkl moves across herdr panes AND nvim splits
+# (nvim side loaded via nvim/lua/plugins/herdr-nav.lua; falls back to wincmd
+# outside herdr). NOTE: shadows readline Ctrl+L clear / Ctrl+K kill-line in
+# shell panes — same tradeoff as vim-tmux-navigator.
+[[keys.command]]
+key = "ctrl+h"
+type = "plugin_action"
+command = "vim-herdr-navigation.left"
+description = "navigate left (vim/herdr)"
+
+[[keys.command]]
+key = "ctrl+j"
+type = "plugin_action"
+command = "vim-herdr-navigation.down"
+description = "navigate down (vim/herdr)"
+
+[[keys.command]]
+key = "ctrl+k"
+type = "plugin_action"
+command = "vim-herdr-navigation.up"
+description = "navigate up (vim/herdr)"
+
+[[keys.command]]
+key = "ctrl+l"
+type = "plugin_action"
+command = "vim-herdr-navigation.right"
+description = "navigate right (vim/herdr)"
+
+# sessionizer: fuzzy project picker (tmux-sessionizer style) + worktree picker
+[[keys.command]]
+key = "prefix+f"
+type = "plugin_action"
+command = "sessionizer.open"
+description = "fuzzy-open project workspace"
+
+[[keys.command]]
+key = "prefix+shift+w"
+type = "plugin_action"
+command = "sessionizer.worktree-open"
+description = "fuzzy-open git worktree workspace"
+
+# file-viewer: git-aware read-only tree + diff/markdown/code pane
+[[keys.command]]
+key = "prefix+e"
+type = "shell"
+command = "herdr plugin action invoke open-file-viewer --plugin herdr-file-viewer"
+description = "file viewer (split)"
+
+[[keys.command]]
+key = "prefix+shift+e"
+type = "shell"
+command = "herdr plugin action invoke open-file-viewer-tab --plugin herdr-file-viewer"
+description = "file viewer (tab)"
 
 [worktrees]
 # Root for herdr-created git worktrees (prefix+shift+G), kept next to projects in ~/dev
