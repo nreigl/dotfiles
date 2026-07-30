@@ -116,6 +116,21 @@ type = "shell"
 command = "herdr plugin action invoke open-file-viewer-tab --plugin herdr-file-viewer"
 description = "file viewer (tab)"
 
+# termscope: jump list from visible pane text — open files (nvim, file:line
+# preserved) or URLs an agent just mentioned. Television-based picker.
+[[keys.command]]
+key = "ctrl+shift+a"
+type = "plugin_action"
+command = "termscope.open"
+description = "visible-screen file picker"
+
+[[keys.command]]
+# NOT ctrl+e (readline end-of-line); u for URL
+key = "prefix+u"
+type = "plugin_action"
+command = "termscope.open-links"
+description = "visible-screen link picker"
+
 [worktrees]
 # Root for herdr-created git worktrees (prefix+shift+G), kept next to projects in ~/dev
 directory = "~/dev/worktrees"
