@@ -18,7 +18,7 @@ config.font_size = G.font_size or 15.0
 config.color_scheme = G.colorscheme or "Tokyo Night"
 
 -- Follow macOS light/dark appearance. Dark mode keeps the globals.json scheme
--- (fzf theme switcher untouched); light mode overrides with Catppuccin Latte.
+-- (theme switcher untouched); light mode overrides with Catppuccin Latte.
 wezterm.on("window-config-reloaded", function(window, _)
 	local overrides = window:get_config_overrides() or {}
 	local is_light = not window:get_appearance():find("Dark")
@@ -38,6 +38,11 @@ config.send_composed_key_when_right_alt_is_pressed = true
 config.window_background_opacity = G.opacity or 0.95
 config.macos_window_background_blur = 40 -- match ghostty's background-blur-radius
 
+-- Tint for the image-mode overlay. Nord polar night (#2E3440) instead of pure
+-- black, so the dark toggle reads blue-grey rather than neutral.
+-- Alternatives: "#3B4252" (lighter Nord), "#1A1B26" (Tokyo Night), "#000000".
+local bg_overlay_color = G.bg_overlay_color or "#2E3440"
+
 -- Background configuration based on solid_background setting
 if not G.solid_background then
 	-- Background with dynamic opacity from globals
@@ -52,7 +57,7 @@ if not G.solid_background then
 		},
 		{
 			source = {
-				Color = "#000000",
+				Color = bg_overlay_color,
 			},
 			opacity = G.bg_overlay_opacity or 0.9,
 			width = "100%",

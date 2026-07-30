@@ -112,7 +112,8 @@
       "Bash(cd ~/Documents/research/FO_loangrowth_fcst echo \"Total project dir : $\\(/usr/bin/du -sh .)",
       "Bash(rm -rf ~/Documents/research/FO_loangrowth_fcst.git.backup)",
       "Bash(rm -rf ~/Documents/research/FO_loangrowth_fcst/.git/filter-repo)",
-      "Bash(/usr/bin/du -sh ~/Documents/research/FO_loangrowth_fcst ~/Documents/research/FO_loangrowth_fcst/.git)"
+      "Bash(/usr/bin/du -sh ~/Documents/research/FO_loangrowth_fcst ~/Documents/research/FO_loangrowth_fcst/.git)",
+      "Bash(herdr plugin *)"
     ],
     "deny": [
       "Read(.env*)",

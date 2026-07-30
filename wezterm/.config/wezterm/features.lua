@@ -4,69 +4,90 @@ local act = wezterm.action
 
 local M = {}
 
--- Helper: fzf switcher which opens in a right split and executes a command with live preview
-M.fzfSwitcher = function(window, pane, script, command)
-  -- Execute fzf with update script on every cursor move for live preview
-  local fzfCommand = "fzf --color=gutter:-1,bg+:-1 --reverse --preview-window=down,1 --preview='" .. script .. " {}'"
+-- Absolute paths: a GUI-launched WezTerm inherits macOS's minimal PATH
+-- (/usr/bin:/bin:/usr/sbin:/sbin), so Homebrew binaries must be named in full.
+-- Declared here so the switcher closures below capture them as upvalues.
+local HERDR = "/opt/homebrew/bin/herdr"
+local FC_LIST = "/opt/homebrew/bin/fc-list"
 
-  window:perform_action(
-    act.SplitPane({
-      direction = "Right",
-      command = {
-        args = {
-          "zsh",
-          "-c",
-          command .. fzfCommand,
-        },
-      },
-      size = { Percent = 25 },
-    }),
-    pane
-  )
-end
-
--- Theme Switcher with live preview
+-- Theme Switcher. Uses WezTerm's native InputSelector (fuzzy=true) rather than
+-- an fzf subprocess: a GUI-launched WezTerm inherits macOS's minimal PATH, so
+-- /opt/homebrew/bin/fzf is not resolvable and the split pane died instantly.
 function M.themes()
   return wezterm.action_callback(function(window, pane)
-    local scriptsPath = wezterm.config_dir .. "/scripts"
-
-    -- Get all builtin color schemes and format them for fzf
     local schemes = wezterm.color.get_builtin_schemes()
-    local scheme_list = {}
+    local choices = {}
     for name, _ in pairs(schemes) do
-      table.insert(scheme_list, name)
+      table.insert(choices, { label = name })
     end
-    table.sort(scheme_list)
-
-    -- Create temp file with themes
-    local themes_file = os.tmpname()
-    local f = io.open(themes_file, "w")
-    for _, name in ipairs(scheme_list) do
-      f:write(name .. "\n")
-    end
-    f:close()
-
-    -- Build command: cat themes file and pipe to fzf with preview
-    local themesCommand = "cat " .. themes_file .. " | "
-
-    M.fzfSwitcher(window, pane, scriptsPath .. "/updateTheme.lua", themesCommand)
-
-    -- Clean up temp file after a delay
-    wezterm.time.call_after(1, function()
-      os.remove(themes_file)
+    table.sort(choices, function(a, b)
+      return a.label < b.label
     end)
+
+    window:perform_action(
+      act.InputSelector({
+        title = "Select Color Scheme",
+        description = "Type to fuzzy-search, Enter to apply, Esc to cancel",
+        choices = choices,
+        fuzzy = true,
+        action = wezterm.action_callback(function(_, _, _, label)
+          if not label then
+            return -- cancelled
+          end
+          globals.setGlobals(function(g)
+            g.colorscheme = label
+          end)
+        end),
+      }),
+      pane
+    )
   end)
 end
 
--- Font Switcher with live preview
+-- Font Switcher. Lists monospaced families via fc-list, presented in WezTerm's
+-- native fuzzy selector. fc-list needs its absolute path for the same
+-- GUI-launch PATH reason as herdr/tmux below.
 function M.fonts()
   return wezterm.action_callback(function(window, pane)
-    local scriptsPath = wezterm.config_dir .. "/scripts"
+    local seen, choices = {}, {}
+    local pipe = io.popen(FC_LIST .. " :spacing=100 family 2>/dev/null")
+    if pipe then
+      for line in pipe:lines() do
+        -- fc-list emits comma-separated aliases; the first is the family name
+        local family = line:match("^([^,]+)")
+        if family and family ~= "" and not family:match("^%.") and not seen[family] then
+          seen[family] = true
+          table.insert(choices, { label = family })
+        end
+      end
+      pipe:close()
+    end
+    table.sort(choices, function(a, b)
+      return a.label < b.label
+    end)
 
-    -- Get system fonts by family name including only monospaced fonts, format and sort them
-    local fontsCommand = "fc-list :spacing=100 family | grep -v '^\\.' | cut -d ',' -f1 | sort -u | "
+    if #choices == 0 then
+      window:toast_notification("WezTerm", "No monospaced fonts found", nil, 4000)
+      return
+    end
 
-    M.fzfSwitcher(window, pane, scriptsPath .. "/updateFont.lua", fontsCommand)
+    window:perform_action(
+      act.InputSelector({
+        title = "Select Font",
+        description = "Type to fuzzy-search, Enter to apply, Esc to cancel",
+        choices = choices,
+        fuzzy = true,
+        action = wezterm.action_callback(function(_, _, _, label)
+          if not label then
+            return -- cancelled
+          end
+          globals.setGlobals(function(g)
+            g.font_family = label
+          end)
+        end),
+      }),
+      pane
+    )
   end)
 end
 
@@ -167,21 +188,22 @@ function M.toggleSolidBackground(window, pane)
       g.bg_image_opacity = 0.0
     else
       -- Into image mode: remember current opacity first
+      -- Overlay at 1.0 = solid Nord tint, photo fully hidden. Drop toward 0.85
+      -- if you ever want the image to read through as faint texture.
       g.saved_solid_opacity = g.opacity
-      g.opacity = 0.95
-      g.bg_overlay_opacity = 0.9
-      g.bg_image_opacity = 0.5
+      g.opacity = 0.92
+      g.bg_overlay_opacity = 1.0
+      g.bg_image_opacity = 0.15
     end
   end)
 end
 
--- Project Switcher with preview
+-- Project Switcher. Enumerates git repos via /usr/bin/find (always on PATH),
+-- then presents them in WezTerm's native fuzzy selector instead of fzf.
 function M.projects()
   return wezterm.action_callback(function(window, pane)
-    local scriptsPath = wezterm.config_dir .. "/scripts"
     local home = os.getenv("HOME")
 
-    -- Define common project locations to search
     local search_paths = {
       home,
       home .. "/Projects",
@@ -192,36 +214,66 @@ function M.projects()
       home .. "/dotfiles",
     }
 
-    -- Build find command to locate directories (max depth 3)
+    -- Locate git repos rather than every directory: a bare -type d sweep of
+    -- $HOME at depth 3 returns thousands of entries and is slow to boot.
     local find_commands = {}
     for _, path in ipairs(search_paths) do
       table.insert(
         find_commands,
-        string.format("find '%s' -maxdepth 3 -type d -not -path '*/.*' 2>/dev/null", path)
+        string.format("/usr/bin/find '%s' -maxdepth 3 -type d -name .git 2>/dev/null", path)
       )
     end
 
-    -- Combine all find commands and pipe to fzf with preview
-    local projectsCommand = table.concat(find_commands, "; ") .. " | "
+    local seen, choices = {}, {}
+    local pipe = io.popen(table.concat(find_commands, "; "))
+    if pipe then
+      for line in pipe:lines() do
+        local dir = line:gsub("/%.git$", "")
+        if dir ~= "" and not seen[dir] then
+          seen[dir] = true
+          table.insert(choices, { label = dir:gsub("^" .. home, "~"), id = dir })
+        end
+      end
+      pipe:close()
+    end
+    table.sort(choices, function(a, b)
+      return a.label < b.label
+    end)
 
-    -- Custom action: on selection, open the project as a herdr workspace
-    -- (falls back to a tmux session if the herdr server isn't running)
-    local switchCommand = projectsCommand ..
-      "fzf --color=gutter:-1,bg+:-1 --reverse " ..
-      "--preview-window=down,60% " ..
-      "--preview='lua " .. scriptsPath .. "/switchProject.lua {}' " ..
-      "--bind='enter:execute(" ..
-        "herdr workspace create --cwd {} --label {/} --focus 2>/dev/null " ..
-        "|| tmux new-session -A -s {/} -c {}" ..
-      ")+abort'"
+    if #choices == 0 then
+      window:toast_notification("WezTerm", "No git projects found", nil, 4000)
+      return
+    end
 
     window:perform_action(
-      act.SplitPane({
-        direction = "Right",
-        command = {
-          args = { "zsh", "-c", switchCommand },
-        },
-        size = { Percent = 30 },
+      act.InputSelector({
+        title = "Select Project",
+        description = "Type to fuzzy-search, Enter to open, Esc to cancel",
+        choices = choices,
+        fuzzy = true,
+        action = wezterm.action_callback(function(win, _, id, _)
+          if not id then
+            return -- cancelled
+          end
+          local label = id:match("([^/]+)$") or id
+          -- herdr only. No tmux fallback by choice: nesting herdr inside tmux
+          -- swallowed keys (see .zshrc auto-attach note), so a failure here
+          -- should surface rather than silently open a different multiplexer.
+          local ok = os.execute(
+            string.format(
+              "%s workspace create --cwd %q --label %q --focus >/dev/null 2>&1",
+              HERDR, id, label
+            )
+          )
+          if not ok then
+            win:toast_notification(
+              "WezTerm",
+              "herdr could not open " .. label .. " — is the herdr server running?",
+              nil,
+              5000
+            )
+          end
+        end),
       }),
       pane
     )

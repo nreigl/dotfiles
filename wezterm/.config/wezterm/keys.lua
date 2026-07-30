@@ -50,54 +50,70 @@ function M.setup(config)
       action = wezterm.action_callback(features.resetFontSize),
     },
 
-    -- Opacity Controls
+    -- Opacity / overlay / image controls.
+    --
+    -- These were on OPT, which is dead: send_composed_key_when_*_alt_is_pressed
+    -- makes macOS compose OPT chords into characters (OPT+Z -> "Ω",
+    -- OPT+SHIFT+- -> "—"), so WezTerm never sees the bound key. Compose is
+    -- wanted for typing accents/@/€, so the bindings moved off OPT instead.
+    --
+    -- Same +/-/0 triad as CMD font-size, one modifier set per target:
+    --   CMD        = / - / 0  font size (above)
+    --   CTRL|SHIFT = / - / 0  window opacity
+    --   CMD|SHIFT  = / - / 0  background overlay
+    --   CTRL|CMD   = / - / 0  background image
+    --
+    -- phys: codes bind the physical key position, so SHIFT cannot re-map
+    -- "=" to "+" or "0" to ")" out from under the binding.
+
+    -- Window Opacity
     {
-      key = "z",
-      mods = "OPT",
+      key = "phys:Equal",
+      mods = "CTRL|SHIFT",
       action = wezterm.action_callback(features.moreOpacity),
     },
     {
-      key = "x",
-      mods = "OPT",
-      action = wezterm.action_callback(features.resetOpacity),
+      key = "phys:Minus",
+      mods = "CTRL|SHIFT",
+      action = wezterm.action_callback(features.lessOpacity),
     },
     {
-      key = "c",
-      mods = "OPT",
-      action = wezterm.action_callback(features.lessOpacity),
+      key = "phys:0",
+      mods = "CTRL|SHIFT",
+      action = wezterm.action_callback(features.resetOpacity),
     },
 
     -- Background Overlay Controls
     {
-      key = "=",
-      mods = "OPT|SHIFT",
+      key = "phys:Equal",
+      mods = "CMD|SHIFT",
       action = wezterm.action_callback(features.lightenBgOverlay),
     },
     {
-      key = "-",
-      mods = "OPT|SHIFT",
+      key = "phys:Minus",
+      mods = "CMD|SHIFT",
       action = wezterm.action_callback(features.darkenBgOverlay),
     },
     {
-      key = "0",
-      mods = "OPT|SHIFT",
+      key = "phys:0",
+      mods = "CMD|SHIFT",
       action = wezterm.action_callback(features.resetBgOverlay),
     },
 
     -- Background Image Controls
     {
-      key = "=",
-      mods = "OPT|CMD",
+      key = "phys:Equal",
+      mods = "CTRL|CMD",
       action = wezterm.action_callback(features.lightenBgImage),
     },
     {
-      key = "-",
-      mods = "OPT|CMD",
+      key = "phys:Minus",
+      mods = "CTRL|CMD",
       action = wezterm.action_callback(features.darkenBgImage),
     },
     {
-      key = "0",
-      mods = "OPT|CMD",
+      key = "phys:0",
+      mods = "CTRL|CMD",
       action = wezterm.action_callback(features.resetBgImage),
     },
 
