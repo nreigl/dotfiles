@@ -74,6 +74,6 @@ keybind = cmd+shift+o=toggle_background_opacity
 
 # shader
 # vendored from https://github.com/hackr-sh/ghostty-shaders (see shaders/)
-# alternative: shaders/cursor_lightning.glsl
-custom-shader = ~/.config/ghostty/shaders/cursor_blaze.glsl
+# options: shaders/cursor_blaze.glsl, shaders/cursor_lightning.glsl
+# custom-shader = ~/.config/ghostty/shaders/cursor_blaze.glsl
 
