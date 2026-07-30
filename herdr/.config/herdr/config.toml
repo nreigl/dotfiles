@@ -116,14 +116,6 @@ type = "shell"
 command = "herdr plugin action invoke open-file-viewer-tab --plugin herdr-file-viewer"
 description = "file viewer (tab)"
 
-# browser: embedded Chromium pane (CDP screencast over kitty graphics),
-# cmux-style agent-drivable browser. Ctrl+click on localhost links also opens it.
-[[keys.command]]
-key = "prefix+b"
-type = "shell"
-command = '"${HERDR_BIN_PATH}" plugin pane open --plugin official.browser --entrypoint browser --placement split --direction right --focus'
-description = "open browser in right split"
-
 [worktrees]
 # Root for herdr-created git worktrees (prefix+shift+G), kept next to projects in ~/dev
 directory = "~/dev/worktrees"
