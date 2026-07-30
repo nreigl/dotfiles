@@ -6,6 +6,7 @@ node = "22"         # Node.js v22 LTS
 ruby = "latest"     # Latest stable Ruby
 go = "latest"
 rust = "stable"     # Stable Rust toolchain
+bun = "latest"
 
 [settings]
 experimental = true
