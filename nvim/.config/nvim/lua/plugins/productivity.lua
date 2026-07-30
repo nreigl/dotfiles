@@ -84,16 +84,12 @@ return {
     },
   },
 
-  -- Markdown preview
-  {
-    "iamcco/markdown-preview.nvim",
-    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-    ft = { "markdown" },
-    build = function() vim.fn["mkdp#util#install"]() end,
-    keys = {
-      { "<leader>mp", "<cmd>MarkdownPreviewToggle<cr>", desc = "Markdown Preview" },
-    },
-  },
+  -- Markdown preview retired in favour of ZenNotes, which owns the notes vault.
+  -- Must be disabled explicitly rather than deleted: LazyVim's lang.markdown
+  -- extra declares this plugin too, so removing the spec would leave it
+  -- installed and merely rebind <leader>mp to <leader>cp.
+  -- In-buffer rendering (render-markdown.nvim, from the same extra) stays.
+  { "iamcco/markdown-preview.nvim", enabled = false },
 
   -- UFO: Modern code folding using Treesitter
   -- Provides smart, context-aware code folding with visual indicators

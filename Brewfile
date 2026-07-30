@@ -8,6 +8,7 @@ tap "nikitabobko/tap"
 # tap "sambadevi/powerlevel9k" # Removed: Using Starship prompt instead
 tap "sass/sass"
 tap "wix/brew"
+tap "zennotes/tap"
 # Search tool like grep, but optimized for programmers
 brew "ack"
 # Library for manipulating PNG images
@@ -113,8 +114,6 @@ brew "jags"
 brew "jq"
 # YAML Parser
 brew "libyaml"
-# Command-line note taker
-brew "jrnl"
 # Julia installer and version multiplexer
 brew "juliaup"
 # Platform built on V8 to build network applications (managed via mise)
@@ -365,8 +364,6 @@ cask "kicad", args: { appdir: "/Applications" }
 # Extensible two-pane file manager
 cask "marta"
 # Conda is optional; Python is managed via UV
-# Knowledge base that works on top of a local folder of plain text Markdown files
-cask "obsidian"
 # Calculate the overall performance of an investment portfolio
 cask "portfolioperformance"
 # Collaboration platform for API development
@@ -403,6 +400,8 @@ cask "whatsapp"
 cask "wkhtmltopdf"
 # Open-source version of the X.Org X Window System
 cask "xquartz"
+# Keyboard-first Markdown notes on a plain folder of .md files (replaces Obsidian)
+cask "zennotes"
 # Video communication and virtual meeting platform
 cask "zoom", args: { appdir: "/Applications" }
 # Collect, organise, cite, and share research sources
