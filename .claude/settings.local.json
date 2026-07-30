@@ -113,7 +113,9 @@
       "Bash(rm -rf ~/Documents/research/FO_loangrowth_fcst.git.backup)",
       "Bash(rm -rf ~/Documents/research/FO_loangrowth_fcst/.git/filter-repo)",
       "Bash(/usr/bin/du -sh ~/Documents/research/FO_loangrowth_fcst ~/Documents/research/FO_loangrowth_fcst/.git)",
-      "Bash(herdr plugin *)"
+      "Bash(herdr plugin *)",
+      "Bash(herdr workspace *)",
+      "Bash(herdr api *)"
     ],
     "deny": [
       "Read(.env*)",
