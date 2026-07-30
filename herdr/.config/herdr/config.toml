@@ -82,3 +82,8 @@ claude = "on"
 # Resume agent conversations after a server restart
 # (analog of tmux-resurrect/continuum)
 resume_agents_on_restore = true
+
+[experimental]
+# Inline image rendering; needs a Kitty-graphics-capable outer terminal
+# (Ghostty: solid support; WezTerm: partial)
+kitty_graphics = true
