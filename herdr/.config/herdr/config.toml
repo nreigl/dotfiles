@@ -45,6 +45,13 @@ focus_pane_right = "prefix+l"
 new_tab = "prefix+c"
 switch_tab = "prefix+1..9"
 
+# Agent-first navigation: jump straight to a sidebar agent row.
+# prefix+alt+1..9 is used instead of [keys.indexed] agents = "alt", because
+# alt+1..9 is already taken by direct tab switching below.
+focus_agent = "prefix+alt+1..9"
+previous_agent = "prefix+comma"
+next_agent = "prefix+period"
+
 # Direct Alt+1..9 tab switching without prefix (tmux: bind -n M-1..5)
 [keys.indexed]
 tabs = "alt"
@@ -136,6 +143,14 @@ description = "visible-screen link picker"
 directory = "~/dev/worktrees"
 
 [ui]
+# Label split panes with the detected agent when no manual pane name is set,
+# so a multi-agent tab is readable without consulting the sidebar.
+show_agent_labels_on_pane_borders = true
+
+# Sidebar agent ordering. "spaces" groups by workspace (default);
+# switch to "priority" to get an attention queue (blocked agents float up).
+agent_panel_sort = "spaces"
+
 # Show Claude panes with live activity (terminal title) in the sidebar
 [ui.sidebar.agents.rows_by_agent]
 claude = [
@@ -165,3 +180,8 @@ resume_agents_on_restore = true
 # Inline image rendering; needs a Kitty-graphics-capable outer terminal
 # (Ghostty: solid support; WezTerm: partial)
 kitty_graphics = true
+
+# Keep recent pane screen history across full server restarts — pairs with
+# session.resume_agents_on_restore so a restarted server comes back with
+# context on screen, not just a live process.
+pane_history = true
