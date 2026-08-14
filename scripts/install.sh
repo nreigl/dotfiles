@@ -89,6 +89,18 @@ configure_mise() {
   fi
 }
 
+# === Install Pi Coding Agent ===
+install_pi() {
+  echo -e "${YELLOW}🤖 Installing Pi coding agent...${NC}"
+
+  if command -v mise &>/dev/null; then
+    mise exec node@22 -- npm install -g --ignore-scripts @earendil-works/pi-coding-agent
+    echo -e "${GREEN}✓ Pi coding agent installed${NC}"
+  else
+    echo -e "${RED}✗ Mise not found; unable to install Pi${NC}"
+  fi
+}
+
 # === Install Zinit (ZSH Plugin Manager) ===
 install_zinit() {
   local ZINIT_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git"
@@ -168,6 +180,7 @@ main() {
   install_uv
   setup_julia
   configure_mise
+  install_pi
   install_zinit
   
   # Stow dotfiles

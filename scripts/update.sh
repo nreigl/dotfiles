@@ -72,6 +72,18 @@ update_mise() {
   fi
 }
 
+# === Update Pi Coding Agent ===
+update_pi() {
+  echo -e "${YELLOW}🤖 Updating Pi coding agent...${NC}"
+
+  if command -v pi &>/dev/null; then
+    pi update --self
+    echo -e "${GREEN}✓ Pi coding agent updated${NC}"
+  else
+    echo -e "${RED}✗ Pi not found${NC}"
+  fi
+}
+
 # === Update Neovim plugins ===
 update_neovim() {
   echo -e "${YELLOW}📝 Updating Neovim plugins...${NC}"
@@ -145,6 +157,7 @@ main() {
   update_python
   update_julia
   update_mise
+  update_pi
   update_neovim
   update_zsh
   update_dotfiles

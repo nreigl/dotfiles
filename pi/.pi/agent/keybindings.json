@@ -1,0 +1,10 @@
+{
+  "tui.editor.cursorUp": ["up", "alt+k"],
+  "tui.editor.cursorDown": ["down", "alt+j"],
+  "tui.editor.cursorLeft": ["left", "ctrl+b", "alt+h"],
+  "tui.editor.cursorRight": ["right", "ctrl+f", "alt+l"],
+  "app.session.new": "ctrl+shift+n",
+  "app.session.tree": "ctrl+shift+t",
+  "app.session.fork": "ctrl+shift+f",
+  "app.session.resume": "ctrl+shift+r"
+}

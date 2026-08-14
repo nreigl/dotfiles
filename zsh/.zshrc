@@ -281,3 +281,12 @@ if command -v gh &>/dev/null; then
     GITHUB_PERSONAL_ACCESS_TOKEN="$(gh auth token 2>/dev/null)" command claude "$@"
   }
 fi
+
+# Pi
+export PATH="/Users/nicolasreigl/.local/share/mise/installs/node/22.19.0/bin:$PATH"
+
+# kimi-code
+export PATH="/Users/nicolasreigl/.kimi-code/bin:$PATH"
+
+# Added by Antigravity IDE
+export PATH="/Users/nicolasreigl/.antigravity-ide/antigravity-ide/bin:$PATH"
