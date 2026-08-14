@@ -87,6 +87,7 @@ Each directory at the root level is a "stow package" containing configs:
 - `mise/` - Version manager config (→ `~/`)
 - `tmux/` - Terminal multiplexer config (→ `~/`)
 - `ssh/`, `aws/` - Security configs (→ `~/.ssh/`, `~/.aws/`)
+- `raycast/` - **Not stowed.** Raycast keeps its settings in an encrypted SQLite database, so hotkeys and extension settings cannot live in this repository. The package holds only `scripts/` (script commands) and `install-extensions.sh`. Point Raycast at the scripts through Settings → Extensions → + → Add Script Directory. See `raycast/README.md`
 
 ### Key Configuration Files
 - `Brewfile` - Homebrew package manifest (480+ packages)
@@ -102,6 +103,8 @@ Each directory at the root level is a "stow package" containing configs:
 - **Terminal**: Ghostty (WezTerm removed 2026-08-14 — it drops Caps Lock→Escape key events on macOS)
 - **Multiplexer**: herdr (agent multiplexer, tmux-parity keys); tmux still available via the `tm` alias
 - **File manager**: yazi (`y` wrapper); superfile on trial (`sf` wrapper). Both cd the shell to the last directory on exit
+- **Launcher**: Raycast (Alfred removed 2026-08-14 — the Powerpack came from a patched build, and a Homebrew update replaced it with the official one). Raycast free covers clipboard history, snippets, quicklinks, and script commands. It does not sync settings between machines
+- **Screenshots**: Shottr (free for personal use, includes OCR and scrolling capture)
 - **Window Management**: none. yabai and skhd both removed 2026-08-14 — neither was running, and `skhdrc` was almost entirely yabai commands
 
 ## Important Notes

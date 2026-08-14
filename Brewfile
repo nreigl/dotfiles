@@ -260,8 +260,6 @@ cask "1password", args: { appdir: "/Applications" }
 cask "aerospace"
 # Status bar app to overcome time-constrained WiFi networks
 cask "airpass", args: { appdir: "/Applications" }
-# Application launcher and productivity software
-cask "alfred", args: { appdir: "/Applications" }
 # Tools for building Android applications
 cask "android-studio", args: { appdir: "/Applications" }
 # App to build and share containerised applications and microservices
@@ -363,6 +361,10 @@ cask "portfolioperformance"
 cask "postman", args: { appdir: "/Applications" }
 # G-code generator for 3D printers (RepRap, Makerbot, Ultimaker etc.)
 # cask "prusaslicer", args: { appdir: "/Applications" } # Disabled: invalid macOS version dependency in upstream cask
+# Control your tools with a few keystrokes
+cask "raycast"
+# Screenshot tool with annotation, OCR and scrolling capture
+cask "shottr"
 # Instant messaging application focusing on security
 cask "signal"
 # Digital design and prototyping platform
