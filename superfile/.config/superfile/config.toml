@@ -18,6 +18,10 @@ dir_editor = "yazi"
 # Homebrew handles upgrades. Do not phone home on start.
 auto_check_update = false
 
+# Write the last directory on exit. The sf() wrapper in
+# zsh/.config/zsh/aliases.zsh reads it.
+cd_on_quit = true
+
 # Styling. Matches the yazi flavor.
 theme = "catppuccin-macchiato"
 code_previewer = "bat"

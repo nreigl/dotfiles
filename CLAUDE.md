@@ -82,7 +82,7 @@ Each directory at the root level is a "stow package" containing configs:
 - `yazi/` - Terminal file manager (→ `~/.config/yazi/`). Keep `yazi.toml` minimal: yazi merges it over built-in presets, and copying the full default config breaks on every release
 - `superfile/` - Second terminal file manager, on trial (→ `~/.config/superfile/`). Only `config.toml` is stowed. Keep it minimal and keep `ignore_missing_fields = true`, which silences the warning about absent fields. `hotkeys.toml` and `theme/` stay unstowed because superfile rewrites them on upgrade
 - `nvim/` - Neovim/LazyVim config (→ `~/.config/nvim/`)
-- `zsh/` - Shell config with `.zshrc`, aliases, functions (→ `~/`)
+- `zsh/` - Shell config (→ `~/`). `.zshrc` sources three files from `.config/zsh/`: `aliases.zsh`, `functions.zsh`, `fzf-functions.zsh`. New aliases and shell functions go in one of those three. Nothing else in this package is sourced
 - `git/` - Global git config and gitignore (→ `~/`)
 - `mise/` - Version manager config (→ `~/`)
 - `tmux/` - Terminal multiplexer config (→ `~/`)
@@ -101,8 +101,8 @@ Each directory at the root level is a "stow package" containing configs:
 - **Editor**: Neovim with LazyVim distribution
 - **Terminal**: Ghostty (WezTerm removed 2026-08-14 — it drops Caps Lock→Escape key events on macOS)
 - **Multiplexer**: herdr (agent multiplexer, tmux-parity keys); tmux still available via the `tm` alias
-- **File manager**: yazi (`y` wrapper); superfile on trial (`sf` wrapper). Both wrappers live in `zsh/.aliases` and cd the shell to the last directory on exit
-- **Window Management**: skhd only (yabai removed 2026-08-14)
+- **File manager**: yazi (`y` wrapper); superfile on trial (`sf` wrapper). Both cd the shell to the last directory on exit
+- **Window Management**: none. yabai and skhd both removed 2026-08-14 — neither was running, and `skhdrc` was almost entirely yabai commands
 
 ## Important Notes
 
