@@ -1,6 +1,8 @@
 # Atuin configuration (local, no sync)
 auto_sync = false
-keymap = "emacs"
+# atuin 18.x renamed this. Bare `keymap` is now a table of cursor styles, so
+# the old `keymap = "emacs"` fails to deserialize and atuin refuses to start.
+keymap_mode = "emacs"
 style = "auto"
 show_preview = true
 inline_height = 18
