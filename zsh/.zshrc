@@ -280,11 +280,20 @@ alias tm='/opt/homebrew/bin/tmux new-session -A -s main'
 # into its Bearer auth header). Rather than globally exporting the gh token into
 # every shell and every child process, scope it to the `claude` process only:
 # `gh auth token` runs just when Claude Code launches, and no other process sees it.
-if command -v gh &>/dev/null; then
-  claude() {
-    GITHUB_PERSONAL_ACCESS_TOKEN="$(gh auth token 2>/dev/null)" command claude "$@"
-  }
-fi
+#
+# The same wrapper also drops CLAUDE_CODE_CHILD_SESSION. Claude Code sets that
+# marker on processes it spawns so nested sessions skip writing their own
+# transcript. A `claude` launched by hand from a Claude-spawned terminal
+# inherits it, silently loses its transcript, and cannot be --resume'd.
+# Launching from an interactive shell always means a real top-level session.
+claude() {
+  local -a env_cmd
+  env_cmd=(env -u CLAUDE_CODE_CHILD_SESSION)
+  if command -v gh &>/dev/null; then
+    env_cmd+=("GITHUB_PERSONAL_ACCESS_TOKEN=$(gh auth token 2>/dev/null)")
+  fi
+  "${env_cmd[@]}" claude "$@"
+}
 
 # Pi
 export PATH="/Users/nicolasreigl/.local/share/mise/installs/node/22.19.0/bin:$PATH"
