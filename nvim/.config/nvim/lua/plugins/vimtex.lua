@@ -103,4 +103,19 @@ return {
       { "<localleader>li", "<cmd>VimtexInfo<cr>", desc = "Info", ft = "tex" },
     },
   },
+
+  {
+    -- texlab sends an inlay hint at each \ref{...} that contains the resolved
+    -- caption, for example " Figure: Macro context ". Neovim draws it as
+    -- virtual text inside the line, so it looks like it overlays the source.
+    -- LazyVim enables inlay hints for every filetype except vue, so exclude
+    -- the LaTeX filetypes here. Keep "vue" in the list: LazyVim overwrites
+    -- this list instead of merging it.
+    "neovim/nvim-lspconfig",
+    opts = {
+      inlay_hints = {
+        exclude = { "vue", "tex", "plaintex", "bib" },
+      },
+    },
+  },
 }
