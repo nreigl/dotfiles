@@ -10,6 +10,11 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+# Defined here, not inside update_dotfiles(). Under `set -u` any function that
+# runs before update_dotfiles() would abort on an unset DOTFILES_DIR.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOTFILES_DIR="$(dirname "$SCRIPT_DIR")"
+
 echo -e "${BLUE}========================================${NC}"
 echo -e "${BLUE}   Updating Development Environment${NC}"
 echo -e "${BLUE}========================================${NC}"
@@ -84,6 +89,32 @@ update_pi() {
   fi
 }
 
+# === Report Brewfile drift ===
+# --no-upgrade is required. Without it, brew reports installed-but-outdated
+# packages as unmet, and self-updating casks (1Password, Slack, Spotify, VS
+# Code, WhatsApp, Signal) then show as unmet permanently. That noise hides the
+# packages that are genuinely absent.
+check_brewfile_drift() {
+  echo -e "${YELLOW}📋 Checking Brewfile drift...${NC}"
+
+  local brewfile="$DOTFILES_DIR/Brewfile"
+  if [ ! -f "$brewfile" ]; then
+    echo -e "${RED}✗ Brewfile not found at $brewfile${NC}"
+    return
+  fi
+
+  local missing
+  missing="$(brew bundle check --verbose --no-upgrade --file="$brewfile" 2>&1 | grep '^→' || true)"
+
+  if [ -z "$missing" ]; then
+    echo -e "${GREEN}✓ Brewfile matches what is installed${NC}"
+  else
+    echo -e "${YELLOW}Listed in the Brewfile but not installed:${NC}"
+    echo "$missing"
+    echo -e "${YELLOW}Install them with 'brew bundle install', or delete the lines.${NC}"
+  fi
+}
+
 # === Update Neovim plugins ===
 update_neovim() {
   echo -e "${YELLOW}📝 Updating Neovim plugins...${NC}"
@@ -115,9 +146,6 @@ update_zsh() {
 # === Update dotfiles repository ===
 update_dotfiles() {
   echo -e "${YELLOW}📁 Updating dotfiles...${NC}"
-  
-  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-  DOTFILES_DIR="$(dirname "$SCRIPT_DIR")"
   
   cd "$DOTFILES_DIR"
   
@@ -154,6 +182,7 @@ main() {
   echo
   
   update_homebrew
+  check_brewfile_drift
   update_python
   update_julia
   update_mise

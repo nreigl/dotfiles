@@ -130,3 +130,42 @@ alias timer='echo "Timer started. Stop with Ctrl-D." && date && time cat && date
 
 # === Taskwarrior ===
 alias twsync='tw_gtasks_sync -l "Taskwarrior" --all'
+
+# === File managers ===
+# yazi, with cd-on-quit.
+y() {
+    local tmp cwd
+    tmp="$(mktemp -t yazi-cwd.XXXXXX)"
+    yazi "$@" --cwd-file="$tmp"
+    if cwd="$(command cat -- "$tmp")" && [[ -n "$cwd" && "$cwd" != "$PWD" ]]; then
+        builtin cd -- "$cwd"
+    fi
+    rm -f -- "$tmp"
+}
+
+# superfile, with cd-on-quit. Requires cd_on_quit = true in
+# superfile/.config/superfile/config.toml.
+#
+# The upstream wrapper hardcodes the macOS path as
+# "$HOME/Library/Application Support/superfile/lastdir". A Homebrew install
+# writes to $XDG_STATE_HOME instead, so the upstream wrapper silently does
+# nothing (superfile issue #1274). Ask the binary for the path instead.
+sf() {
+    local lastdir_file
+    lastdir_file="$(command spf path-list --lastdir-file)" || return
+    export SPF_LAST_DIR="$lastdir_file"
+    command spf "$@"
+    if [[ -f "$SPF_LAST_DIR" ]]; then
+        source "$SPF_LAST_DIR"
+        rm -f -- "$SPF_LAST_DIR"
+    fi
+    unset SPF_LAST_DIR
+}
+
+# === Terminal ===
+# The Homebrew cask does not link a ghostty binary onto PATH, so the CLI is
+# only reachable inside the app bundle. Useful subcommands:
+#   ghostty +list-themes / +list-fonts / +list-actions / +list-keybinds
+#   ghostty +validate-config                 check a config before reloading
+#   ghostty +show-config --default --docs    every setting with its default
+alias ghostty="/Applications/Ghostty.app/Contents/MacOS/ghostty"

@@ -6,7 +6,6 @@ tap "mgmeyers/pdfannots2json"
 tap "nikitabobko/tap"
 # tap "sambadevi/powerlevel9k" # Removed: Using Starship prompt instead
 tap "sass/sass"
-tap "wix/brew"
 tap "zennotes/tap"
 # Search tool like grep, but optimized for programmers
 brew "ack"
@@ -145,8 +144,6 @@ brew "ncdu"
 brew "neovim"
 # Pandoc filter for numbering and cross-referencing
 brew "pandoc-crossref"
-# Pandoc filter for including code from source files
-brew "pandoc-include-code"
 # Render and include figures in Pandoc documents using many plotting toolkits
 brew "pandoc-plot"
 # Search PDFs for strings matching a regular expression
@@ -181,8 +178,6 @@ brew "rust"
 # Terminal multiplexer with VT100/ANSI terminal emulation (use tmux instead)
 # 7-Zip is a file archiver with a high compression ratio
 brew "sevenzip"
-# Terminal-based client for Spotify
-brew "spotify-tui"
 # Cross-shell prompt for astronauts
 brew "starship"
 # Organize software neatly under a single directory tree (e.g. /usr/local)
@@ -258,13 +253,9 @@ brew "mgmeyers/pdfannots2json/pdfannots2json"
 # brew "sambadevi/powerlevel9k/powerlevel9k" # Removed: Using Starship prompt instead
 # Stylesheet Preprocessor
 brew "sass/sass/sass"
-# Apple simulator utilities
-brew "wix/brew/applesimutils"
 # Password manager that keeps all passwords secure behind one password
 cask "1password", args: { appdir: "/Applications" }
 # AdoptOpenJDK OpenJDK (Java) Development Kit
-# Modern JDK (Temurin/OpenJDK 8)
-cask "temurin8"
 # AeroSpace is an i3-like tiling window manager for macOS
 cask "aerospace"
 # Status bar app to overcome time-constrained WiFi networks
@@ -275,8 +266,6 @@ cask "alfred", args: { appdir: "/Applications" }
 cask "android-studio", args: { appdir: "/Applications" }
 # App to build and share containerised applications and microservices
 cask "docker-desktop"
-# Tool to hide status bar icons
-cask "dozer", args: { appdir: "/Applications" }
 # Web browser
 cask "firefox", args: { appdir: "/Applications" }
 # Screen colour temperature controller
@@ -361,8 +350,6 @@ cask "hammerspoon"
 cask "hiddenbar"
 # System monitoring app
 cask "istat-menus", args: { appdir: "/Applications" }
-# Open-source screen recorder built with web technology
-cask "kap", args: { appdir: "/Applications" }
 # File archiver
 cask "keka"
 # Electronics design automation suite
@@ -386,8 +373,6 @@ cask "skim"
 cask "slack", args: { appdir: "/Applications" }
 # Music streaming service
 cask "spotify", args: { appdir: "/Applications" }
-# Pomodoro timer for Taskwarrior
-cask "taskwarrior-pomodoro"
 # Unpacks archive files
 cask "the-unarchiver", args: { appdir: "/Applications" }
 # Open-source BitTorrent client
@@ -404,8 +389,6 @@ cask "vlc"
 # history if the bug is ever fixed upstream.
 # Native desktop client for WhatsApp
 cask "whatsapp"
-# HTML to PDF renderer
-cask "wkhtmltopdf"
 # Open-source version of the X.Org X Window System
 cask "xquartz"
 # Keyboard-first Markdown notes on a plain folder of .md files (replaces Obsidian)
