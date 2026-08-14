@@ -17,9 +17,10 @@ set -euo pipefail
 # To find an id, open the spot on windguru.cz and read the number in the URL,
 # for example https://www.windguru.cz/48651 has the id 48651.
 SPOTS="
-laulasmaa=
-vaana=
-pirita=
+laulasmaa=397937
+vaana=497080
+vääna=497080
+pirita=872473
 tallinn=341
 "
 
