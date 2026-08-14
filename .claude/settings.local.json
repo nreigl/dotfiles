@@ -115,7 +115,16 @@
       "Bash(/usr/bin/du -sh ~/Documents/research/FO_loangrowth_fcst ~/Documents/research/FO_loangrowth_fcst/.git)",
       "Bash(herdr plugin *)",
       "Bash(herdr workspace *)",
-      "Bash(herdr api *)"
+      "Bash(herdr api *)",
+      "Bash(herdr status *)",
+      "Bash(herdr agent *)",
+      "Bash(mole --version)",
+      "Read(//Applications/KiCad/**)",
+      "Bash(mole --help)",
+      "Bash(mole uninstall *)",
+      "Read(//opt/homebrew/Caskroom/kicad/10.0.5/**)",
+      "Read(//Library/Application Support/kicad/demos/**)",
+      "Bash(/usr/bin/du *)"
     ],
     "deny": [
       "Read(.env*)",
@@ -130,5 +139,6 @@
       "Bash(rm -rf /:*)"
     ],
     "defaultMode": "acceptEdits"
-  }
+  },
+  "outputStyle": "simple-english:simple-english"
 }

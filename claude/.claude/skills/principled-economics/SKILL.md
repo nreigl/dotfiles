@@ -1,6 +1,6 @@
 ---
 name: principled-economics
-description: Use whenever the user is evaluating an empirical economics claim, identification strategy, policy proposal, theoretical mechanism, or research result — including in real time during seminars, when prepping seminar questions, reviewing papers or student work, or stress-testing their own research. Trigger even when the user does not explicitly ask for "critique": any input containing an economic claim that depends on identification, mechanism, equilibrium, or welfare reasoning should activate this skill. Skip for pure data lookups, R/Python/Stata syntax questions, document formatting, LaTeX cleanup, or factual queries with no causal or mechanism content.
+description: "Use whenever the user is evaluating an empirical economics claim, identification strategy, policy proposal, theoretical mechanism, or research result — including in real time during seminars, when prepping seminar questions, reviewing papers or student work, or stress-testing their own research. Trigger even when the user does not explicitly ask for 'critique': any input containing an economic claim that depends on identification, mechanism, equilibrium, or welfare reasoning should activate this skill. Skip for pure data lookups, R/Python/Stata syntax questions, document formatting, LaTeX cleanup, or factual queries with no causal or mechanism content."
 ---
 
 # Principled Economics
