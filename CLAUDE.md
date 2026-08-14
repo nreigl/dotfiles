@@ -77,7 +77,10 @@ ruff --version
 
 ### Stow Package Structure
 Each directory at the root level is a "stow package" containing configs:
-- `alacritty/`, `wezterm/` - Terminal emulators (configs symlinked to `~/.config/`)
+- `ghostty/` - Terminal emulator (config symlinked to `~/.config/ghostty/`)
+- `herdr/` - Terminal multiplexer for coding agents (→ `~/.config/herdr/`)
+- `yazi/` - Terminal file manager (→ `~/.config/yazi/`). Keep `yazi.toml` minimal: yazi merges it over built-in presets, and copying the full default config breaks on every release
+- `superfile/` - Second terminal file manager, on trial (→ `~/.config/superfile/`). Only `config.toml` is stowed. Keep it minimal and keep `ignore_missing_fields = true`, which silences the warning about absent fields. `hotkeys.toml` and `theme/` stay unstowed because superfile rewrites them on upgrade
 - `nvim/` - Neovim/LazyVim config (→ `~/.config/nvim/`)
 - `zsh/` - Shell config with `.zshrc`, aliases, functions (→ `~/`)
 - `git/` - Global git config and gitignore (→ `~/`)
@@ -89,15 +92,17 @@ Each directory at the root level is a "stow package" containing configs:
 - `Brewfile` - Homebrew package manifest (480+ packages)
 - `scripts/install.sh` - Main installer (lines 1-198)
 - `scripts/update.sh` - Update all tools (lines 1-158)
-- `scripts/stow-all.sh` - Links 22 stow packages (lines 22-43)
+- `scripts/stow-all.sh` - Links 28 stow packages (the `PACKAGES` array). `scripts/stow-remove.sh` holds an identical list — update both together
 - `mise.toml` - Global Node.js version (currently v22)
 
 ### Tool Stack
 - **Package Management**: Homebrew (system), UV (Python), Juliaup (Julia), mise (Node/Ruby/Go)
 - **Shell**: ZSH + Zinit + Starship prompt
 - **Editor**: Neovim with LazyVim distribution
-- **Terminal**: WezTerm/Alacritty
-- **Window Management**: yabai + skhd (optional)
+- **Terminal**: Ghostty (WezTerm removed 2026-08-14 — it drops Caps Lock→Escape key events on macOS)
+- **Multiplexer**: herdr (agent multiplexer, tmux-parity keys); tmux still available via the `tm` alias
+- **File manager**: yazi (`y` wrapper); superfile on trial (`sf` wrapper). Both wrappers live in `zsh/.aliases` and cd the shell to the last directory on exit
+- **Window Management**: skhd only (yabai removed 2026-08-14)
 
 ## Important Notes
 

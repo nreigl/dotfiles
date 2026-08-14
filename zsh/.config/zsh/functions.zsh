@@ -205,3 +205,55 @@ cheat() {
 calc() {
   echo "$*" | bc -l
 }
+
+# Show PDF pages in the terminal. No terminal renders PDF, so pdftoppm converts
+# the pages to PNG first and timg draws them with the Kitty graphics protocol.
+# Ghostty supports that protocol. Use Skim to read a paper; use this for a look
+# at one figure without leaving the shell.
+#
+#   pdfview paper.pdf        all pages
+#   pdfview paper.pdf 3      page 3
+#   pdfview paper.pdf 2 5    pages 2 to 5
+#
+# Set PDFVIEW_DPI to change the render resolution. The default is 150.
+pdfview() {
+  emulate -L zsh
+  setopt local_options null_glob
+
+  local file="$1" first="${2:-1}" last="${3:-$2}"
+
+  if [[ -z "$file" || ! -f "$file" ]]; then
+    echo "usage: pdfview <file.pdf> [first_page] [last_page]" >&2
+    return 1
+  fi
+
+  local dep
+  for dep in pdftoppm timg; do
+    if ! command -v "$dep" >/dev/null 2>&1; then
+      echo "pdfview: $dep is not installed (brew install ${dep/pdftoppm/poppler})" >&2
+      return 1
+    fi
+  done
+
+  local dir
+  dir="$(mktemp -d)" || return 1
+
+  local -a range=(-f "$first")
+  [[ -n "$last" ]] && range+=(-l "$last")
+
+  local rc=0
+  if pdftoppm -png -r "${PDFVIEW_DPI:-150}" "${range[@]}" "$file" "$dir/page"; then
+    local -a pages=("$dir"/page*.png)
+    if (( ${#pages} )); then
+      timg "${pages[@]}" || rc=$?
+    else
+      echo "pdfview: no pages rendered from $file" >&2
+      rc=1
+    fi
+  else
+    rc=1
+  fi
+
+  [[ -n "$dir" ]] && rm -rf "$dir"
+  return $rc
+}

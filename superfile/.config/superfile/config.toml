@@ -1,0 +1,29 @@
+# Keep this file MINIMAL. superfile merges it over its built-in defaults, so
+# only deviations from the default belong here. `ignore_missing_fields = true`
+# silences the startup warning about the fields that are absent.
+#
+# To see every field and its default, run:
+#   spf --fix-config-file      # writes missing fields into this file
+#   spf path-list              # prints config, hotkey, log, and data paths
+#
+# The `theme/` directory under ~/.config/superfile is written by superfile
+# itself on every upgrade. It is not stowed.
+
+ignore_missing_fields = true
+
+# Defaults
+editor = "nvim"
+dir_editor = "yazi"
+
+# Homebrew handles upgrades. Do not phone home on start.
+auto_check_update = false
+
+# Styling. Matches the yazi flavor.
+theme = "catppuccin-macchiato"
+code_previewer = "bat"
+
+# Plugins
+zoxide_support = true
+
+# File opening rules. This table must stay at the end of the file.
+[open_with]

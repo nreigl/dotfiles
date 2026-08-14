@@ -34,14 +34,20 @@ alpha-blending = linear-corrected
 
 macos-titlebar-style = tabs
 macos-titlebar-proxy-icon = hidden
-# Both Option keys compose special chars (@, \, €, ...), matching WezTerm's
-# send_composed_key_when_*_alt_is_pressed = true. No terminal Alt/Meta key.
-macos-option-as-alt = false
+# Left Option composes special chars (@, \, €, ...). Right Option is a real
+# Alt, which herdr needs for [keys.indexed] tabs = "alt" (Alt+1..9 tab
+# switching), focus_agent = "prefix+alt+1..9", and the prefix+alt+g lazygit
+# popup. With "false" on both keys, herdr never saw an Alt key at all.
+macos-option-as-alt = right
 
-# Matches WezTerm's translucent look (opacity 0.65 + blur 40).
-# cmd+shift+o toggles to fully opaque; applies to new windows only.
-background-opacity = 0.65
+# cmd+shift+o toggles between this value and fully opaque.
+# Lower is more transparent. 0.65 was the old WezTerm-parity value.
+background-opacity = 0.5
 background-blur-radius = 40
+
+# Ghostty updates itself by default. Homebrew is authoritative here, so two
+# updaters would fight. Update with: brew upgrade --cask ghostty
+auto-update = off
 
 # Background image mode (WezTerm-image-mode parity, Ghostty 1.2+).
 # Uncomment to get the landscape look; tune opacity to taste.
@@ -64,13 +70,17 @@ window-inherit-working-directory = false
 working-directory = home
 
 # keymaps
-keybind = global:cmd+`=toggle_quick_terminal
+# Was global:cmd+` — that is the macOS "Move focus to next window" shortcut
+# (symbolic hotkey 27), and a global: binding steals it from every application.
+keybind = global:ctrl+cmd+`=toggle_quick_terminal
 keybind = shift+ctrl+left_bracket=previous_tab
 keybind = shift+ctrl+right_bracket=next_tab
 keybind = shift+ctrl+,=move_tab:-1
 keybind = shift+ctrl+.=move_tab:+1
 # Flip between configured transparency and fully opaque
 keybind = cmd+shift+o=toggle_background_opacity
+# WezTerm parity (was CTRL|CMD+f there). Matches the macOS system shortcut.
+keybind = ctrl+cmd+f=toggle_fullscreen
 
 # shader
 # vendored from https://github.com/hackr-sh/ghostty-shaders (see shaders/)

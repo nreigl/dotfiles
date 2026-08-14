@@ -468,3 +468,13 @@ function y() {
     fi
     rm -f -- "$tmp"
 }
+
+# superfile, with cd-on-quit. Same contract as y() above.
+function sf() {
+    local tmp="$(mktemp -t "spf-cwd.XXXXXX")" cwd
+    spf --print-last-dir "$@" > "$tmp"
+    if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+        builtin cd -- "$cwd"
+    fi
+    rm -f -- "$tmp"
+}

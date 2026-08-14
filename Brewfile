@@ -2,7 +2,6 @@ tap "bramstein/webfonttools"
 tap "dart-lang/dart"
 tap "epk/epk"
 tap "jesseduffield/lazygit"
-tap "koekeishiya/formulae"
 tap "mgmeyers/pdfannots2json"
 tap "nikitabobko/tap"
 # tap "sambadevi/powerlevel9k" # Removed: Using Starship prompt instead
@@ -190,6 +189,8 @@ brew "starship"
 brew "stow"
 # Version control system designed to be a better CVS
 brew "subversion"
+# Modern and pretty fancy file manager for the terminal
+brew "superfile"
 # Tool to enforce Swift style and conventions
 brew "swiftlint"
 # TUI to view and query tabular files (CSV,TSV, Parquet, etc.)
@@ -209,6 +210,9 @@ brew "texlab"
 brew "thefuck"
 # Command-line time tracking application
 brew "timewarrior"
+# Terminal image and video viewer. Uses the Kitty graphics protocol, which
+# Ghostty implements, so images render as pixels. Backs the pdfview function.
+brew "timg"
 # Terminal multiplexer
 brew "tmux"
 # Command-line interface to the freedesktop.org trashcan
@@ -245,10 +249,9 @@ brew "atuin"
 # Using zinit for zsh plugins
 # UNIX shell (command interpreter)
 brew "zsh"
-# Simple hotkey-daemon for macOS.
-brew "koekeishiya/formulae/skhd"
-# A tiling window manager for macOS based on binary space partitioning.
-brew "koekeishiya/formulae/yabai"
+# yabai and skhd removed 2026-08-14, with the yabai/ and skhd/ stow packages.
+# Neither process was running, neither was a registered service, and skhdrc was
+# almost entirely yabai commands. The koekeishiya/formulae tap went with them.
 # Extract annotations from PDFs and convert them to JSON
 brew "mgmeyers/pdfannots2json/pdfannots2json"
 # A badass zsh theme with more power than a normal earthling
@@ -324,7 +327,7 @@ cask "font-monoid"
 cask "font-monoid-nerd-font"
 cask "font-mononoki-nerd-font"
 cask "font-noto-nerd-font"
-cask "font-open-dyslexic-nerd-font"
+cask "font-opendyslexic-nerd-font"
 cask "font-overpass-nerd-font"
 cask "font-profont-nerd-font"
 cask "font-proggy-clean-tt-nerd-font"
@@ -345,6 +348,9 @@ cask "font-victor-mono"
 cask "font-victor-mono-nerd-font"
 # Free and open-source image editor
 cask "gimp"
+# Primary terminal emulator. Replaced WezTerm 2026-08-14: WezTerm drops
+# Caps Lock -> Escape key events on macOS, on stable and on nightly alike.
+cask "ghostty"
 # Performance software for cyclists, runners and triathletes
 cask "goldencheetah"
 # Web browser
@@ -392,8 +398,10 @@ cask "ultimaker-cura", args: { appdir: "/Applications" }
 cask "visual-studio-code", args: { appdir: "/Applications" }
 # Multimedia player
 cask "vlc"
-# GPU-accelerated cross-platform terminal emulator and multiplexer
-cask "wezterm"
+# WezTerm removed 2026-08-14, cask and wezterm/ stow package both. It drops
+# Caps Lock -> Escape key events on macOS on the stable tag (20240203) and on
+# nightly (20260812) alike. Ghostty does not. Recover the config from git
+# history if the bug is ever fixed upstream.
 # Native desktop client for WhatsApp
 cask "whatsapp"
 # HTML to PDF renderer

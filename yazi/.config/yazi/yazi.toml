@@ -1,0 +1,13 @@
+# Keep this file MINIMAL. Yazi merges it over its built-in presets, so only
+# deviations from the default belong here.
+#
+# The previous version of this file was a full copy of the 2025 default config.
+# That broke on every yazi release: 26.x renamed the rule key `name` -> `url`,
+# dropped top-level `"$schema"`, and made `group` required on fetchers. None of
+# those settings were customized, so none of them needed to be here.
+#
+# To see what a setting defaults to, read the upstream preset:
+# https://github.com/sxyazi/yazi/tree/main/yazi-config/preset
+
+[mgr]
+show_hidden = true
