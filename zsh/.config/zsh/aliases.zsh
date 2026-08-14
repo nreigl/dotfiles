@@ -87,8 +87,7 @@ alias path='echo -e ${PATH//:/\\n}'
 alias ports='netstat -tulanp'
 alias myip='curl -s https://ipecho.net/plain; echo'
 ## Open current directory in Finder (Marta if installed)
-# Keep this here (modern aliases) so it works even when ~/.aliases is
-# disabled by the legacy guard. Accepts optional path arg, defaults to '.'
+# Accepts an optional path argument. Defaults to '.'
 o() {
   local target
   target="${1:-.}"

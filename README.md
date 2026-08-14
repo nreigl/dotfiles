@@ -170,15 +170,12 @@ export OPENAI_API_KEY="your-key"
 - Python is managed by `UV` (ultra-fast), so separate Homebrew Python or Conda are optional.
 
 ### Aliases
-- Primary aliases live in `~/.config/zsh/aliases.zsh` and only activate when the underlying tools are installed.
-- Legacy aggressive GNU/coreutils overrides in `~/.aliases` are disabled by default to avoid breaking scripts and muscle memory. To enable them explicitly:
+Aliases live in `~/.config/zsh/aliases.zsh` and only activate when the underlying tool is installed. Shell functions live in `~/.config/zsh/functions.zsh` and `~/.config/zsh/fzf-functions.zsh`. `.zshrc` sources these three files. Add your own aliases and functions to them.
 
-```bash
-export ENABLE_LEGACY_GNU_ALIASES=1
-```
+The legacy `~/.aliases` file was removed on 2026-08-14. Nothing sourced it, and an `ENABLE_LEGACY_GNU_ALIASES` guard disabled most of it anyway. Run `git show 9694c2508fb8^:zsh/.aliases` to read the old contents.
 
-### Custom Aliases
-Edit `~/.config/zsh/aliases.zsh` to add your own aliases.
+### Secrets
+Copy `~/.zsh_secrets.template` to `~/.zsh_secrets` and fill in your API keys. `.zshrc` sources that file if it exists. Never commit the filled-in file.
 
 ### Neovim
 - Leader key: `<Space>`

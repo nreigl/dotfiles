@@ -201,6 +201,10 @@ bindkey '^[[F' end-of-line
 # Load local machine-specific config if it exists
 [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
 
+# Load API keys and tokens. Copy ~/.zsh_secrets.template to ~/.zsh_secrets and
+# fill it in. Never commit the filled-in file.
+[[ -f "$HOME/.zsh_secrets" ]] && source "$HOME/.zsh_secrets"
+
 # === Docker Completions ===
 if [[ -d "$HOME/.docker/completions" ]]; then
   fpath=($HOME/.docker/completions $fpath)
