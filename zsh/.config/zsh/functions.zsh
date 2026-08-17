@@ -149,30 +149,12 @@ fcd() {
   dir=$(fd --type d --hidden --follow --exclude .git 2>/dev/null | fzf +m) && cd "$dir"
 }
 
-# Open file in editor
-fe() {
-  local file
-  file=$(fzf --preview 'bat --style=numbers --color=always --line-range=:500 {}') && ${EDITOR:-nvim} "$file"
-}
-
-# Kill process (simple fallback; avoided name clash with fzf alias)
-fkill_simple() {
-  local pid
-  pid=$(ps -ef | sed 1d | fzf -m | awk '{print $2}')
-  if [ "x$pid" != "x" ]; then
-    echo "$pid" | xargs kill -9
-  fi
-}
-
-# If no fkill alias/function exists, provide a default binding
-if ! alias fkill >/dev/null 2>&1 && ! typeset -f fkill >/dev/null 2>&1; then
-  alias fkill='fkill_simple'
-fi
+# fe (file edit) and fkill live in fzf-functions.zsh, which loads later
 
 # Git branch selection
 fbr() {
   local branch
-  branch=$(git branch --all | grep -v HEAD | fzf +m) &&
+  branch=$(git branch --all | command grep -v HEAD | fzf +m) &&
   git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
 }
 

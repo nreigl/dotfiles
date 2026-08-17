@@ -53,6 +53,7 @@ source "${ZINIT_HOME}/zinit.zsh"
 zle -N fzf-git-files
 zle -N fzf-git-branch
 zle -N fzf-file-preview
+zle -N fzf-my-cd-widget
 
 # Load essential plugins first
 zinit light zsh-users/zsh-autosuggestions
@@ -93,7 +94,17 @@ command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
 # Zoxide (smart cd)
 command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
 
-# FZF
+# === FZF Configuration ===
+# Set before key-bindings.zsh loads, so the widgets see it.
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
+# Previews for fzf's own Ctrl-T and Alt-C widgets
+export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always --line-range :500 {} 2>/dev/null || sed -n \"1,200p\" {}'"
+export FZF_ALT_C_OPTS="--preview 'eza --tree --level=2 --icons {} 2>/dev/null || ls -lah {}'"
+# Options live in the fzf stow package, not inline here.
+export FZF_DEFAULT_OPTS_FILE="$XDG_CONFIG_HOME/fzf/fzfrc"
+
 # Use fzf key-bindings only; skip fzf's completion (fzf-tab handles completion)
 if [[ -f /opt/homebrew/opt/fzf/shell/key-bindings.zsh ]]; then
   source /opt/homebrew/opt/fzf/shell/key-bindings.zsh
@@ -104,24 +115,6 @@ fi
 # Atuin (smart, syncable shell history + Ctrl-R UI)
 # Init after FZF so Atuin's Ctrl-R takes precedence
 command -v atuin >/dev/null 2>&1 && eval "$(atuin init zsh)"
-
-# === FZF Configuration ===
-export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
-export FZF_DEFAULT_OPTS='
-  --height 40% --layout=reverse --border=rounded
-  --color=bg+:#363a4f,bg:#24273a,spinner:#f4dbd6,hl:#ed8796
-  --color=fg:#cad3f5,header:#ed8796,info:#c6a0f6,pointer:#f4dbd6
-  --color=marker:#f4dbd6,fg+:#cad3f5,prompt:#c6a0f6,hl+:#ed8796
-  --bind="ctrl-d:preview-down,ctrl-u:preview-up"
-  --bind="ctrl-f:preview-page-down,ctrl-b:preview-page-up"
-  --bind="ctrl-/:toggle-preview"
-  --bind="alt-a:select-all,alt-d:deselect-all"
-  --bind="ctrl-y:execute-silent(echo {} | pbcopy)"
-  --preview-window="right:50%:hidden"
-  --cycle
-'
 
 # === LaTeX Configuration ===
 # Add the latest TeXLive installation to PATH
@@ -137,7 +130,7 @@ fi
 autoload -Uz compinit
 # Ensure ZDOTDIR fallback and use a stable dump path
 ZDOTDIR=${ZDOTDIR:-$HOME}
-local zcompdump="$ZDOTDIR/.zcompdump"
+zcompdump="$ZDOTDIR/.zcompdump"
 compinit -d "$zcompdump"
 
 # Completion styling
@@ -191,7 +184,8 @@ bindkey '^[[H' beginning-of-line
 bindkey '^[[F' end-of-line
 
 # === Aliases ===
-# Aliases are loaded from ~/.config/zsh/aliases.zsh via zinit
+# Aliases are sourced from $XDG_CONFIG_HOME/zsh/aliases.zsh further down, after
+# the interactive setup. See the "Additional Aliases" section.
 
 # === Functions ===
 # Load shared functions to avoid duplication
@@ -222,11 +216,6 @@ if command -v gh &>/dev/null; then
   }
 fi
 
-# === Tmux Autostart (Optional) ===
-# Uncomment to auto-start tmux
-# [[ $- != *i* ]] && return
-# [[ -z "$TMUX" ]] && exec tmux
-
 # === Additional Aliases ===
 # Source ZSH aliases from config directory
 [[ -f "$XDG_CONFIG_HOME/zsh/aliases.zsh" ]] && source "$XDG_CONFIG_HOME/zsh/aliases.zsh"
@@ -237,10 +226,6 @@ fi
 # === Final Setup ===
 # Ensure XDG directories exist
 mkdir -p "$XDG_CONFIG_HOME" "$XDG_DATA_HOME" "$XDG_CACHE_HOME" "$XDG_STATE_HOME/zsh"
-
-# Welcome message (optional - comment out for faster startup)
-# echo "🚀 ZSH loaded with modern tooling (UV, Mise, Starship, Zoxide)"
-# echo "📦 Python: $(python3 --version 2>&1 | cut -d' ' -f2) | Julia: $(julia --version 2>&1 | cut -d' ' -f3)"
 
 # Define z once (built on zoxide) for consistent navigation
 unfunction z 2>/dev/null || true
@@ -294,9 +279,6 @@ claude() {
   fi
   "${env_cmd[@]}" claude "$@"
 }
-
-# Pi
-export PATH="/Users/nicolasreigl/.local/share/mise/installs/node/22.19.0/bin:$PATH"
 
 # kimi-code
 export PATH="/Users/nicolasreigl/.kimi-code/bin:$PATH"

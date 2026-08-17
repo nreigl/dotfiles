@@ -1,0 +1,28 @@
+# fzf global options, read through $FZF_DEFAULT_OPTS_FILE (set in .zshrc).
+# One option per line. Lines that start with # are comments.
+
+--height 40%
+--layout=reverse
+--border=rounded
+--cycle
+
+# Catppuccin Macchiato
+--color=bg+:#363a4f,bg:#24273a,spinner:#f4dbd6,hl:#ed8796
+--color=fg:#cad3f5,header:#ed8796,info:#c6a0f6,pointer:#f4dbd6
+--color=marker:#f4dbd6,fg+:#cad3f5,prompt:#c6a0f6,hl+:#ed8796
+
+# Preview is visible by default. Functions that want it hidden ask for it.
+--preview-window=right:50%
+
+# Preview scrolling. ctrl-d and ctrl-u stay on the fzf defaults
+# (half-page-down and clear-query).
+--bind=alt-up:preview-up,alt-down:preview-down
+--bind=ctrl-f:preview-page-down,ctrl-b:preview-page-up
+
+# Most terminals send ctrl-_ for ctrl-/, so bind both.
+--bind=ctrl-/:toggle-preview,ctrl-_:toggle-preview
+
+--bind=alt-a:select-all,alt-d:deselect-all
+# Quote any action that contains a pipe or parentheses. The opts file is
+# tokenized like a command line, so an unquoted one aborts every fzf run.
+--bind='ctrl-y:execute-silent(echo {} | pbcopy)'
