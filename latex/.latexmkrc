@@ -5,6 +5,13 @@ $pdf_mode = 4;  # 4 = lualatex, 5 = xelatex
 $dvi_mode = 0;
 $postscript_mode = 0;
 
+# Keep auxiliary files and the PDF out of the project root.
+# This lives here, not in vimtex.lua, so that latexmk, VimTeX and texlab all
+# agree on the location. texlab resolves the log and the PDF on its own; if
+# only VimTeX knows about build/, texlab loses its log diagnostics and its
+# forward search.
+$out_dir = 'build';
+
 # Use biber for bibliography (modern replacement for bibtex)
 $bibtex_use = 2;  # 2 = biber
 

@@ -5,15 +5,33 @@ return {
     ft = { "tex", "plaintex", "bib" },
     dependencies = {
       "hrsh7th/nvim-cmp",
-      "hrsh7th/cmp-omni",
+      "saadparwaiz1/cmp_luasnip",
     },
     config = function()
+      local cmp = require("cmp")
+
+      -- cmp-vimtex ships after/plugin/cmp_vimtex.lua, which calls setup() with
+      -- default options. lazy.nvim sources after/plugin before it runs this
+      -- config, so the plugin's own "only if unset" guard never fires and our
+      -- setup() call registers a second "vimtex" source. cmp then queries both
+      -- and every citation candidate appears twice. Record the sources that
+      -- exist before our call, and drop them after it.
+      -- cmp.core.sources is keyed by source id, not a dense array, so iterate
+      -- with pairs. ipairs stops at the first missing id and silently misses
+      -- sources beyond it.
+      local stale = {}
+      for id, src in pairs(cmp.core.sources) do
+        if src.name == "vimtex" then
+          table.insert(stale, id)
+        end
+      end
+
       require("cmp_vimtex").setup({
         additional_information = {
-          info_in_menu = false,
+          info_in_menu = true,
           info_in_window = false,
-          info_max_length = 20,
-          match_against_info = false,
+          info_max_length = 60,
+          match_against_info = true,
           symbols_in_menu = false,
         },
         bibtex_parser = {
@@ -21,7 +39,7 @@ return {
         },
         search = {
           browser = "open",
-          default = "search_engines",
+          default = "google_scholar",
           search_engines = {
             google_scholar = {
               name = "Google Scholar",
@@ -31,13 +49,16 @@ return {
         },
       })
 
+      for _, id in ipairs(stale) do
+        cmp.unregister_source(id)
+      end
+
       -- Setup filetype-specific cmp sources for TeX files only
-      local cmp = require("cmp")
       cmp.setup.filetype({ "tex", "plaintex", "bib" }, {
         sources = cmp.config.sources({
           { name = "vimtex", priority = 1000 },
-          { name = "snippets", priority = 750 },
-          { name = "omni", priority = 500 },
+          { name = "nvim_lsp", priority = 900 },
+          { name = "luasnip", priority = 750 },
           { name = "buffer", priority = 250 },
           { name = "path", priority = 100 },
         }),
