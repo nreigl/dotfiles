@@ -66,12 +66,8 @@ alias ....='cd ../../..'
 alias .....='cd ../../../..'
 alias ~='cd ~'
 alias -- -='cd -'
-# Zoxide interactive mode with automatic cd
-unalias zz 2>/dev/null || true
-zz() {
-    local result=$(zoxide query -i "$@")
-    [ -n "$result" ] && cd "$result"
-}
+# Zoxide interactive jump: zz is defined in fzf-functions.zsh, which sources
+# after this file. Do not define it here.
 # For zinit, use explicit name
 alias zinit-update='zinit update --all'
 
@@ -123,7 +119,6 @@ alias kdel='kubectl delete'
 alias klog='kubectl logs'
 
 # === Misc ===
-alias speedtest='speedtest-cli'
 alias week='date +%V'
 alias timer='echo "Timer started. Stop with Ctrl-D." && date && time cat && date'
 

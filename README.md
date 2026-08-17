@@ -7,10 +7,14 @@ My personal dotfiles for macOS with state-of-the-art tooling and performance opt
 ## 🚀 Stack
 
 ### Core Tools
-- **Terminal**: [WezTerm](https://wezfurlong.org/wezterm/) / [Alacritty](https://alacritty.org/)
+- **Terminal**: [Ghostty](https://ghostty.org/)
 - **Shell**: ZSH with [Zinit](https://github.com/zdharma-continuum/zinit) plugin manager
 - **Prompt**: [Starship](https://starship.rs/) - blazing fast, customizable prompt
 - **Editor**: [Neovim](https://neovim.io/) with [LazyVim](https://www.lazyvim.org/) distribution
+- **Multiplexer**: [herdr](https://github.com/herdr-dev/herdr) for coding agents; tmux via the `tm` alias
+- **File manager**: [yazi](https://yazi-rs.github.io/) (`y`); [superfile](https://superfile.dev/) on trial (`sf`)
+- **Launcher**: [Raycast](https://raycast.com/) (not stowed - settings live in an encrypted database)
+- **Screenshots**: [Shottr](https://shottr.cc/)
 
 ### Modern CLI Replacements
 - `eza` - Better `ls` (with icons and git status)
@@ -21,7 +25,7 @@ My personal dotfiles for macOS with state-of-the-art tooling and performance opt
 - `delta` - Better `git diff` (side-by-side diffs)
 
 ### XDG Layout
-- Most configs live under `~/.config/...` (fzf, ripgrep, starship, wezterm, nvim, etc.).
+- Most configs live under `~/.config/...` (fzf, ripgrep, starship, ghostty, nvim, etc.).
 - FZF custom config: `~/.config/fzf/fzf.zsh`
 - FZF/ZLE functions: `~/.config/zsh/fzf-functions.zsh`
 
@@ -32,9 +36,9 @@ My personal dotfiles for macOS with state-of-the-art tooling and performance opt
 - **Formatting**: [Ruff](https://docs.astral.sh/ruff/) - Lightning-fast Python linter/formatter
 - **LaTeX**: Full TeXLive distribution with VimTeX integration
 
-### Window Management (Optional)
-- **WM**: [yabai](https://github.com/koekeishiya/yabai) - Tiling window manager
-- **Hotkeys**: [skhd](https://github.com/koekeishiya/skhd) - Simple hotkey daemon
+### Window Management
+None. yabai and skhd were both removed on 2026-08-14. Neither was running, and
+`skhdrc` held almost nothing but yabai commands.
 
 ## 📦 Installation
 
@@ -75,35 +79,44 @@ stow tmux
 
 ```
 dotfiles/
-├── scripts/           # Installation and management scripts
+├── scripts/          # Installation and management scripts
 │   ├── install.sh    # Main installation script
+│   ├── doctor.sh     # Health check for the whole repo
 │   ├── stow-all.sh   # Link all dotfiles
 │   ├── stow-remove.sh # Remove all symlinks
 │   └── update.sh     # Update all tools
-├── alacritty/        # Terminal emulator config
+├── atuin/            # Shell history sync
 ├── aws/              # AWS CLI configuration
+├── claude/           # Claude Code settings, agents, and skills
 ├── cursor/           # Cursor IDE settings
+├── docker/           # Docker CLI config
 ├── fzf/              # Fuzzy finder configuration
 ├── gh/               # GitHub CLI config
+├── ghostty/          # Terminal emulator config and shaders
 ├── git/              # Git configuration (XDG: ~/.config/git)
+├── herdr/            # Agent multiplexer config
 ├── julia/            # Julia startup.jl
 ├── latex/            # LaTeX/latexmk configuration
-├── lazygit/          # LazyGit configuration
+├── macos/            # macOS defaults script
 ├── mise/             # Version manager config
 ├── nvim/             # Neovim/LazyVim configuration
+├── pi/               # Pi agent settings, extensions, and prompts
 ├── python/           # Python/UV/Ruff configuration
+├── raycast/          # Raycast scripts (NOT stowed)
 ├── ripgrep/          # Ripgrep configuration
 ├── ssh/              # SSH configuration
 ├── starship/         # Shell prompt
+├── superfile/        # Second file manager (on trial)
 ├── television/       # Television channels and UI configuration
+├── texmf/            # LaTeX beamer theme
 ├── tmux/             # Terminal multiplexer
 ├── vscode/           # VS Code settings
-├── wezterm/          # WezTerm terminal config
-├── vim/              # Vim fallback config
-├── yabai/            # Tiling window manager config
-├── skhd/             # Hotkey daemon config
+├── yazi/             # Terminal file manager
 └── zsh/              # ZSH shell configuration
 ```
+
+`scripts/stow-all.sh` holds the authoritative package list. `scripts/doctor.sh`
+fails if that list drifts from what is on disk.
 
 ## 🛠 Usage
 
@@ -111,6 +124,15 @@ dotfiles/
 ```bash
 ./scripts/update.sh
 ```
+
+### Check the Setup
+```bash
+./scripts/doctor.sh          # full report
+./scripts/doctor.sh --quiet  # problems only
+SKIP_CHECKS=brewfile ./scripts/doctor.sh
+```
+`doctor.sh` is read-only. It reports problems and never repairs them. It exits
+1 if any check fails.
 
 ### Python Development
 ```bash
@@ -166,7 +188,7 @@ export OPENAI_API_KEY="your-key"
 - Global ignore file at `~/.config/git/ignore`.
 
 ### Node and Python
-- Node is managed by `mise` (see `mise.toml`), so `brew install node` is not required.
+- Node is managed by `mise` (see `mise/.config/mise/config.toml`), so `brew install node` is not required.
 - Python is managed by `UV` (ultra-fast), so separate Homebrew Python or Conda are optional.
 
 ### Aliases
@@ -263,6 +285,6 @@ Inspired by many amazing dotfile repositories in the community.
 
 ---
 
-**Last Updated**: January 2025
+**Last Updated**: August 2026
 **macOS Compatibility**: Sequoia 15.2+
 **Architecture**: Apple Silicon (M1/M2/M3) optimized

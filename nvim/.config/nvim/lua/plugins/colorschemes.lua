@@ -1,28 +1,21 @@
 return {
-  -- Existing Nord theme (you can keep it, or remove if switching to Dracula)
-  { "shaunsingh/nord.nvim" },
-
-  -- Dracula theme with config
+  -- Dracula theme. LazyVim applies it via `opts.colorscheme` below, so this
+  -- spec only configures the plugin. Do not call vim.cmd.colorscheme here.
   {
     "Mofiqul/dracula.nvim",
     name = "dracula",
     priority = 1000,
-    config = function()
-      require("dracula").setup({
-        italic_comment = true,
-        transparent_bg = true, -- to match wezterm blur
-      })
-      vim.cmd.colorscheme("dracula")
-    end,
+    opts = {
+      italic_comment = true,
+      transparent_bg = true, -- to match the terminal background blur
+    },
   },
 
   -- LazyVim core config
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "dracula", -- switch from "nord" to "dracula"
+      colorscheme = "dracula",
     },
   },
 }
-
- 

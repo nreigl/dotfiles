@@ -323,8 +323,8 @@ cask "font-sauce-code-pro-nerd-font"
 cask "font-sf-mono-nerd-font"
 cask "font-shure-tech-mono-nerd-font"
 cask "font-source-code-pro"
-cask "font-source-sans-pro"
-cask "font-source-serif-pro"
+# cask "font-source-sans-pro" # Removed 2026-08-18: already installed in ~/Library/Fonts, not via brew
+# cask "font-source-serif-pro" # Removed 2026-08-18: already installed in ~/Library/Fonts, not via brew
 cask "font-space-mono-nerd-font"
 cask "font-symbols-only-nerd-font"
 cask "font-terminess-ttf-nerd-font"
@@ -351,14 +351,14 @@ cask "istat-menus", args: { appdir: "/Applications" }
 # File archiver
 cask "keka"
 # Electronics design automation suite
-cask "kicad", args: { appdir: "/Applications" }
+# cask "kicad", args: { appdir: "/Applications" } # Removed 2026-08-18: not installed, unused
 # Extensible two-pane file manager
 cask "marta"
 # Conda is optional; Python is managed via UV
 # Calculate the overall performance of an investment portfolio
 cask "portfolioperformance"
 # Collaboration platform for API development
-cask "postman", args: { appdir: "/Applications" }
+# cask "postman", args: { appdir: "/Applications" } # Removed 2026-08-18: not installed, unused
 # G-code generator for 3D printers (RepRap, Makerbot, Ultimaker etc.)
 # cask "prusaslicer", args: { appdir: "/Applications" } # Disabled: invalid macOS version dependency in upstream cask
 # Control your tools with a few keystrokes

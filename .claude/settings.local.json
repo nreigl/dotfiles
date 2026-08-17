@@ -42,7 +42,6 @@
       "Bash(stow:*)",
       "Bash(tmux:*)",
       "Bash(nvim:*)",
-      "Bash(wezterm:*)",
       "Bash(open:*)",
       "Bash(mkdir:*)",
       "Bash(rm:*)",

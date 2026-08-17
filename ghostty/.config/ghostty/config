@@ -49,9 +49,9 @@ background-blur-radius = 40
 # updaters would fight. Update with: brew upgrade --cask ghostty
 auto-update = off
 
-# Background image mode (WezTerm-image-mode parity, Ghostty 1.2+).
-# Uncomment to get the landscape look; tune opacity to taste.
-# background-image = ~/dotfiles/wezterm/.config/wezterm/images/pexels-eberhardgross-572897.jpg
+# Background image mode (Ghostty 1.2+).
+# Uncomment and point at a real image; tune opacity to taste.
+# background-image = ~/Pictures/wallpaper.jpg
 # background-image-fit = cover
 # background-image-opacity = 0.25
 

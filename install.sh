@@ -65,7 +65,7 @@ printf "💻  Set macOS preferences\n"
 
 printf "🔧  Configure development tools\n"
 # Ruby, Node, Python, and other language versions are managed by mise
-# See mise.toml for configuration
+# See mise/.config/mise/config.toml for configuration
 # UV handles Python package management
 # Neovim uses LazyVim (lazy.nvim plugin manager)
 

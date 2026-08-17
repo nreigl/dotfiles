@@ -33,7 +33,7 @@
     "python.languageServer": "Jedi",
     "telemetry.enableCrashReporter": false,
     "telemetry.enableTelemetry": false,
-    "terminal.external.osxExec": "WezTerm.app",
+    "terminal.external.osxExec": "Ghostty.app",
     "typescript.updateImportsOnFileMove.enabled": "always",
     "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
     "workbench.colorTheme": "One Dark Pro",
