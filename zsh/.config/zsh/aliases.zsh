@@ -14,8 +14,11 @@ else
 fi
 
 command -v bat &>/dev/null && alias cat='bat --style=plain'
-command -v rg &>/dev/null && alias grep='rg'
-command -v fd &>/dev/null && alias find='fd'
+# No grep=rg or find=fd aliases. `rg` and `fd` are shorter than the names they
+# would replace, so the alias costs compatibility and saves no typing. It also
+# hides two traps: `grep -r pattern .` means --replace in ripgrep and fails
+# silently, and ripgrep skips hidden and gitignored files by default, which
+# turns a real match into an empty result. Call rg and fd by name.
 command -v dust &>/dev/null && alias du='dust'
 command -v duf &>/dev/null && alias df='duf'
 command -v btop &>/dev/null && alias top='btop' && alias htop='btop'
