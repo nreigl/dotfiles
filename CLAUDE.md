@@ -57,11 +57,46 @@ mise use ruby@3.2         # Install and set Ruby version
 - `<C-Space>` (insert mode) - Trigger VimTeX omni-completion manually
 - Completion shows: `2025 Stefani, "Long-term debt and short-term rates"`
 
+**Math snippets (autotriggered, math zone only):**
+- `mk` opens inline math, `dm` opens display math. Both work in prose only
+- Inside math: `ff`→`\frac{}{}`, `sq`→`\sqrt{}`, `x1`→`x_{1}`, `sr`/`cb`/`td` for powers, `xbar`→`\bar{x}` (also `hat`, `til`, `dot`, `vec`), `;a`→`\alpha` and the rest of the Greek alphabet, `==`/`<=`/`->`/`**` for relations, `sum`/`prod`/`int`/`lim`
+- Every math trigger is guarded by `vimtex#syntax#in_mathzone()`, so two-letter triggers cannot fire in prose
+- `vimtex_imaps_enabled = 0`, so VimTeX's own insert-mode maps do not compete with LuaSnip
+
 **Settings:**
 - Compiler: latexmk with lualatex (modern Unicode support)
 - PDF viewer: Skim (forward/backward sync enabled)
 - Build directory: `build/` (keeps project root clean)
 - Completion: nvim-cmp with cmp-vimtex for intelligent suggestions
+
+**Where the compiler settings live.** The engine and the build directory are set
+in `latex/.latexmkrc` (`$pdf_mode = 4`, `$out_dir = 'build'`), **not** in
+`nvim/.config/nvim/lua/plugins/vimtex.lua`. VimTeX reads that file and derives
+the `-lualatex` flag from it, latexmk obeys it directly, and texlab resolves the
+log and the PDF through it. If the engine or the output path is set in the
+Neovim config instead, texlab keeps looking in the project root and loses its
+log diagnostics and its forward search. Adding engine flags to
+`vimtex_compiler_latexmk.options` is documented as wrong
+(`:h g:vimtex_compiler_latexmk`).
+
+**Do not add `-file-line-error`.** It is absent from `latex/.latexmkrc` and from
+`vimtex_compiler_latexmk.options` on purpose. The quickfix parser is `pplatex`,
+which reads the classic `! Undefined control sequence.` form. Against a log in
+`file:line:` form it reports zero errors and prints no warning, so the quickfix
+list goes silent on every compile error while appearing to work. VimTeX strips
+the flag from its own latexmk options, but it cannot strip it from the engine
+commands in `.latexmkrc`. `pplatex` itself is built from source into
+`~/.local/bin` (not in Homebrew, needs cmake and the deprecated `pcre`), so it is
+absent on a new machine. `vimtex.lua` falls back to `latexlog` when it is
+missing.
+
+**Division of labour.** VimTeX owns compilation, viewing, SyncTeX, the table of
+contents, motions, and citation/label completion. texlab is LSP-only: rename,
+go-to-definition, symbols, hover, chktex. Leave `texlab.build.onSave` and
+`forwardSearchAfter` at `false`, or two latexmk processes race on the same aux
+files. Warning filters are duplicated on purpose in `vimtex_quickfix_ignore_filters`
+and `texlab.diagnostics.ignoredPatterns` — VimTeX uses Vim regex, texlab uses
+Rust regex, so the two lists cannot be shared.
 
 ### Testing/Verification
 ```bash
@@ -82,6 +117,7 @@ Each directory at the root level is a "stow package" containing configs:
 - `yazi/` - Terminal file manager (→ `~/.config/yazi/`). Keep `yazi.toml` minimal: yazi merges it over built-in presets, and copying the full default config breaks on every release
 - `superfile/` - Second terminal file manager, on trial (→ `~/.config/superfile/`). Only `config.toml` is stowed. Keep it minimal and keep `ignore_missing_fields = true`, which silences the warning about absent fields. `hotkeys.toml` and `theme/` stay unstowed because superfile rewrites them on upgrade
 - `nvim/` - Neovim/LazyVim config (→ `~/.config/nvim/`)
+- `latex/` - Global latexmk config (→ `~/.latexmkrc`). Load-bearing for the LaTeX setup: it selects the engine (`$pdf_mode = 4`, lualatex) and the build directory (`$out_dir = 'build'`) for VimTeX, latexmk, and texlab at once. Do not move these two settings into `vimtex.lua` — texlab reads only this file. Also holds the biber setting and the glossaries dependency
 - `zsh/` - Shell config (→ `~/`). `.zshrc` sources three files from `.config/zsh/`: `aliases.zsh`, `functions.zsh`, `fzf-functions.zsh`. New aliases and shell functions go in one of those three. Nothing else in this package is sourced
 - `git/` - Global git config and gitignore (→ `~/`)
 - `mise/` - Version manager config (→ `~/`)
