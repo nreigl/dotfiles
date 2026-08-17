@@ -25,5 +25,5 @@
     "~/.claude/skills",
     "-../../.claude/skills/herdr/SKILL.md"
   ],
-  "lastChangelogVersion": "0.84.1"
+  "lastChangelogVersion": "0.84.2"
 }
