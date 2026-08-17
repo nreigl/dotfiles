@@ -13,7 +13,12 @@ Modern dotfiles repository with state-of-the-art tooling for macOS development e
 ./scripts/update.sh       # Update all tools (Homebrew, UV, Julia, mise, Neovim plugins, ZSH plugins)
 ./scripts/stow-all.sh     # Link all dotfile configurations
 ./scripts/stow-remove.sh  # Remove all symlinks
+./scripts/doctor.sh       # Health check: stow drift, broken links, dead references
 ```
+
+Run `./scripts/doctor.sh` after any structural change to the repo. It is
+read-only and exits 1 if any check fails. `--quiet` prints problems only.
+`SKIP_CHECKS=name1,name2` mutes named checks.
 
 ### Development Commands
 
@@ -129,8 +134,8 @@ Each directory at the root level is a "stow package" containing configs:
 - `Brewfile` - Homebrew package manifest (480+ packages)
 - `scripts/install.sh` - Main installer (lines 1-198)
 - `scripts/update.sh` - Update all tools (lines 1-158)
-- `scripts/stow-all.sh` - Links 28 stow packages (the `PACKAGES` array). `scripts/stow-remove.sh` holds an identical list — update both together
-- `mise.toml` - Global Node.js version (currently v22)
+- `scripts/stow-all.sh` - Links 27 stow packages (the `PACKAGES` array). `scripts/stow-remove.sh` holds an identical list — update both together. `scripts/doctor.sh` fails if the two lists drift apart or if a listed package is missing
+- `mise/.config/mise/config.toml` - Language versions (Node v22, Ruby, Go, Rust, Bun). This is the only mise config; the former root `mise.toml` duplicated the Node pin and was removed on 2026-08-18
 
 ### Tool Stack
 - **Package Management**: Homebrew (system), UV (Python), Juliaup (Julia), mise (Node/Ruby/Go)
