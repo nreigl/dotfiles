@@ -299,6 +299,66 @@ check_removed_tools() {
   fi
 }
 
+check_shell_duplicates() {
+  skipped shell && return 0
+  section "Shell definitions"
+
+  # .zshrc sources aliases.zsh, then fzf-functions.zsh, so a name defined in
+  # two files silently resolves to whichever loads last. That is how `zz` ended
+  # up with two bodies, one of them dead. Report any name defined more than
+  # once across the files .zshrc actually sources.
+  local files=(
+    "$DOTFILES_DIR/zsh/.zshrc"
+    "$DOTFILES_DIR/zsh/.config/zsh/aliases.zsh"
+    "$DOTFILES_DIR/zsh/.config/zsh/functions.zsh"
+    "$DOTFILES_DIR/zsh/.config/zsh/fzf-functions.zsh"
+  )
+
+  local found=0 name
+  # Shell functions: `name() {` at the start of a line.
+  while IFS= read -r name; do
+    [[ -z "$name" ]] && continue
+    err "shell function '$name' is defined more than once:"
+    grep -n "^${name}() *{" "${files[@]}" 2>/dev/null |
+      sed "s|$DOTFILES_DIR/||" | sed 's/^/         /'
+    found=1
+  done < <(
+    grep -ho "^[a-zA-Z0-9_-]*() *{" "${files[@]}" 2>/dev/null |
+      sed 's/() *{//' | sort | uniq -d || true
+  )
+
+  # Aliases: `alias name=`. An `unalias name` line is a deliberate override.
+  while IFS= read -r name; do
+    [[ -z "$name" ]] && continue
+    err "alias '$name' is defined more than once:"
+    grep -n "^alias ${name}=" "${files[@]}" 2>/dev/null |
+      sed "s|$DOTFILES_DIR/||" | sed 's/^/         /'
+    found=1
+  done < <(
+    grep -ho "^alias [a-zA-Z0-9_-]*=" "${files[@]}" 2>/dev/null |
+      sed 's/^alias //; s/=$//' | sort | uniq -d || true
+  )
+
+  if [[ $found -eq 0 ]]; then ok "no duplicate function or alias definitions"; fi
+}
+
+check_path_accretion() {
+  skipped path && return 0
+  section "PATH hygiene"
+
+  # Tool installers append `export PATH=...` to the tracked .zshrc. Each one is
+  # harmless alone, but they accumulate silently and outlive the tool.
+  local zshrc="$DOTFILES_DIR/zsh/.zshrc" count
+  count="$(grep -c '^export PATH=' "$zshrc" 2>/dev/null || echo 0)"
+
+  if [[ "$count" -gt 4 ]]; then
+    warn "$count separate 'export PATH=' lines in .zshrc; installers are accreting:"
+    grep -n '^export PATH=' "$zshrc" | sed 's/^/         /'
+  else
+    ok "$count 'export PATH=' lines in .zshrc, within the expected range"
+  fi
+}
+
 check_brewfile() {
   skipped brewfile && return 0
   section "Brewfile"
@@ -356,6 +416,8 @@ main() {
   check_referenced_binaries
   check_referenced_paths
   check_removed_tools
+  check_shell_duplicates
+  check_path_accretion
   check_brewfile
   check_git_hygiene
 

@@ -204,6 +204,15 @@ main() {
   echo -e "  Neovim: $(nvim --version 2>&1 | head -1 | cut -d' ' -f2)"
   echo
   echo -e "${YELLOW}Restart your terminal for all changes to take effect${NC}"
+
+  # Updates are where drift appears: a cask disappears, a tool rewrites .zshrc,
+  # a plugin leaves a dangling symlink. Report it, but never fail the update
+  # over it, so a health problem cannot mask a successful set of upgrades.
+  echo
+  echo -e "${GREEN}========================================${NC}"
+  echo -e "${GREEN}🩺 Health check${NC}"
+  echo -e "${GREEN}========================================${NC}"
+  "$DOTFILES_DIR/scripts/doctor.sh" --quiet || true
 }
 
 # Run main update

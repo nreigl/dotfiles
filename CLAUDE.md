@@ -18,7 +18,19 @@ Modern dotfiles repository with state-of-the-art tooling for macOS development e
 
 Run `./scripts/doctor.sh` after any structural change to the repo. It is
 read-only and exits 1 if any check fails. `--quiet` prints problems only.
-`SKIP_CHECKS=name1,name2` mutes named checks.
+`SKIP_CHECKS=name1,name2` mutes named checks. `scripts/update.sh` runs it at
+the end and never fails the update because of it.
+
+Eleven checks: package-list parity, stow dry run, broken symlinks, git
+tracking of linked files, required binaries and alias targets, referenced
+repo paths and applications, references to removed tools, duplicate shell
+functions and aliases, PATH accretion in `.zshrc`, Brewfile installation
+state, and working-tree cleanliness.
+
+**Writing scripts in this repo: use `command rm`, `command cp`, `command mv`.**
+`aliases.zsh` maps all three to their `-i` form. In a non-interactive shell the
+prompt gets no answer, so the write is skipped and the command still exits 0.
+The failure is silent, and it will not appear in the exit status.
 
 ### Development Commands
 

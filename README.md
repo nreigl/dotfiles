@@ -132,7 +132,14 @@ fails if that list drifts from what is on disk.
 SKIP_CHECKS=brewfile ./scripts/doctor.sh
 ```
 `doctor.sh` is read-only. It reports problems and never repairs them. It exits
-1 if any check fails.
+1 if any check fails. `scripts/update.sh` runs it at the end, because updates
+are when drift appears.
+
+Eleven checks: package-list parity, stow dry run, broken symlinks, git tracking
+of linked files, required binaries and alias targets, referenced repo paths and
+applications, references to removed tools, duplicate shell functions and
+aliases, PATH accretion in `.zshrc`, Brewfile installation state, and
+working-tree cleanliness.
 
 ### Python Development
 ```bash
