@@ -37,7 +37,12 @@ sub run_makeglossaries {
   };
 }
 
-# Ensure synctex is enabled
-$lualatex = 'lualatex -synctex=1 -interaction=nonstopmode -file-line-error %O %S';
-$xelatex = 'xelatex -synctex=1 -interaction=nonstopmode -file-line-error %O %S';
-$pdflatex = 'pdflatex -synctex=1 -interaction=nonstopmode -file-line-error %O %S';
+# Ensure synctex is enabled.
+# -file-line-error is deliberately absent. pplatex parses the classic
+# "! Undefined control sequence." form and silently reports 0 errors against a
+# log written in file:line: form, so passing the flag loses every error in the
+# Neovim quickfix list. VimTeX strips the flag from its own latexmk options when
+# vimtex_quickfix_method is pplatex, but it cannot strip it from here.
+$lualatex = 'lualatex -synctex=1 -interaction=nonstopmode %O %S';
+$xelatex = 'xelatex -synctex=1 -interaction=nonstopmode %O %S';
+$pdflatex = 'pdflatex -synctex=1 -interaction=nonstopmode %O %S';

@@ -24,9 +24,11 @@ return {
         callback = 1,
         continuous = 1,
         executable = "latexmk",
+        -- -file-line-error is deliberately absent: pplatex reports 0 errors
+        -- against a log in file:line: form. See latex/.latexmkrc, which drops
+        -- the flag from the engine commands for the same reason.
         options = {
           "-verbose",
-          "-file-line-error",
           "-synctex=1",
           "-interaction=nonstopmode",
         },
