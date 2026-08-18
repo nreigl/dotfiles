@@ -359,6 +359,40 @@ check_path_accretion() {
   fi
 }
 
+check_texlive() {
+  skipped texlive && return 0
+  section "TeX Live"
+
+  if ! command -v tlmgr >/dev/null 2>&1; then
+    ok "tlmgr not installed, nothing to check"
+    return 0
+  fi
+
+  local installed current month
+  installed="$(tlmgr --version 2>/dev/null | sed -n 's/^TeX Live.*version \([0-9]*\).*/\1/p' | head -1)"
+  current="$(date +%Y)"
+  month="$(date +%m)"
+
+  if [[ -z "$installed" ]]; then
+    warn "cannot determine the installed TeX Live release"
+    return 0
+  fi
+
+  # Offline heuristic, so this check costs no network round trip. A TeX Live
+  # release ships around April, and the previous one is frozen the moment it
+  # does. So a release is stale if it predates the current year and we are past
+  # April, or if it predates the current year by more than one. Confirm with
+  # `tlmgr update --list`, which reports the real remote version.
+  if [[ "$installed" -lt $((current - 1)) ]] ||
+     { [[ "$installed" -lt "$current" ]] && [[ $((10#$month)) -ge 4 ]]; }; then
+    warn "TeX Live $installed is likely superseded. Its repository is frozen, so no package updates remain."
+    printf "         upgrade path: https://tug.org/texlive/upgrade.html\n"
+    printf "         confirm with: tlmgr update --list\n"
+  else
+    ok "TeX Live $installed looks current"
+  fi
+}
+
 check_brewfile() {
   skipped brewfile && return 0
   section "Brewfile"
@@ -418,6 +452,7 @@ main() {
   check_removed_tools
   check_shell_duplicates
   check_path_accretion
+  check_texlive
   check_brewfile
   check_git_hygiene
 

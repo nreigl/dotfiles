@@ -166,14 +166,36 @@ update_dotfiles() {
 # === Update LaTeX packages ===
 update_latex() {
   echo -e "${YELLOW}📚 Updating LaTeX packages...${NC}"
-  
-  if command -v tlmgr &>/dev/null; then
-    sudo tlmgr update --self
-    sudo tlmgr update --all
-    echo -e "${GREEN}✓ LaTeX packages updated${NC}"
-  else
+
+  if ! command -v tlmgr &>/dev/null; then
     echo -e "${YELLOW}⚠️  tlmgr not found, skipping LaTeX updates${NC}"
+    return 0
   fi
+
+  # Once a TeX Live release is superseded its repository is frozen, and every
+  # tlmgr update exits 1. Under `set -euo pipefail` that aborted this whole
+  # script before the summary ran. Detect the condition first, without sudo,
+  # and report it instead of failing.
+  local status
+  status="$(tlmgr update --list 2>&1 || true)"
+
+  if echo "$status" | grep -q "older than remote repository"; then
+    local local_ver remote_ver
+    local_ver="$(echo "$status" | sed -n 's/.*Local TeX Live (\([0-9]*\)).*/\1/p' | head -1)"
+    remote_ver="$(echo "$status" | sed -n 's/.*remote repository (\([0-9]*\)).*/\1/p' | head -1)"
+    echo -e "${YELLOW}⚠️  TeX Live ${local_ver:-?} is superseded by ${remote_ver:-a newer release}.${NC}"
+    echo -e "${YELLOW}   The ${local_ver:-current} repository is frozen, so no package updates remain.${NC}"
+    echo -e "${YELLOW}   tlmgr cannot cross a release boundary. To upgrade, either:${NC}"
+    echo -e "${YELLOW}     - install MacTeX ${remote_ver:-latest} (keeps ${local_ver:-the old tree} for rollback), or${NC}"
+    echo -e "${YELLOW}     - run update-tlmgr-latest.sh --update (rewrites the tree in place)${NC}"
+    echo -e "${YELLOW}   See https://tug.org/texlive/upgrade.html${NC}"
+    return 0
+  fi
+
+  # `|| true` on both: a tlmgr failure must warn, never kill the update run.
+  sudo tlmgr update --self || echo -e "${YELLOW}⚠️  tlmgr update --self failed${NC}"
+  sudo tlmgr update --all || echo -e "${YELLOW}⚠️  tlmgr update --all failed${NC}"
+  echo -e "${GREEN}✓ LaTeX packages updated${NC}"
 }
 
 # === Main update function ===

@@ -135,11 +135,11 @@ SKIP_CHECKS=brewfile ./scripts/doctor.sh
 1 if any check fails. `scripts/update.sh` runs it at the end, because updates
 are when drift appears.
 
-Eleven checks: package-list parity, stow dry run, broken symlinks, git tracking
+Twelve checks: package-list parity, stow dry run, broken symlinks, git tracking
 of linked files, required binaries and alias targets, referenced repo paths and
 applications, references to removed tools, duplicate shell functions and
-aliases, PATH accretion in `.zshrc`, Brewfile installation state, and
-working-tree cleanliness.
+aliases, PATH accretion in `.zshrc`, a superseded TeX Live release, Brewfile
+installation state, and working-tree cleanliness.
 
 ### Python Development
 ```bash

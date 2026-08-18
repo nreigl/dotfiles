@@ -21,11 +21,11 @@ read-only and exits 1 if any check fails. `--quiet` prints problems only.
 `SKIP_CHECKS=name1,name2` mutes named checks. `scripts/update.sh` runs it at
 the end and never fails the update because of it.
 
-Eleven checks: package-list parity, stow dry run, broken symlinks, git
+Twelve checks: package-list parity, stow dry run, broken symlinks, git
 tracking of linked files, required binaries and alias targets, referenced
 repo paths and applications, references to removed tools, duplicate shell
-functions and aliases, PATH accretion in `.zshrc`, Brewfile installation
-state, and working-tree cleanliness.
+functions and aliases, PATH accretion in `.zshrc`, a superseded TeX Live
+release, Brewfile installation state, and working-tree cleanliness.
 
 **Writing scripts in this repo: use `command rm`, `command cp`, `command mv`.**
 `aliases.zsh` maps all three to their `-i` form. In a non-interactive shell the
