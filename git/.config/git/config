@@ -44,11 +44,33 @@
   last = log -1 HEAD
   contributors = shortlog --summary --numbered
   today = log --since=midnight --author='Nicolas Reigl' --oneline
+
+  # Review in hunk (opt-in). core.pager stays delta on purpose: delta is what
+  # scripts and pipes get, and routing every `git diff` through an interactive
+  # TUI would break them. These aliases override the pager for one command.
+  # NOTE: `git hdiff` shows only what git puts in the patch, so untracked files
+  # are absent. Use the `hd` shell alias (`hunk diff`) to see those.
+  # The quotes must be escaped. Git strips an unescaped pair while it reads the
+  # value, and `git` then splits `hunk pager` into two argv words and looks for
+  # a `pager` subcommand.
+  hdiff = -c core.pager=\"hunk pager\" diff
+  hshow = -c core.pager=\"hunk pager\" show
+[difftool "hunk"]
+  # Same escaping rule as the aliases above: git strips unescaped quotes, and
+  # the unquoted value breaks on a path that contains a space.
+  cmd = hunk difftool \"$LOCAL\" \"$REMOTE\" \"$MERGED\"
+[difftool]
+  # `prompt` has no per-tool form, so this applies to whichever tool
+  # `diff.tool` selects. That is hunk, set in the [diff] section below.
+  prompt = false
 [color]
   ui = auto
 [diff]
   algorithm = patience
   colorMoved = zebra
+  # Makes the [difftool "hunk"] block above reachable. Without it `git difftool`
+  # never selects hunk and the block is dead config.
+  tool = hunk
 [push]
   default = current
 [commit]

@@ -95,6 +95,7 @@ dotfiles/
 ├── ghostty/          # Terminal emulator config and shaders
 ├── git/              # Git configuration (XDG: ~/.config/git)
 ├── herdr/            # Agent multiplexer config
+├── hunk/             # Diff viewer for agent changesets
 ├── julia/            # Julia startup.jl
 ├── latex/            # LaTeX/latexmk configuration
 ├── macos/            # macOS defaults script
@@ -110,6 +111,7 @@ dotfiles/
 ├── television/       # Television channels and UI configuration
 ├── texmf/            # LaTeX beamer theme
 ├── tmux/             # Terminal multiplexer
+├── tuicr/            # Code review TUI (writes the review)
 ├── vscode/           # VS Code settings
 ├── yazi/             # Terminal file manager
 └── zsh/              # ZSH shell configuration

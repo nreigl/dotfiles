@@ -1,0 +1,66 @@
+# tuicr — code review TUI with vim keybindings
+# https://tuicr.dev/
+#
+# Role in this setup: WRITE the review that goes back to the agent. tuicr is
+# the half hunk cannot do. Read the diff, comment on lines, then export the
+# markdown and paste it into the Claude pane.
+#
+# Export: `y` or `:clip` in the TUI copies the review to the clipboard. `Y`
+# copies only the comment under the cursor. There is no `E` binding. Press `?`
+# for the full table. `tuicr --stdout` prints instead of copying, which is what
+# you want when you pipe the review somewhere.
+
+theme_dark = "catppuccin-mocha"
+theme_light = "catppuccin-latte"
+appearance = "system"           # follow the terminal, like herdr auto_switch
+
+backend = "libgit2"
+diff_view = "side-by-side"      # unified or side-by-side
+show_file_list = true
+show_commits = true
+show_reviewed = true
+show_pr_checks = true
+relative_line_numbers = false
+cursor_line = true
+ignore_whitespace = false
+commit_order = "descending"
+scroll_offset = 4
+mouse = true
+transparent_background = true
+
+# Edit comments with vim keys. The rest of the TUI is modal already.
+comment_vim = true
+comment_tab_width = 2
+
+# Homebrew owns the binary. Do not let tuicr update itself behind brew's back.
+no_update_check = true
+
+# Print the comment-type legend with the export, so an agent reading the
+# pasted markdown knows what "nit" means without being told.
+export_legend = true
+
+# Comment types. The label becomes the markdown prefix an agent reads.
+[[comment_types]]
+label = "bug"
+definition = "Wrong behaviour. Must be fixed before merge."
+color = "#f38ba8"
+
+[[comment_types]]
+label = "nit"
+definition = "Style or naming. Optional."
+color = "#f9e2af"
+
+[[comment_types]]
+label = "question"
+definition = "Explain why this was done this way."
+color = "#89b4fa"
+
+[[comment_types]]
+label = "todo"
+definition = "Follow-up work. Not a blocker for this change."
+color = "#fab387"
+
+[[comment_types]]
+label = "praise"
+definition = "Keep this. Do not undo it in a later pass."
+color = "#a6e3a1"

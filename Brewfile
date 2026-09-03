@@ -178,6 +178,8 @@ brew "rust"
 # Terminal multiplexer with VT100/ANSI terminal emulation (use tmux instead)
 # 7-Zip is a file archiver with a high compression ratio
 brew "sevenzip"
+# SoX (Sound eXchange) is a sound processing program (Claude Code /voice)
+brew "sox"
 # Cross-shell prompt for astronauts
 brew "starship"
 # Organize software neatly under a single directory tree (e.g. /usr/local)
@@ -214,6 +216,9 @@ brew "tmux"
 brew "trash-cli", link: true
 # Display directories as trees (with optional color/HTML output)
 brew "tree"
+# Code review TUI with vim keybindings; writes comments back as markdown
+# (pairs with hunk, which is npm-managed: npm i -g hunkdiff)
+brew "tuicr"
 # Maintained ctags implementation
 brew "universal-ctags"
 # Vi 'workalike' with many additional features

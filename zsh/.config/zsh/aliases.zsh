@@ -51,6 +51,18 @@ alias gst='git stash'
 alias gstp='git stash pop'
 alias gf='git fetch'
 
+# === Diff review ===
+# Two tools, two jobs. Do not reach for the wrong one.
+#   hunk  = READ an agent-authored changeset. Viewer only, no export.
+#   tuicr = WRITE the review. Comment on lines, export markdown, paste it back
+#           into the agent pane. This is the return path hunk does not have.
+# Same keys live in herdr: prefix+alt+d (hunk), prefix+alt+r (tuicr).
+alias hd='hunk diff'          # working tree, untracked files included
+alias hds='hunk diff --staged'
+alias hs='hunk show'          # last commit; `hs HEAD~1` for an earlier one
+alias cr='tuicr -w'           # review the working tree
+alias crs='tuicr -w --stdout' # same, but print the review instead of copying it
+
 # === Python ===
 alias py='python3'
 alias python='python3'
@@ -83,7 +95,9 @@ alias mkdir='mkdir -pv'
 # === System ===
 alias reload='source ~/.zshrc'
 alias path='echo -e ${PATH//:/\\n}'
-alias ports='netstat -tulanp'
+# Listening TCP ports with the owning process. The Linux form
+# `netstat -tulanp` fails on macOS, where -p takes a protocol name.
+alias ports='lsof -iTCP -sTCP:LISTEN -nP'
 alias myip='curl -s https://ipecho.net/plain; echo'
 ## Open current directory in Finder (Marta if installed)
 # Accepts an optional path argument. Defaults to '.'

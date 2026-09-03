@@ -10,8 +10,8 @@ onboarding = false
 
 [theme]
 # Match tmux/nvim Catppuccin setup; follow terminal light/dark appearance
-name = "catppuccin"
-auto_switch = true
+name = "dracula"
+auto_switch = false
 dark_name = "catppuccin"
 light_name = "catppuccin-latte"
 
@@ -64,6 +64,29 @@ command = "lazygit"
 description = "run lazygit"
 width = "80%"
 height = "80%"
+
+# --- Diff review popups ---
+# Two halves of one workflow, so they sit next to the lazygit popup.
+#   prefix+alt+d  hunk   READ what the agent changed (viewer, no export)
+#   prefix+alt+r  tuicr  WRITE the review that goes back (comments -> markdown)
+# Both are popups, not splits: a review is a moment, not a pane you keep.
+# Sized larger than lazygit (90%) because a side-by-side diff needs the width.
+
+[[keys.command]]
+key = "prefix+alt+d"
+type = "popup"
+command = "hunk diff"
+description = "review working tree (hunk)"
+width = "90%"
+height = "90%"
+
+[[keys.command]]
+key = "prefix+alt+r"
+type = "popup"
+command = "tuicr -w"
+description = "comment on working tree (tuicr)"
+width = "90%"
+height = "90%"
 
 # --- Plugins ---
 

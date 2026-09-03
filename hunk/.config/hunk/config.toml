@@ -1,0 +1,44 @@
+# hunk — terminal diff viewer for agent-authored changesets
+# https://hunk.dev/docs/
+#
+# Role in this setup: READ what an agent changed. hunk is a viewer. It has no
+# export path. To write review comments that go back to an agent, use tuicr.
+#
+# Install path warning: hunk comes from `npm i -g hunkdiff`, so the binary and
+# the bundled Claude skill live under the ACTIVE mise Node version
+# (~/.local/share/mise/installs/node/22.19.0/...). A Node major upgrade drops
+# both. scripts/update.sh reinstalls hunk and re-syncs the skill for that reason.
+
+# `theme` is the only theme key hunk reads. It takes one built-in theme id,
+# `custom`, or `auto`. `auto` detects the terminal background and picks hunk's
+# own pair, github-dark-default and github-light-default. hunk has no way to
+# name the pair, so a catppuccin pin costs the automatic switch. The switch is
+# worth more here, because Ghostty switches too (dark:Ayu Mirage, light:Ayu
+# Light). `theme_dark` and `theme_light` are tuicr keys; hunk ignores them
+# without a warning.
+theme = "auto"
+
+mode = "auto"                   # auto, split, stack — auto picks by pane width
+vcs = "git"
+line_numbers = true
+wrap_lines = false
+tab_width = 2
+sidebar = "auto"                # file list appears when the pane is wide enough
+menu_bar = true
+
+# Reload while an agent keeps editing. This is the point of the herdr pane:
+# leave hunk open next to the agent and watch the changeset grow.
+watch = true
+
+# Show inline agent notes by default. The hunk-review skill writes them through
+# `hunk session comment add`.
+agent_notes = true
+
+# Untracked files stay visible. An agent that adds a new file must not hide it.
+exclude_untracked = false
+
+# Do not ask about saving view preferences on quit. The popup is transient.
+prompt_save_view_preferences = false
+
+# Let the Ghostty background show through, to match the herdr theme.
+transparent_background = true

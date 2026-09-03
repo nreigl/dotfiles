@@ -123,7 +123,11 @@
       "Bash(mole uninstall *)",
       "Read(//opt/homebrew/Caskroom/kicad/10.0.5/**)",
       "Read(//Library/Application Support/kicad/demos/**)",
-      "Bash(/usr/bin/du *)"
+      "Bash(/usr/bin/du *)",
+      "Bash(tuicr --help)",
+      "Bash(tuicr review *)",
+      "Bash(hunk --help)",
+      "Bash(hunk skill path *)"
     ],
     "deny": [
       "Read(.env*)",
