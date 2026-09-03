@@ -62,14 +62,23 @@ backup() {
   echo "Backed up to: $1.bak.$(date +%Y%m%d_%H%M%S)"
 }
 
-# Find and replace in files
+# Find and replace a literal string in files. Both arguments are treated as
+# plain text: rg searches with --fixed-strings, and perl \Q...\E quotes the
+# pattern, so a slash, dot, or ampersand in either argument is safe.
 replace() {
   if [ "$#" -ne 3 ]; then
     echo "Usage: replace <find> <replace> <file_pattern>"
     echo "Example: replace 'old text' 'new text' '*.txt'"
     return 1
   fi
-  rg -l "$1" -g "$3" | xargs -I {} sed -i '' "s/$1/$2/g" {}
+  local -a files
+  files=("${(@f)$(rg -l --fixed-strings -g "$3" -- "$1")}")
+  if [[ ${#files} -eq 0 || -z "${files[1]}" ]]; then
+    echo "replace: no file matches '$1'" >&2
+    return 1
+  fi
+  FIND="$1" REPL="$2" perl -pi -e 's/\Q$ENV{FIND}\E/$ENV{REPL}/g' -- "${files[@]}"
+  echo "replace: edited ${#files} file(s)"
 }
 
 # === Git Operations ===

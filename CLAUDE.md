@@ -131,6 +131,8 @@ ruff --version
 Each directory at the root level is a "stow package" containing configs:
 - `ghostty/` - Terminal emulator (config symlinked to `~/.config/ghostty/`)
 - `herdr/` - Terminal multiplexer for coding agents (→ `~/.config/herdr/`)
+- `hunk/` - Diff viewer for agent-authored changesets (→ `~/.config/hunk/`). Read-only: hunk has no export path. `theme` is the only theme key it reads
+- `tuicr/` - Code review TUI (→ `~/.config/tuicr/`). The write half that hunk lacks: comment on lines, then copy the review with `y` or `:clip`
 - `yazi/` - Terminal file manager (→ `~/.config/yazi/`). Keep `yazi.toml` minimal: yazi merges it over built-in presets, and copying the full default config breaks on every release
 - `superfile/` - Second terminal file manager, on trial (→ `~/.config/superfile/`). Only `config.toml` is stowed. Keep it minimal and keep `ignore_missing_fields = true`, which silences the warning about absent fields. `hotkeys.toml` and `theme/` stay unstowed because superfile rewrites them on upgrade
 - `nvim/` - Neovim/LazyVim config (→ `~/.config/nvim/`)
@@ -146,7 +148,7 @@ Each directory at the root level is a "stow package" containing configs:
 - `Brewfile` - Homebrew package manifest (480+ packages)
 - `scripts/install.sh` - Main installer (lines 1-198)
 - `scripts/update.sh` - Update all tools (lines 1-158)
-- `scripts/stow-all.sh` - Links 27 stow packages (the `PACKAGES` array). `scripts/stow-remove.sh` holds an identical list — update both together. `scripts/doctor.sh` fails if the two lists drift apart or if a listed package is missing
+- `scripts/stow-all.sh` - Links 29 stow packages (the `PACKAGES` array). `scripts/stow-remove.sh` holds an identical list — update both together. `scripts/doctor.sh` fails if the two lists drift apart or if a listed package is missing
 - `mise/.config/mise/config.toml` - Language versions (Node v22, Ruby, Go, Rust, Bun). This is the only mise config; the former root `mise.toml` duplicated the Node pin and was removed on 2026-08-18
 
 ### Tool Stack
@@ -194,7 +196,9 @@ stow -n -v <package>
 stow --adopt <package>  # Careful: moves existing files into repo
 
 # Fix z function in Claude Code (if getting "bad pattern" error)
-unfunction z; source ~/dotfiles/zsh/.zshrc.local
+# z is defined at the end of zsh/.zshrc. ~/.zshrc.local is an empty
+# placeholder for machine-local overrides and defines nothing.
+unfunction z; source ~/dotfiles/zsh/.zshrc
 # Note: Claude Code resets working directory after each command
 # The z function works but directory changes don't persist in Claude Code
 # Use absolute paths or cd commands within scripts instead

@@ -348,10 +348,15 @@ check_path_accretion() {
 
   # Tool installers append `export PATH=...` to the tracked .zshrc. Each one is
   # harmless alone, but they accumulate silently and outlive the tool.
+  # `grep -c` prints 0 AND exits 1 when nothing matches, so `|| echo 0` would
+  # yield "0\n0" and break the arithmetic test below. `|| true` keeps the 0.
   local zshrc="$DOTFILES_DIR/zsh/.zshrc" count
-  count="$(grep -c '^export PATH=' "$zshrc" 2>/dev/null || echo 0)"
+  count="$(grep -c '^export PATH=' "$zshrc" 2>/dev/null || true)"
+  count="${count:-0}"
 
-  if [[ "$count" -gt 4 ]]; then
+  # The baseline is zero: every tool directory lives in the path=() arrays at
+  # the top of .zshrc, so any `export PATH=` line is an installer's addition.
+  if [[ "$count" -gt 0 ]]; then
     warn "$count separate 'export PATH=' lines in .zshrc; installers are accreting:"
     grep -n '^export PATH=' "$zshrc" | sed 's/^/         /'
   else
@@ -369,7 +374,10 @@ check_texlive() {
   fi
 
   local installed current month
-  installed="$(tlmgr --version 2>/dev/null | sed -n 's/^TeX Live.*version \([0-9]*\).*/\1/p' | head -1)"
+  # `|| true`: `set -euo pipefail` is active, so a broken TeX Live that leaves
+  # tlmgr on PATH but makes `tlmgr --version` exit nonzero would abort doctor.sh
+  # here, before the last two checks run. An empty value is handled below.
+  installed="$(tlmgr --version 2>/dev/null | sed -n 's/^TeX Live.*version \([0-9]*\).*/\1/p' | head -1 || true)"
   current="$(date +%Y)"
   month="$(date +%m)"
 

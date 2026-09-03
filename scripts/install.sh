@@ -66,10 +66,11 @@ setup_julia() {
   echo -e "${YELLOW}🔷 Setting up Julia...${NC}"
   
   if command -v juliaup &>/dev/null; then
-    juliaup add 1.11
-    juliaup add 1.10
-    juliaup default 1.11
-    echo -e "${GREEN}✓ Julia 1.11 set as default${NC}"
+    # The `release` channel tracks the current stable Julia. A pinned minor
+    # version goes stale within a year and then installs an old Julia.
+    juliaup add release
+    juliaup default release
+    echo -e "${GREEN}✓ Julia release channel set as default${NC}"
   else
     echo -e "${RED}✗ Juliaup not found, install it via brew${NC}"
   fi
@@ -98,6 +99,25 @@ install_pi() {
     echo -e "${GREEN}✓ Pi coding agent installed${NC}"
   else
     echo -e "${RED}✗ Mise not found; unable to install Pi${NC}"
+  fi
+}
+
+# === Install hunk (diff viewer) ===
+# The `hd`/`hds`/`hs` aliases and the git `hdiff`/`hshow` aliases all call
+# `hunk`. Without this, doctor.sh check_referenced_binaries fails on a fresh
+# machine with three "alias points at a missing command" errors.
+install_hunk() {
+  echo -e "${YELLOW}🔍 Installing hunk...${NC}"
+
+  if ! command -v mise &>/dev/null; then
+    echo -e "${RED}✗ Mise not found; unable to install hunk${NC}"
+    return 0
+  fi
+
+  if mise exec node@22 -- npm install -g hunkdiff@latest; then
+    echo -e "${GREEN}✓ hunk installed${NC}"
+  else
+    echo -e "${YELLOW}⚠️  hunk install failed; run ./scripts/update.sh to retry${NC}"
   fi
 }
 
@@ -139,7 +159,11 @@ create_directories() {
   mkdir -p "$HOME/.local/share"
   mkdir -p "$HOME/.local/state/zsh"
   mkdir -p "$HOME/.cache"
-  
+  # ssh/.ssh/config sets ControlPath under this directory. ssh does not create
+  # it, and without it every connection warns and runs without multiplexing.
+  mkdir -p "$HOME/.ssh/sockets"
+  chmod 700 "$HOME/.ssh" "$HOME/.ssh/sockets"
+
   echo -e "${GREEN}✓ Directories created${NC}"
 }
 
@@ -147,23 +171,14 @@ create_directories() {
 configure_macos() {
   if [[ "$OSTYPE" == "darwin"* ]]; then
     echo -e "${YELLOW}🍎 Configuring macOS settings...${NC}"
-    
-    # Show hidden files in Finder
-    defaults write com.apple.finder AppleShowAllFiles -bool true
-    
-    # Show path bar in Finder
-    defaults write com.apple.finder ShowPathbar -bool true
-    
-    # Disable press-and-hold for keys in favor of key repeat
-    defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
-    
-    # Set fast key repeat rate
-    defaults write NSGlobalDomain KeyRepeat -int 2
-    defaults write NSGlobalDomain InitialKeyRepeat -int 15
-    
-    killall Finder || true
-    
-    echo -e "${GREEN}✓ macOS configured${NC}"
+
+    # macos/.macos is the single source of truth for `defaults write` lines.
+    # It asks for sudo once and restarts Finder and Dock itself.
+    if bash "$DOTFILES_DIR/macos/.macos"; then
+      echo -e "${GREEN}✓ macOS configured${NC}"
+    else
+      echo -e "${YELLOW}⚠️  macos/.macos exited with an error; rerun it by hand${NC}"
+    fi
   fi
 }
 
@@ -181,6 +196,7 @@ main() {
   setup_julia
   configure_mise
   install_pi
+  install_hunk
   install_zinit
   
   # Stow dotfiles
@@ -197,12 +213,15 @@ main() {
   echo -e "${YELLOW}Next steps:${NC}"
   echo -e "1. Restart your terminal or run: ${BLUE}source ~/.zshrc${NC}"
   echo -e "2. Install LazyVim plugins: ${BLUE}nvim${NC} (will auto-install)"
-  echo -e "3. Configure Git: ${BLUE}git config --global user.name 'Your Name'${NC}"
+  # ~/.gitconfig and ~/.config/git/config are both symlinks into this repo, so
+  # `git config --global` would write the identity into a tracked file.
+  echo -e "3. Configure Git: ${BLUE}git config --file ~/.gitconfig.local user.name 'Your Name'${NC}"
+  echo -e "   (and user.email). That file is untracked and included by the tracked config."
   echo -e "4. Test LaTeX: Create a .tex file and use ${BLUE}\\ll${NC} in Neovim"
   echo
   echo -e "${GREEN}Installed tools:${NC}"
   echo -e "  🐍 Python: UV with Python 3.12"
-  echo -e "  🔷 Julia: 1.11 (latest) via Juliaup"
+  echo -e "  🔷 Julia: release channel via Juliaup"
   echo -e "  📦 Node: LTS via mise"
   echo -e "  📝 Neovim: LazyVim with VimTeX"
   echo -e "  🚀 Shell: ZSH with Starship prompt"

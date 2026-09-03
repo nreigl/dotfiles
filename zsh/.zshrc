@@ -14,12 +14,21 @@ typeset -U path
 path=(
   $HOME/.local/bin           # User binaries (UV, etc.)
   /opt/homebrew/bin          # Homebrew (Apple Silicon)
+  /opt/homebrew/sbin
   /usr/local/bin             # Local binaries
   /usr/bin                   # System binaries
   /bin                       # Core binaries
   /usr/sbin                  # System admin
   /sbin                      # Core admin
   $path                      # Existing paths
+)
+# Tool directories. Installers append `export PATH=...` lines to the end of
+# this file; move them up here instead. Missing directories are dropped by
+# the (N) glob qualifier, so the list can hold tools that are not installed.
+path+=(
+  $HOME/.antigravity/antigravity/bin(N)
+  $HOME/.antigravity-ide/antigravity-ide/bin(N)
+  $HOME/.kimi-code/bin(N)
 )
 
 # === History Configuration ===
@@ -70,9 +79,6 @@ zinit light zdharma-continuum/fast-syntax-highlighting
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
 
-# Load git library first (synchronously to ensure it's available)
-zinit snippet OMZL::git.zsh
-
 # Additional useful plugins (loaded async)
 zinit wait lucid for \
   OMZP::sudo \
@@ -122,7 +128,7 @@ if [[ -d "/usr/local/texlive" ]]; then
   # Find the latest year directory
   LATEST_TEXLIVE=$(ls -d /usr/local/texlive/20* 2>/dev/null | sort -r | head -1)
   if [[ -n "$LATEST_TEXLIVE" && -d "$LATEST_TEXLIVE/bin/universal-darwin" ]]; then
-    export PATH="$PATH:$LATEST_TEXLIVE/bin/universal-darwin"
+    path+=("$LATEST_TEXLIVE/bin/universal-darwin")
   fi
 fi
 
@@ -248,11 +254,6 @@ z() {
   fi
 }
 
-export PATH="/opt/homebrew/sbin:$PATH"
-
-# Added by Antigravity
-export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
-
 # === Multiplexers: explicit, never auto-attach ===
 # Auto-attaching tmux in WezTerm nested herdr inside tmux (tmux swallowed the
 # ctrl+a prefix). Shells now start plain; pick a multiplexer per window:
@@ -279,9 +280,3 @@ claude() {
   fi
   "${env_cmd[@]}" claude "$@"
 }
-
-# kimi-code
-export PATH="/Users/nicolasreigl/.kimi-code/bin:$PATH"
-
-# Added by Antigravity IDE
-export PATH="/Users/nicolasreigl/.antigravity-ide/antigravity-ide/bin:$PATH"
