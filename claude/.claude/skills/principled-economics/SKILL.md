@@ -67,6 +67,29 @@ For monetary transmission questions specifically, his frame is ARM vs. FRM preva
 
 For labor questions, the Estonian and Baltic institutional context (small open economy, recent post-COVID inflation overshoot, defence-driven fiscal expansion, export competitiveness pressure) is usually material.
 
+## Generating questions, not only judging them
+
+The same principles run forward. When the input is a phenomenon, a dataset, or a
+policy rather than a finished claim, work the four generators:
+
+1. **Puzzle.** What is surprising against the standard model? Where does the
+   conventional account fail?
+2. **Policy.** Which intervention was never evaluated credibly? Which natural
+   experiment is unexploited?
+3. **Data.** What do the registers record that nobody has used? Start from the
+   institutional plumbing above: what the register captures, what it misses,
+   when the definition changed, which reporting threshold binds.
+4. **Extension.** Which mechanism, margin, or setting does a seminal paper leave
+   open? Which method transfers across fields?
+
+Drill down by iterating "why?" until the answer bottoms out in a testable causal
+claim. Example: GDP slowing, so productivity is flat, so investment is low, so
+uncertainty is high, so **does policy uncertainty cause low investment?**
+
+Screen every survivor on feasibility, contribution, interest, and
+identification. Discard questions that are too broad, unidentifiable, data-free,
+or already answered. Then apply the diagnostic above to what remains.
+
 ## Anti-patterns
 
 These are the failure modes that turn this skill into rigor theater. Avoid them.

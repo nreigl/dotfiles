@@ -1,6 +1,6 @@
 ---
 name: beamer-presentation
-description: Create academic presentations in Beamer (jambro theme, lualatex)
+description: Use when building or restructuring an academic or policy talk in Beamer: the jambro theme setup, slide budget for the talk length, and slide discipline. Skip for the written paper (use `econ-write-house`) and for a poster.
 ---
 
 # Beamer Presentation

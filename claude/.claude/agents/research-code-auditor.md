@@ -197,3 +197,6 @@ After completing all phases, produce a single structured report:
 - Prioritize findings that affect correctness over those that affect tidiness.
 - If the project has no manuscript yet, focus on Phases 2-5 (skip 1 and 6).
 - If no central config exists, note this as a structural recommendation rather than flagging every script individually.
+- Lead the report with the count of critical findings and the top remediation
+  priorities, before any per-phase detail. A reader who stops after one
+  paragraph must still know whether the project is safe to submit.

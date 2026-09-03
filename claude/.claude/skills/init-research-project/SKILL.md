@@ -1,6 +1,6 @@
 ---
 name: init-research-project
-description: Scaffold a new empirical research project with spec governance (central config, hash-based staleness detection, Makefile pipeline)
+description: Use when creating a new empirical research project from nothing: directory layout, central spec config, staleness detection, Makefile pipeline, and version control. Skip for an existing project, where adding files would fight the conventions already in place.
 argument-hint: [project name]
 ---
 
@@ -281,7 +281,7 @@ clean:
 
 # --- Audit (run research-code-auditor checks) ---
 audit:
-	@echo "Run /audit-research-code in Claude Code or use the research-code-auditor agent"
+	@echo "Ask Claude Code to audit this project; the research-code-auditor agent runs the 6-phase sweep"
 ```
 
 Adapt targets and commands to the user's language and pipeline structure.
@@ -432,7 +432,7 @@ Staleness prevention:
   - All estimation scripts must source R/config.R
   - Use save_with_hash() / check_hash() for saved outputs
   - Run spec compliance tests before committing
-  - Use /audit-research-code or research-code-auditor agent before submission
+  - Ask the research-code-auditor agent for a full audit before submission
 
 Next steps:
   1. Edit R/config.R with your actual parameters
