@@ -193,7 +193,7 @@ export OPENAI_API_KEY="your-key"
 - Television shell integration is intentionally disabled so fzf/fzf-tab keep `Ctrl-T` and Atuin keeps `Ctrl-R`.
 
 ### Git (XDG)
-- Global config at `~/.config/git/config`. A minimal `~/.gitconfig` includes this file for compatibility with tools expecting it.
+- Global config at `~/.config/git/config`. There is no `~/.gitconfig`: git reads the XDG path on its own, and a shim there made git parse the same file twice.
 - Global ignore file at `~/.config/git/ignore`.
 
 ### Node and Python
