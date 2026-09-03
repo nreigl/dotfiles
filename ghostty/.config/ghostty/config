@@ -72,7 +72,8 @@ working-directory = home
 # keymaps
 # Was global:cmd+` — that is the macOS "Move focus to next window" shortcut
 # (symbolic hotkey 27), and a global: binding steals it from every application.
-keybind = global:ctrl+cmd+`=toggle_quick_terminal
+# On a German macOS keyboard, `equal` is the ´ key.
+keybind = global:ctrl+cmd+equal=toggle_quick_terminal
 keybind = shift+ctrl+left_bracket=previous_tab
 keybind = shift+ctrl+right_bracket=next_tab
 keybind = shift+ctrl+,=move_tab:-1

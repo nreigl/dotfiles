@@ -6,5 +6,5 @@
   "app.session.new": "ctrl+shift+n",
   "app.session.tree": "ctrl+shift+t",
   "app.session.fork": "ctrl+shift+f",
-  "app.session.resume": "ctrl+shift+r"
+  "app.session.resume": "ctrl+shift+s"
 }
