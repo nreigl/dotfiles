@@ -1,6 +1,6 @@
 ---
 name: econ-write-house
-description: House style for Nicolas Reigl's economics writing, layered over the econ-write skill. Use when drafting, revising, restructuring, or reviewing any economics prose - working papers, journal submissions, policy briefs, memos, abstracts, conclusions, captions, table notes, non-technical summaries, referee responses, slide text. econ-write supplies the section formulas and field conventions; this file supplies the register, the evidence hierarchy, the claims discipline, and the punctuation rules, and it wins on every conflict. Skip for prose that is not part of a research output: commit messages, chat replies, code comments, and documentation, which follow the `simple-english` rules instead.
+description: "House style for Nicolas Reigl's economics writing, layered over the econ-write skill. Use when drafting, revising, restructuring, or reviewing any economics prose - working papers, journal submissions, policy briefs, memos, abstracts, conclusions, captions, table notes, non-technical summaries, referee responses, slide text. econ-write supplies the section formulas and field conventions; this file supplies the register, the evidence hierarchy, the claims discipline, and the punctuation rules, and it wins on every conflict. Skip for prose that is not part of a research output: commit messages, chat replies, code comments, and documentation, which follow the `simple-english` rules instead."
 ---
 
 # House layer over `econ-write`

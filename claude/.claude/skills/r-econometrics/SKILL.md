@@ -1,6 +1,6 @@
 ---
 name: r-econometrics
-description: Use when writing or reviewing causal-inference code in R: IV, difference-in-differences with common or staggered timing, RDD, and panel fixed effects with fixest. Skip for debugging an R error message, for data wrangling with no estimation in it, and for interpreting results already estimated (use `principled-economics`).
+description: "Use when writing or reviewing causal-inference code in R: IV, difference-in-differences with common or staggered timing, RDD, and panel fixed effects with fixest. Skip for debugging an R error message, for data wrangling with no estimation in it, and for interpreting results already estimated (use `principled-economics`)."
 ---
 
 # R Econometrics

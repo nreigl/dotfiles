@@ -1,6 +1,6 @@
 ---
 name: tuicr-review
-description: Use when the user wants review comments written or answered, and when the user has tuicr open. tuicr is the review TUI that exports: it persists inline comments and copies the whole review out. hunk can annotate a live session but has no export path, so its comments cannot leave it. Prefer tuicr whenever a comment must survive the session or be copied out. tuicr works on any file, so this covers LaTeX manuscripts as well as code. If the user says only "the review TUI", ask which one before running any command.
+description: "Use when the user wants review comments written or answered, and when the user has tuicr open. tuicr is the review TUI that exports: it persists inline comments and copies the whole review out. hunk can annotate a live session but has no export path, so its comments cannot leave it. Prefer tuicr whenever a comment must survive the session or be copied out. tuicr works on any file, so this covers LaTeX manuscripts as well as code. If the user says only \"the review TUI\", ask which one before running any command."
 ---
 
 # tuicr Review
