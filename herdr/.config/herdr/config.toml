@@ -9,7 +9,8 @@
 onboarding = false
 
 [theme]
-# Match tmux/nvim Catppuccin setup; follow terminal light/dark appearance
+# Fixed Dracula theme. auto_switch = false, so herdr ignores the terminal
+# light/dark appearance. Set it to true to use dark_name and light_name.
 name = "dracula"
 auto_switch = false
 dark_name = "catppuccin"
