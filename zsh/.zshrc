@@ -47,6 +47,12 @@ setopt HIST_SAVE_NO_DUPS         # Don't write duplicates
 setopt HIST_REDUCE_BLANKS        # Remove extra blanks
 setopt HIST_VERIFY               # Show command before executing
 
+# === Keymap ===
+# Select the emacs keymap before any plugin or tool binds a key.
+# EDITOR=nvim makes zsh start in viins, so a plain `bindkey` that runs before
+# this line lands in viins and is lost (this broke the `?` binding of Atuin AI).
+bindkey -e
+
 # === Zinit Plugin Manager ===
 ZINIT_HOME="${XDG_DATA_HOME}/zinit/zinit.git"
 if [[ ! -d "$ZINIT_HOME" ]]; then
@@ -107,7 +113,7 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
 # Previews for fzf's own Ctrl-T and Alt-C widgets
 export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always --line-range :500 {} 2>/dev/null || sed -n \"1,200p\" {}'"
-export FZF_ALT_C_OPTS="--preview 'eza --tree --level=2 --icons {} 2>/dev/null || ls -lah {}'"
+export FZF_ALT_C_OPTS="--preview 'eza --tree --level=2 --icons=always {} 2>/dev/null || ls -lah {}'"
 # Options live in the fzf stow package, not inline here.
 export FZF_DEFAULT_OPTS_FILE="$XDG_CONFIG_HOME/fzf/fzfrc"
 
@@ -183,8 +189,7 @@ setopt NO_BEEP              # No beeping
 setopt NOTIFY               # Report status of background jobs immediately
 
 # === Key Bindings ===
-bindkey -e  # Emacs key bindings
-# These bindings are set after the plugin loads (see below)
+# `bindkey -e` runs near the top of this file (see Keymap)
 bindkey '^[[3~' delete-char
 bindkey '^[[H' beginning-of-line
 bindkey '^[[F' end-of-line
@@ -246,7 +251,7 @@ z() {
           --nth 2.. \
           --tac \
           --no-sort \
-          --preview 'eza --tree --level=2 --icons {2..}' \
+          --preview 'eza --tree --level=2 --icons=always {2..}' \
           --bind 'enter:become:echo {2..}')
     [[ -n "$dir" ]] && cd "$dir"
   else

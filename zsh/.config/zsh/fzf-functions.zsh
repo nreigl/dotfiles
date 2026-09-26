@@ -49,14 +49,30 @@ fzf-file-preview() {
 }
 
 # === Directory Navigation ===
-# Alt-C: Enhanced directory navigation.
+# Alt-C: search folders and files below the current directory, then cd.
+# A folder selection changes into that folder. A file selection changes into
+# the parent folder of that file. Use `z` for a folder outside this tree.
 # Named fzf-my-cd-widget so it does not shadow fzf's own fzf-cd-widget.
 fzf-my-cd-widget() {
-  local dir
-  dir=$( (command -v fd >/dev/null 2>&1 && fd --type d --hidden --follow --exclude .git || \
-    command find . -type d -not -path '*/.git/*' 2>/dev/null) | \
-    fzf --preview 'command -v eza >/dev/null 2>&1 && eza --tree --level=2 --icons {} || ls -lah {}')
-  [[ -n "$dir" ]] && cd "$dir"
+  local sel preview
+  # fzf runs the preview through sh, so the folder test lives in the string.
+  preview='if [ -d {} ]; then
+             command -v eza >/dev/null 2>&1 && eza --tree --level=2 --icons=always {} || ls -lah {}
+           else
+             command -v bat >/dev/null 2>&1 && bat --style=numbers --color=always --line-range :500 {} || sed -n "1,200p" {}
+           fi'
+  sel=$( (command -v fd >/dev/null 2>&1 && fd --type d --type f --hidden --follow --exclude .git || \
+    command find . \( -type d -o -type f \) -not -path '*/.git/*' 2>/dev/null) | \
+    fzf --preview "$preview" \
+        --header 'Enter: cd to the folder, or to the parent folder of the file')
+  # ${sel:h} is the zsh head modifier. It returns the parent path.
+  # Keep the branches separate. An `&& ... || ...` chain would fall through to
+  # the parent folder when cd into an unreadable folder fails.
+  if [[ -d "$sel" ]]; then
+    cd "$sel"
+  elif [[ -n "$sel" ]]; then
+    cd "${sel:h}"
+  fi
   zle && zle reset-prompt
 }
 
@@ -261,7 +277,7 @@ zz() {
         --tac \
         --no-sort \
         --query "$*" \
-        --preview 'command -v eza >/dev/null 2>&1 && eza --tree --level=2 --icons {2..} || ls -lah {2..}' \
+        --preview 'command -v eza >/dev/null 2>&1 && eza --tree --level=2 --icons=always {2..} || ls -lah {2..}' \
         --preview-window 'right:40%' \
         --bind 'enter:become:echo {2..}')
   [[ -n "$dir" ]] && cd "$dir"

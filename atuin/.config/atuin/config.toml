@@ -9,6 +9,9 @@ inline_height = 18
 filter_mode = "global"      # search across all history
 search_mode = "fuzzy"       # fuzzy matching for Ctrl-R
 
+[ai]
+enabled = true
+
 # Uncomment to tweak further:
 # # number of results to return
 # max_results = 1000
