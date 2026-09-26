@@ -25,7 +25,7 @@
     "~/.claude/skills",
     "-../../.claude/skills/herdr/SKILL.md"
   ],
-  "lastChangelogVersion": "0.84.2",
+  "lastChangelogVersion": "0.85.1",
   "packages": [
     "npm:pi-web-access",
     "npm:@henryqw/pi-herdr-btw",
