@@ -36,7 +36,7 @@ UNSTOWED_ALLOWLIST=(scripts docs raycast tmp)
 # depend on a new binary.
 REQUIRED_BINS=(
   stow git nvim zsh tmux fzf rg fd eza bat zoxide starship mise
-  direnv atuin uv jq gh delta yazi herdr
+  direnv atuin uv jq gh delta yazi herdr git-lfs
 )
 
 # Tools removed from this setup. Any surviving reference is dead config.
@@ -73,6 +73,40 @@ skipped() {
 # Read the PACKAGES array out of a stow script without sourcing it.
 read_packages() {
   sed -n '/^PACKAGES=(/,/^)/p' "$1" | sed -n 's/^  *"\(.*\)"$/\1/p'
+}
+
+# Print the directories under $HOME where stow can place links, derived from
+# the package trees. Each top-level directory of a package (.config, .ssh,
+# .julia, ...) is scanned in full. ~/Library is too large for that, so a
+# package that links into Library adds only the directory two levels below it
+# (for example "Library/Application Support/Code" or "Library/texmf/tex").
+# Links directly in $HOME are found by a separate `find -maxdepth 1`.
+link_scan_roots() {
+  local pkg entry sub
+  for pkg in $(read_packages "$SCRIPT_DIR/stow-all.sh"); do
+    [[ -d "$DOTFILES_DIR/$pkg" ]] || continue
+    for entry in "$DOTFILES_DIR/$pkg"/* "$DOTFILES_DIR/$pkg"/.[!.]*; do
+      [[ -d "$entry" && ! -L "$entry" ]] || continue
+      entry="$(basename "$entry")"
+      if [[ "$entry" == "Library" ]]; then
+        while IFS= read -r sub; do
+          printf '%s\n' "$HOME/Library/${sub#./}"
+        done < <(cd "$DOTFILES_DIR/$pkg/Library" && find . -mindepth 2 -maxdepth 2 -type d)
+      else
+        printf '%s\n' "$HOME/$entry"
+      fi
+    done
+  done | sort -u
+}
+
+# Print every symlink in $HOME and in the link_scan_roots directories.
+find_home_links() {
+  find "$HOME" -maxdepth 1 -type l 2>/dev/null || true
+  local root
+  while IFS= read -r root; do
+    [[ -d "$root" ]] || continue
+    find "$root" -type l 2>/dev/null || true
+  done < <(link_scan_roots)
 }
 
 # --- checks -----------------------------------------------------------------
@@ -156,10 +190,7 @@ check_broken_symlinks() {
       err "broken link: $link -> $target"
       found=1
     fi
-  done < <(find "$HOME" -maxdepth 1 -type l 2>/dev/null
-           find "$HOME/.config" "$HOME/.claude" "$HOME/.pi" "$HOME/.ssh" \
-                "$HOME/.aws" "$HOME/.docker" "$HOME/.julia" "$HOME/.tmux" \
-                -type l 2>/dev/null || true)
+  done < <(find_home_links)
 
   if [[ $found -eq 0 ]]; then ok "no broken symlinks into the repo"; fi
 }
@@ -185,10 +216,30 @@ check_untracked_stowed() {
       err "linked but untracked (a fresh clone would miss it): $rel"
       found=1
     fi
-  done < <(find "$HOME" -maxdepth 1 -type l 2>/dev/null
-           find "$HOME/.config" "$HOME/.claude" "$HOME/.pi" -type l 2>/dev/null || true)
+  done < <(find_home_links)
 
   if [[ $found -eq 0 ]]; then ok "every linked file is tracked"; fi
+}
+
+check_git_identity_file() {
+  skipped gitconfig && return 0
+  section "Git identity file"
+
+  # ~/.gitconfig must be an untracked real file. Git reads it after the tracked
+  # ~/.config/git/config, and `git config --global` writes into it. If it is
+  # missing, `--global` writes land in the tracked XDG file. If it is a
+  # symlink, they land wherever the link points.
+  local f="$HOME/.gitconfig"
+  if [[ -L "$f" ]]; then
+    warn "~/.gitconfig is a symlink ($(readlink "$f")); replace it with a real file"
+  elif [[ ! -f "$f" ]]; then
+    warn "~/.gitconfig is missing; 'git config --global' writes into the tracked repo file"
+    printf "         create it, then run: git config --global user.name 'Your Name'\n"
+  elif ! git config --file "$f" user.email >/dev/null 2>&1; then
+    warn "~/.gitconfig sets no user.email; run: git config --global user.email ..."
+  else
+    ok "~/.gitconfig is a real file and holds the identity"
+  fi
 }
 
 check_referenced_binaries() {
@@ -287,7 +338,7 @@ check_removed_tools() {
   hits="$(grep -rniE "$REMOVED_TOOLS" "$DOTFILES_DIR" \
     --exclude-dir=.git --exclude-dir=tmp --exclude-dir=docs \
     --exclude=CLAUDE.md --exclude=README.md --exclude=doctor.sh \
-    --exclude=Brewfile --exclude=lazy-lock.json \
+    --exclude=lazy-lock.json \
     --exclude=install-extensions.sh 2>/dev/null |
     grep -vE '^[^:]+:[0-9]+: *(#|--|//)' || true)"
 
@@ -410,26 +461,28 @@ check_brewfile() {
     return
   fi
 
-  # Fetch the installed list once. Calling `brew list <pkg>` per entry costs
-  # about a second each, which makes the whole check take minutes.
-  local installed
-  installed="$(
-    { brew list --formula 2>/dev/null; brew list --cask 2>/dev/null; } |
-      sed 's|.*/||' | sort -u
-  )"
+  # Fetch each installed list once. Calling `brew list <pkg>` per entry costs
+  # about a second each, which makes the whole check take minutes. Formulae
+  # and casks are compared separately: one shared list let the `docker` cask
+  # hide a missing `docker` formula.
+  local formulae casks
+  formulae="$(brew list --formula -1 2>/dev/null | sed 's|.*/||' | sort -u || true)"
+  casks="$(brew list --cask -1 2>/dev/null | sed 's|.*/||' | sort -u || true)"
 
-  local missing=0 pkg
-  while IFS= read -r pkg; do
+  local missing=0 kind pkg installed
+  while IFS=' ' read -r kind pkg; do
+    [[ -z "$pkg" ]] && continue
+    if [[ "$kind" == "brew" ]]; then installed="$formulae"; else installed="$casks"; fi
     if ! echo "$installed" | grep -qxF "$pkg"; then
-      warn "Brewfile lists a package that is not installed: $pkg"
+      warn "Brewfile lists a $kind that is not installed: $pkg"
       missing=$((missing + 1))
     fi
   done < <(
     grep -E '^(brew|cask) "' "$DOTFILES_DIR/Brewfile" |
-      sed 's/^[a-z]* "\([^"]*\)".*/\1/' | sed 's|.*/||' | sort -u || true
+      sed 's/^\([a-z]*\) "\([^"]*\)".*/\1 \2/' | sed 's| .*/| |' | sort -u || true
   )
 
-  if [[ $missing -eq 0 ]]; then ok "every Brewfile formula is installed"; fi
+  if [[ $missing -eq 0 ]]; then ok "every Brewfile formula and cask is installed"; fi
 }
 
 check_git_hygiene() {
@@ -455,6 +508,7 @@ main() {
   check_stow_conflicts
   check_broken_symlinks
   check_untracked_stowed
+  check_git_identity_file
   check_referenced_binaries
   check_referenced_paths
   check_removed_tools

@@ -57,10 +57,22 @@ unstow_package() {
   
   if [ -d "$package" ]; then
     echo -e "${YELLOW}Unstowing $package...${NC}"
-    stow -v --delete "$package" 2>&1 | grep -v "BUG in find_stowed_path" || true
-    echo -e "${GREEN}✓ $package unstowed${NC}"
+    # Read stow's exit status from PIPESTATUS[0], not from the grep. See the
+    # same block in stow-all.sh.
+    local rc
+    set +e
+    stow -v --delete "$package" 2>&1 | grep -v "BUG in find_stowed_path"
+    rc=${PIPESTATUS[0]}
+    set -e
+    if [[ $rc -eq 0 ]]; then
+      echo -e "${GREEN}✓ $package unstowed${NC}"
+    else
+      echo -e "${RED}✗ $package: stow exited with status $rc${NC}"
+      FAILED+=("$package")
+    fi
   else
     echo -e "${RED}✗ $package directory not found${NC}"
+    FAILED+=("$package")
   fi
 }
 
@@ -74,8 +86,14 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
 fi
 
 # Unstow each package
+FAILED=()
 for package in "${PACKAGES[@]}"; do
   unstow_package "$package"
 done
 
-echo -e "${GREEN}✨ All packages unstowed successfully!${NC}"
+if [[ ${#FAILED[@]} -gt 0 ]]; then
+  echo -e "${RED}✗ ${#FAILED[@]} of ${#PACKAGES[@]} packages failed: ${FAILED[*]}${NC}"
+  exit 1
+fi
+
+echo -e "${GREEN}✨ All ${#PACKAGES[@]} packages unstowed successfully!${NC}"

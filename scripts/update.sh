@@ -15,6 +15,12 @@ NC='\033[0m' # No Color
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOTFILES_DIR="$(dirname "$SCRIPT_DIR")"
 
+# Every tool step runs under `set -e`. One failed tool must not stop the other
+# updates, so each step ends in `|| warn "..."` and reports the failure instead.
+warn() {
+  echo -e "${YELLOW}⚠️  $1${NC}"
+}
+
 echo -e "${BLUE}========================================${NC}"
 echo -e "${BLUE}   Updating Development Environment${NC}"
 echo -e "${BLUE}========================================${NC}"
@@ -22,18 +28,24 @@ echo -e "${BLUE}========================================${NC}"
 # === Update Homebrew ===
 update_homebrew() {
   echo -e "${YELLOW}🍺 Updating Homebrew...${NC}"
-  brew update
-  brew upgrade --formula
+  local brew_failed=0
+  brew update || { warn "brew update failed"; brew_failed=1; }
+  brew upgrade --formula || { warn "brew upgrade --formula failed"; brew_failed=1; }
   # Upgrade casks but never google-chrome (it manages its own updates).
   # `|| true` keeps grep's "no match" exit status from tripping `set -euo pipefail`
   # when the only outdated cask is chrome (or nothing is outdated).
   local outdated_casks
   outdated_casks=$(brew outdated --cask --quiet | grep -v '^google-chrome$' || true)
   if [ -n "$outdated_casks" ]; then
-    echo "$outdated_casks" | xargs brew upgrade --cask
+    echo "$outdated_casks" | xargs brew upgrade --cask ||
+      { warn "brew upgrade --cask failed"; brew_failed=1; }
   fi
-  brew cleanup
-  echo -e "${GREEN}✓ Homebrew updated${NC}"
+  brew cleanup || warn "brew cleanup failed"
+  if [[ $brew_failed -eq 0 ]]; then
+    echo -e "${GREEN}✓ Homebrew updated${NC}"
+  else
+    warn "Homebrew only partly updated"
+  fi
 }
 
 # === Update UV and Python tools ===
@@ -42,12 +54,14 @@ update_python() {
   
   if command -v uv &>/dev/null; then
     # Update UV itself. `uv self update` replaces the curl | sh installer.
-    uv self update || echo -e "${YELLOW}⚠️  uv self update failed; uv left as-is${NC}"
+    uv self update || warn "uv self update failed; uv left as-is"
 
     # Update tools installed with UV
-    uv tool upgrade --all
-    
-    echo -e "${GREEN}✓ Python tools updated${NC}"
+    if uv tool upgrade --all; then
+      echo -e "${GREEN}✓ Python tools updated${NC}"
+    else
+      warn "uv tool upgrade --all failed"
+    fi
   else
     echo -e "${RED}✗ UV not found${NC}"
   fi
@@ -58,8 +72,11 @@ update_julia() {
   echo -e "${YELLOW}🔷 Updating Julia...${NC}"
   
   if command -v juliaup &>/dev/null; then
-    juliaup update
-    echo -e "${GREEN}✓ Julia updated${NC}"
+    if juliaup update; then
+      echo -e "${GREEN}✓ Julia updated${NC}"
+    else
+      warn "juliaup update failed"
+    fi
   else
     echo -e "${RED}✗ Juliaup not found${NC}"
   fi
@@ -70,8 +87,11 @@ update_mise() {
   echo -e "${YELLOW}🔧 Updating mise tools...${NC}"
   
   if command -v mise &>/dev/null; then
-    mise upgrade
-    echo -e "${GREEN}✓ Mise tools updated${NC}"
+    if mise upgrade; then
+      echo -e "${GREEN}✓ Mise tools updated${NC}"
+    else
+      warn "mise upgrade failed"
+    fi
   else
     echo -e "${RED}✗ Mise not found${NC}"
   fi
@@ -92,6 +112,8 @@ update_mise() {
 # This runs AFTER update_dotfiles on purpose. The copy modifies the working
 # tree, and update_dotfiles skips `git pull` whenever the tree is dirty. In the
 # other order, every run that syncs a new skill is a run that never pulls.
+# update_pi and update_neovim also write tracked files (pi settings.json and
+# lazy-lock.json), so main() runs them after update_dotfiles for the same reason.
 update_npm_globals() {
   echo -e "${YELLOW}📦 Updating npm global tools...${NC}"
 
@@ -138,8 +160,11 @@ update_pi() {
   echo -e "${YELLOW}🤖 Updating Pi coding agent...${NC}"
 
   if command -v pi &>/dev/null; then
-    pi update --self
-    echo -e "${GREEN}✓ Pi coding agent updated${NC}"
+    if pi update --self; then
+      echo -e "${GREEN}✓ Pi coding agent updated${NC}"
+    else
+      warn "pi update --self failed"
+    fi
   else
     echo -e "${RED}✗ Pi not found${NC}"
   fi
@@ -176,8 +201,11 @@ update_neovim() {
   echo -e "${YELLOW}📝 Updating Neovim plugins...${NC}"
   
   if command -v nvim &>/dev/null; then
-    nvim --headless "+Lazy! sync" +qa
-    echo -e "${GREEN}✓ Neovim plugins updated${NC}"
+    if nvim --headless "+Lazy! sync" +qa; then
+      echo -e "${GREEN}✓ Neovim plugins updated${NC}"
+    else
+      warn "Lazy sync failed"
+    fi
   else
     echo -e "${RED}✗ Neovim not found${NC}"
   fi
@@ -212,21 +240,24 @@ update_dotfiles() {
   local behind
   behind="$(git rev-list --count HEAD..origin/main 2>/dev/null || echo 0)"
 
-  if ! git diff-index --quiet HEAD --; then
+  if ! git diff-index --quiet HEAD -- 2>/dev/null; then
     echo -e "${YELLOW}⚠️  You have uncommitted changes in dotfiles; skipping git pull${NC}"
     if [[ "$behind" -gt 0 ]]; then
       echo -e "${YELLOW}   origin/main is $behind commit(s) ahead. Commit, then run: git pull${NC}"
     fi
   elif [[ "$behind" -gt 0 ]]; then
-    git pull origin main
-    echo -e "${GREEN}✓ Dotfiles updated ($behind commit(s))${NC}"
+    if git pull origin main; then
+      echo -e "${GREEN}✓ Dotfiles updated ($behind commit(s))${NC}"
+    else
+      warn "git pull failed; the dotfiles repo is not updated"
+    fi
   else
     echo -e "${GREEN}✓ Dotfiles already up to date${NC}"
   fi
   
   # Restow all packages
   echo -e "${YELLOW}🔗 Restowing dotfiles...${NC}"
-  ./scripts/stow-all.sh
+  ./scripts/stow-all.sh || warn "stow-all.sh reported failures; run it again and read the ✗ lines"
 }
 
 # === Update LaTeX packages ===
@@ -277,6 +308,12 @@ main() {
   echo
   
   update_homebrew
+  # update_dotfiles runs second. The steps after it write tracked files
+  # (lazy-lock.json, pi settings.json, the hunk skill), and a dirty tree makes
+  # update_dotfiles skip `git pull`. Homebrew runs first so that stow and git
+  # are current before the pull and the restow.
+  update_dotfiles
+  # After the pull, so the drift report reads the newest Brewfile.
   check_brewfile_drift
   update_python
   update_julia
@@ -284,9 +321,6 @@ main() {
   update_pi
   update_neovim
   update_zsh
-  update_dotfiles
-  # After update_dotfiles: it writes into the working tree, and a dirty tree
-  # makes update_dotfiles skip `git pull`.
   update_npm_globals
   update_latex
   

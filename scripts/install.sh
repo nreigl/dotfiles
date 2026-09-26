@@ -36,13 +36,21 @@ install_core_tools() {
   # Install from Brewfile if it exists
   if [ -f "$DOTFILES_DIR/Brewfile" ]; then
     echo -e "${YELLOW}Installing from Brewfile...${NC}"
-    brew bundle --file="$DOTFILES_DIR/Brewfile"
+    # One failed entry makes `brew bundle` exit 1. The usual cause is a `mas`
+    # entry when the App Store is not signed in. Under `set -e` that stopped
+    # the install before uv, mise, and stow ran. Warn and continue instead.
+    if brew bundle --file="$DOTFILES_DIR/Brewfile"; then
+      echo -e "${GREEN}✓ Core tools installed${NC}"
+    else
+      echo -e "${YELLOW}⚠️  brew bundle did not install every Brewfile entry.${NC}"
+      echo -e "${YELLOW}   If the failed entries are mas apps, sign in to the App Store.${NC}"
+      echo -e "${YELLOW}   Then run: brew bundle install --file=$DOTFILES_DIR/Brewfile${NC}"
+    fi
   else
     # Manual installation of essentials
     brew install stow mise starship zoxide fzf fd ripgrep bat eza dust btop
+    echo -e "${GREEN}✓ Core tools installed${NC}"
   fi
-  
-  echo -e "${GREEN}✓ Core tools installed${NC}"
 }
 
 # === Install UV (Python) ===
@@ -76,15 +84,20 @@ setup_julia() {
   fi
 }
 
-# === Configure mise ===
-configure_mise() {
-  echo -e "${YELLOW}🔧 Configuring mise...${NC}"
-  
+# === Install mise tools ===
+# Runs AFTER stow_dotfiles. The stowed mise/.config/mise/config.toml pins the
+# tool versions (node = "22"). Do not add `mise use --global` here: before
+# stow it creates a real ~/.config/mise/config.toml, and that file then
+# blocks the mise package from linking.
+install_mise_tools() {
+  echo -e "${YELLOW}🔧 Installing mise tools...${NC}"
+
   if command -v mise &>/dev/null; then
-    # Keep in sync with mise config (node = "22")
-    mise install node@22
-    mise use node@22 --global
-    echo -e "${GREEN}✓ Mise configured with Node.js 22${NC}"
+    if mise install; then
+      echo -e "${GREEN}✓ mise tools installed from the stowed config${NC}"
+    else
+      echo -e "${YELLOW}⚠️  mise install failed; run it again by hand${NC}"
+    fi
   else
     echo -e "${RED}✗ Mise not found${NC}"
   fi
@@ -144,10 +157,13 @@ stow_dotfiles() {
   # Make scripts executable
   chmod +x scripts/*.sh
   
-  # Run stow-all script
-  ./scripts/stow-all.sh
-  
-  echo -e "${GREEN}✓ Dotfiles stowed${NC}"
+  # stow-all.sh exits 1 if any package fails. Warn and continue, so the
+  # remaining steps still run, but do not claim success.
+  if ./scripts/stow-all.sh; then
+    echo -e "${GREEN}✓ Dotfiles stowed${NC}"
+  else
+    echo -e "${YELLOW}⚠️  Some packages did not stow. Fix the conflicts, then run ./scripts/stow-all.sh${NC}"
+  fi
 }
 
 # === Create necessary directories ===
@@ -173,12 +189,43 @@ configure_macos() {
     echo -e "${YELLOW}🍎 Configuring macOS settings...${NC}"
 
     # macos/.macos is the single source of truth for `defaults write` lines.
-    # It asks for sudo once and restarts Finder and Dock itself.
+    # It asks for sudo once and restarts Finder and Dock itself. It has no
+    # `set -e`, so a failed line does not change its exit status. Treat the
+    # run as best effort and never claim that every setting applied.
     if bash "$DOTFILES_DIR/macos/.macos"; then
-      echo -e "${GREEN}✓ macOS configured${NC}"
+      echo -e "${YELLOW}⚠️  macos/.macos ran. It does not stop on a failed setting,${NC}"
+      echo -e "${YELLOW}   so read its output above for errors.${NC}"
     else
       echo -e "${YELLOW}⚠️  macos/.macos exited with an error; rerun it by hand${NC}"
     fi
+  fi
+}
+
+# === Machine-local git identity ===
+# ~/.gitconfig is an untracked real file that holds user.name and user.email.
+# Git reads it after ~/.config/git/config (tracked), so its keys win, and
+# `git config --global` writes into it instead of into the repo.
+setup_git_identity() {
+  echo -e "${YELLOW}👤 Checking the git identity file...${NC}"
+
+  if [[ -L "$HOME/.gitconfig" ]]; then
+    echo -e "${RED}✗ ~/.gitconfig is a symlink to $(readlink "$HOME/.gitconfig").${NC}"
+    echo -e "${RED}  git config --global would write into that target. Replace the link${NC}"
+    echo -e "${RED}  with a real file, then run install.sh again. Skipping this step.${NC}"
+    return 0
+  fi
+
+  if [[ ! -e "$HOME/.gitconfig" ]]; then
+    touch "$HOME/.gitconfig"
+    echo -e "${GREEN}✓ Created an empty ~/.gitconfig${NC}"
+  else
+    echo -e "${GREEN}✓ ~/.gitconfig exists${NC}"
+  fi
+
+  if ! git config --file "$HOME/.gitconfig" user.name >/dev/null 2>&1; then
+    echo -e "${YELLOW}   No identity is set. Run:${NC}"
+    echo -e "   ${BLUE}git config --global user.name 'Your Name'${NC}"
+    echo -e "   ${BLUE}git config --global user.email 'you@example.com'${NC}"
   fi
 }
 
@@ -194,13 +241,17 @@ main() {
   install_core_tools
   install_uv
   setup_julia
-  configure_mise
-  install_pi
-  install_hunk
   install_zinit
-  
+
   # Stow dotfiles
   stow_dotfiles
+  setup_git_identity
+
+  # After stow: mise reads the tool pins from the stowed config, and pi and
+  # hunk install under the Node that mise installs.
+  install_mise_tools
+  install_pi
+  install_hunk
   
   # macOS specific
   configure_macos
@@ -213,10 +264,10 @@ main() {
   echo -e "${YELLOW}Next steps:${NC}"
   echo -e "1. Restart your terminal or run: ${BLUE}source ~/.zshrc${NC}"
   echo -e "2. Install LazyVim plugins: ${BLUE}nvim${NC} (will auto-install)"
-  # ~/.gitconfig and ~/.config/git/config are both symlinks into this repo, so
-  # `git config --global` would write the identity into a tracked file.
-  echo -e "3. Configure Git: ${BLUE}git config --file ~/.gitconfig.local user.name 'Your Name'${NC}"
-  echo -e "   (and user.email). That file is untracked and included by the tracked config."
+  # ~/.config/git/config is a symlink into this repo. ~/.gitconfig is an
+  # untracked real file, and `git config --global` writes into it.
+  echo -e "3. Configure Git: ${BLUE}git config --global user.name 'Your Name'${NC}"
+  echo -e "   (and user.email). The identity goes into ~/.gitconfig, which is untracked."
   echo -e "4. Test LaTeX: Create a .tex file and use ${BLUE}\\ll${NC} in Neovim"
   echo
   echo -e "${GREEN}Installed tools:${NC}"

@@ -1,3 +1,7 @@
 --target=$HOME
 --verbose=1
 --no-folding
+# Stow reads .stow-local-ignore only inside each package, never at the repo
+# root. Keep repo-wide ignore patterns here. Each --ignore adds to the built-in
+# default list (.git, README.* and LICENSE.* at a package root, and others).
+--ignore=\.DS_Store

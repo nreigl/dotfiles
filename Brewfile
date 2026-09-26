@@ -82,6 +82,9 @@ brew "gh"
 brew "git-delta"
 # Distributed revision control system
 brew "git"
+# Git extension for large files. The git config sets filter.lfs required = true,
+# so a checkout of an LFS repo fails without it
+brew "git-lfs"
 # Render markdown on the CLI
 brew "glow"
 # GNU implementation of the famous stream editor
@@ -406,6 +409,9 @@ cask "zoom", args: { appdir: "/Applications" }
 cask "zotero"
 # Desktop client for the Zulip team chat platform
 cask "zulip"
+# mas entries fail if the App Store is not signed in. install.sh treats a
+# failed `brew bundle` as a warning, so the rest of the install still runs.
+# Sign in to the App Store, then run `brew bundle install` again.
 mas "DigiDoc4", id: 1370791134
 mas "eduVPN", id: 1317704208
 mas "Web eID", id: 1576665083
