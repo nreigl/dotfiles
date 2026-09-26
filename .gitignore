@@ -76,7 +76,6 @@ Thumbs.db
 .netrc
 .pypirc
 aws/.aws/credentials
-docker/.docker/config.json
 gh/.config/gh/hosts.yml
 
 # SSH (keep config, ignore keys)

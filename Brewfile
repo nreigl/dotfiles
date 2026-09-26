@@ -269,7 +269,6 @@ cask "airpass", args: { appdir: "/Applications" }
 # Tools for building Android applications
 cask "android-studio", args: { appdir: "/Applications" }
 # App to build and share containerised applications and microservices
-cask "docker-desktop"
 # Web browser
 cask "firefox", args: { appdir: "/Applications" }
 # Screen colour temperature controller
@@ -428,7 +427,6 @@ vscode "julialang.language-julia"
 vscode "kylebarron.stata-enhanced"
 vscode "mathworks.language-matlab"
 vscode "ms-azuretools.vscode-containers"
-vscode "ms-azuretools.vscode-docker"
 vscode "ms-python.debugpy"
 vscode "ms-python.python"
 vscode "ms-python.vscode-pylance"

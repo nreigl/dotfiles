@@ -149,7 +149,7 @@ Each directory at the root level is a "stow package" containing configs:
 - `Brewfile` - Homebrew package manifest (formulae, casks, Mac App Store apps, and VS Code extensions)
 - `scripts/install.sh` - Main installer
 - `scripts/update.sh` - Update all tools
-- `scripts/stow-all.sh` - Links 29 stow packages (the `PACKAGES` array). `scripts/stow-remove.sh` holds an identical list — update both together. `scripts/doctor.sh` fails if the two lists drift apart or if a listed package is missing
+- `scripts/stow-all.sh` - Links 28 stow packages (the `PACKAGES` array). `scripts/stow-remove.sh` holds an identical list — update both together. `scripts/doctor.sh` fails if the two lists drift apart or if a listed package is missing
 - `mise/.config/mise/config.toml` - Language versions (Node v22, Ruby, Go, Rust, Bun). This is the only mise config; the former root `mise.toml` duplicated the Node pin and was removed on 2026-08-18
 
 ### Tool Stack

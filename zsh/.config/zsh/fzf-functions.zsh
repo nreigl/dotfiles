@@ -101,19 +101,6 @@ fzf-kill-process() {
   fi
 }
 
-# === Docker Integration ===
-# List and manage Docker containers
-fzf-docker() {
-  local container
-  container=$(docker ps -a | sed 1d | \
-    fzf --multi \
-        --preview 'docker inspect {1} | head -80' \
-        --preview-window 'right:60%' \
-        --header 'WARNING: Enter removes the selected containers' | \
-    awk '{print $1}')
-  [[ -n "$container" ]] && docker rm ${(f)container}
-}
-
 # === Homebrew Integration ===
 # Search and install Homebrew packages
 fzf-brew-install() {
@@ -141,7 +128,6 @@ fi
 # === Aliases ===
 alias fgh='fzf-git-history'  # Changed from fh to avoid conflict
 alias fkill='fzf-kill-process'
-alias fdocker='fzf-docker'
 alias fbrew='fzf-brew-install'
 
 # === Enhanced ripgrep integration ===

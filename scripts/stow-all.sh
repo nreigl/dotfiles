@@ -24,7 +24,6 @@ PACKAGES=(
   "aws"
   "claude"
   "cursor"
-  "docker"
   "fzf"
   "gh"
   "ghostty"

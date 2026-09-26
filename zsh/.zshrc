@@ -129,11 +129,6 @@ if [[ -d "/usr/local/texlive" ]]; then
 fi
 
 # === Completion System ===
-# Docker completions must be on fpath before compinit runs.
-if [[ -d "$HOME/.docker/completions" ]]; then
-  fpath=($HOME/.docker/completions $fpath)
-fi
-
 autoload -Uz compinit
 # Ensure ZDOTDIR fallback and use a stable dump path
 ZDOTDIR=${ZDOTDIR:-$HOME}

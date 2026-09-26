@@ -90,7 +90,6 @@ dotfiles/
 ├── aws/              # AWS CLI configuration
 ├── claude/           # Claude Code settings, agents, and skills
 ├── cursor/           # Cursor IDE settings
-├── docker/           # Docker CLI config
 ├── fzf/              # Fuzzy finder configuration
 ├── gh/               # GitHub CLI config
 ├── ghostty/          # Terminal emulator config and shaders

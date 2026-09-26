@@ -168,18 +168,6 @@ fbr() {
   git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
 }
 
-# === Docker Functions ===
-# Docker container shell
-dsh() {
-  docker exec -it "$1" /bin/bash || docker exec -it "$1" /bin/sh
-}
-
-# Docker cleanup
-dclean() {
-  docker system prune -af --volumes
-  echo "Docker cleanup complete"
-}
-
 # === Utility ===
 # Weather for a city
 # Ensure any existing alias doesn't break function definition during reload
