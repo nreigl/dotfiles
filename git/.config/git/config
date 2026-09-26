@@ -1,5 +1,6 @@
-[include]
-  path = ~/.gitconfig.local
+# Machine-local settings and the identity (user.name, user.email) live in
+# ~/.gitconfig. That file is an untracked real file, not a symlink. Git reads
+# it after this file, so its keys win, and `git config --global` writes there.
 [core]
   editor = nvim
   excludesfile = ~/.config/git/ignore
@@ -83,7 +84,7 @@
   autostash = true
 [pager]
   branch = false
-# User configuration is in ~/.gitconfig.local (not tracked)
+# The identity is in ~/.gitconfig (untracked). See the note at the top.
 [pull]
 	rebase = true
 [init]

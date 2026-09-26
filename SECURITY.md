@@ -53,14 +53,25 @@ echo "base64string" | base64 -d
 - Disable `ForwardAgent` unless necessary
 
 ### Git Configuration
+`~/.config/git/config` is tracked in this repo. `~/.gitconfig` is an untracked
+real file that holds the identity and other machine-local keys. Git reads
+`~/.gitconfig` after the XDG file, so its keys win. `git config --global`
+writes into `~/.gitconfig`. If `~/.gitconfig` does not exist, git writes into
+the tracked XDG file instead, so do not delete it. Do not make it a symlink.
+
 ```bash
+# Identity (lands in ~/.gitconfig, not in the repo)
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+
 # Sign commits with GPG
 git config --global commit.gpgsign true
 git config --global user.signingkey YOUR_KEY_ID
-
-# Use SSH for GitHub/GitLab
-git config --global url."git@github.com:".insteadOf "https://github.com/"
 ```
+
+This setup uses HTTPS for GitHub (`gh` sets `git_protocol: https`). If you add
+an SSH key later, you can rewrite GitHub URLs to SSH in `~/.gitconfig`:
+`git config --global url."git@github.com:".insteadOf "https://github.com/"`.
 
 ### Environment Variables
 ```bash
