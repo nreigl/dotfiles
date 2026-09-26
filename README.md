@@ -37,8 +37,9 @@ My personal dotfiles for macOS with state-of-the-art tooling and performance opt
 - **LaTeX**: Full TeXLive distribution with VimTeX integration
 
 ### Window Management
-None. yabai and skhd were both removed on 2026-08-14. Neither was running, and
-`skhdrc` held almost nothing but yabai commands.
+[AeroSpace](https://github.com/nikitabobko/AeroSpace), installed from the
+Brewfile. Its config, `~/.config/aerospace/aerospace.toml`, is not in this
+repo. yabai and skhd were both removed on 2026-08-14.
 
 ## 📦 Installation
 
@@ -118,7 +119,9 @@ dotfiles/
 ```
 
 `scripts/stow-all.sh` holds the authoritative package list. `scripts/doctor.sh`
-fails if that list drifts from what is on disk.
+fails if a listed package directory is missing or if `stow-remove.sh` holds a
+different list. It warns if a top-level directory is not in the list and not
+on its allowlist.
 
 ## 🛠 Usage
 
@@ -137,11 +140,12 @@ SKIP_CHECKS=brewfile ./scripts/doctor.sh
 1 if any check fails. `scripts/update.sh` runs it at the end, because updates
 are when drift appears.
 
-Twelve checks: package-list parity, stow dry run, broken symlinks, git tracking
-of linked files, required binaries and alias targets, referenced repo paths and
-applications, references to removed tools, duplicate shell functions and
-aliases, PATH accretion in `.zshrc`, a superseded TeX Live release, Brewfile
-installation state, and working-tree cleanliness.
+Thirteen checks: package-list parity, stow dry run, broken symlinks, git
+tracking of linked files, the machine-local `~/.gitconfig`, required binaries
+and alias targets, referenced repo paths and applications, references to
+removed tools, duplicate shell functions and aliases, PATH accretion in
+`.zshrc`, a superseded TeX Live release, Brewfile installation state, and
+working-tree cleanliness.
 
 ### Python Development
 ```bash
@@ -193,7 +197,8 @@ export OPENAI_API_KEY="your-key"
 - Television shell integration is intentionally disabled so fzf/fzf-tab keep `Ctrl-T` and Atuin keeps `Ctrl-R`.
 
 ### Git (XDG)
-- Global config at `~/.config/git/config`. There is no `~/.gitconfig`: git reads the XDG path on its own, and a shim there made git parse the same file twice.
+- Global config at `~/.config/git/config` (tracked).
+- Identity and machine-local keys in `~/.gitconfig`, an untracked real file. Git reads it after the XDG file, so its keys win. `git config --global` writes into it. Do not delete it: without it, `--global` writes land in the tracked file. Do not make it a symlink. `install.sh` creates it, and `doctor.sh` warns if it is missing or a symlink.
 - Global ignore file at `~/.config/git/ignore`.
 
 ### Node and Python

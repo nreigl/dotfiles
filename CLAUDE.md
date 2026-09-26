@@ -21,11 +21,12 @@ read-only and exits 1 if any check fails. `--quiet` prints problems only.
 `SKIP_CHECKS=name1,name2` mutes named checks. `scripts/update.sh` runs it at
 the end and never fails the update because of it.
 
-Twelve checks: package-list parity, stow dry run, broken symlinks, git
-tracking of linked files, required binaries and alias targets, referenced
-repo paths and applications, references to removed tools, duplicate shell
-functions and aliases, PATH accretion in `.zshrc`, a superseded TeX Live
-release, Brewfile installation state, and working-tree cleanliness.
+Thirteen checks: package-list parity, stow dry run, broken symlinks, git
+tracking of linked files, the machine-local `~/.gitconfig`, required binaries
+and alias targets, referenced repo paths and applications, references to
+removed tools, duplicate shell functions and aliases, PATH accretion in
+`.zshrc`, a superseded TeX Live release, Brewfile installation state, and
+working-tree cleanliness.
 
 **Writing scripts in this repo: use `command rm`, `command cp`, `command mv`.**
 `aliases.zsh` maps all three to their `-i` form. In a non-interactive shell the
@@ -138,16 +139,16 @@ Each directory at the root level is a "stow package" containing configs:
 - `nvim/` - Neovim/LazyVim config (→ `~/.config/nvim/`)
 - `latex/` - Global latexmk config (→ `~/.latexmkrc`). Load-bearing for the LaTeX setup: it selects the engine (`$pdf_mode = 4`, lualatex) and the build directory (`$out_dir = 'build'`) for VimTeX, latexmk, and texlab at once. Do not move these two settings into `vimtex.lua` — texlab reads only this file. Also holds the biber setting and the glossaries dependency
 - `zsh/` - Shell config (→ `~/`). `.zshrc` sources three files from `.config/zsh/`: `aliases.zsh`, `functions.zsh`, `fzf-functions.zsh`. New aliases and shell functions go in one of those three. Nothing else in this package is sourced
-- `git/` - Global git config and gitignore (→ `~/`)
+- `git/` - Global git config and gitignore (→ `~/.config/git/`). The identity lives in `~/.gitconfig`, an untracked real file that is not a symlink. Git reads it after the XDG file, so its keys win, and `git config --global` writes into it. If `~/.gitconfig` is missing, `--global` writes land in the tracked file. `install.sh` creates it and refuses to continue that step if it is a symlink. `doctor.sh` warns if it is missing or a symlink
 - `mise/` - Version manager config (→ `~/`)
 - `tmux/` - Terminal multiplexer config (→ `~/`)
 - `ssh/`, `aws/` - Security configs (→ `~/.ssh/`, `~/.aws/`)
 - `raycast/` - **Not stowed.** Raycast keeps its settings in an encrypted SQLite database, so hotkeys and extension settings cannot live in this repository. The package holds only `scripts/` (script commands) and `install-extensions.sh`. Point Raycast at the scripts through Settings → Extensions → + → Add Script Directory. See `raycast/README.md`
 
 ### Key Configuration Files
-- `Brewfile` - Homebrew package manifest (480+ packages)
-- `scripts/install.sh` - Main installer (lines 1-198)
-- `scripts/update.sh` - Update all tools (lines 1-158)
+- `Brewfile` - Homebrew package manifest (formulae, casks, Mac App Store apps, and VS Code extensions)
+- `scripts/install.sh` - Main installer
+- `scripts/update.sh` - Update all tools
 - `scripts/stow-all.sh` - Links 29 stow packages (the `PACKAGES` array). `scripts/stow-remove.sh` holds an identical list — update both together. `scripts/doctor.sh` fails if the two lists drift apart or if a listed package is missing
 - `mise/.config/mise/config.toml` - Language versions (Node v22, Ruby, Go, Rust, Bun). This is the only mise config; the former root `mise.toml` duplicated the Node pin and was removed on 2026-08-18
 
@@ -160,7 +161,7 @@ Each directory at the root level is a "stow package" containing configs:
 - **File manager**: yazi (`y` wrapper); superfile on trial (`sf` wrapper). Both cd the shell to the last directory on exit
 - **Launcher**: Raycast (Alfred removed 2026-08-14 — the Powerpack came from a patched build, and a Homebrew update replaced it with the official one). Raycast free covers clipboard history, snippets, quicklinks, and script commands. It does not sync settings between machines
 - **Screenshots**: Shottr (free for personal use, includes OCR and scrolling capture)
-- **Window Management**: none. yabai and skhd both removed 2026-08-14 — neither was running, and `skhdrc` was almost entirely yabai commands
+- **Window Management**: AeroSpace (`cask "aerospace"` in the Brewfile). Its config, `~/.config/aerospace/aerospace.toml`, is not in this repo. yabai and skhd were removed 2026-08-14 — neither was running, and `skhdrc` was almost entirely yabai commands
 
 ## Important Notes
 
@@ -273,7 +274,8 @@ pdflatex manuscript.tex && biber manuscript && pdflatex manuscript.tex
 
 **Configuration:**
 - Files: `nvim/.config/nvim/lua/plugins/vimtex.lua` and `tex-citations.lua`
-- nvim-cmp enabled for .tex files only (not blink.cmp)
+- The `coding.nvim-cmp` extra in `lazyvim.json` enables nvim-cmp for every filetype and disables blink.cmp
+- `tex-citations.lua` adds the `cmp-vimtex` source for tex, plaintex, and bib files only
 - Omni-completion fallback: `<C-Space>` in insert mode
 
 ### Troubleshooting LaTeX
