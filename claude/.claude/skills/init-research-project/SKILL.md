@@ -1,7 +1,7 @@
 ---
 name: init-research-project
 description: "Use when creating a new empirical research project from nothing: directory layout, central spec config, staleness detection, Makefile pipeline, and version control. Skip for an existing project, where adding files would fight the conventions already in place."
-argument-hint: [project name]
+argument-hint: "[project name]"
 ---
 
 # Initialize Research Project

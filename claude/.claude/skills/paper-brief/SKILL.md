@@ -1,7 +1,7 @@
 ---
 name: paper-brief
 description: Produces a one-page PDF brief of an academic economics paper from a PDF URL or a filepath. Six fixed sections, written so an economics PhD outside the subfield can follow the strategy and the result. Use when the user asks for a brief, a summary, or a read of one economics paper, and when the user prepares for a seminar, a department visit, or a meeting with a visiting author. The output is always a one-page PDF file, so say so before you start if the user only asked for a summary.
-argument-hint: [PDF URL or filepath]
+argument-hint: "[PDF URL or filepath]"
 ---
 
 # Paper Brief

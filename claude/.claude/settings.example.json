@@ -29,8 +29,6 @@
       "Bash(R CMD:*)",
       "Bash(quarto:*)",
       "Bash(uv:*)",
-      "Bash(python:*)",
-      "Bash(python3:*)",
       "Bash(ruff:*)",
       "Bash(mypy:*)",
       "Bash(pytest:*)",
@@ -38,7 +36,6 @@
       "Bash(juliaup:*)",
       "Bash(/Applications/MATLAB_RXXXXx.app/bin/matlab:*)",
       "Bash(mise:*)",
-      "Bash(node:*)",
       "Bash(npm:*)",
       "Bash(go:*)",
       "Bash(cargo:*)",
@@ -76,19 +73,12 @@
       "Bash(awk:*)",
       "Bash(sed:*)",
       "Bash(tr:*)",
-      "Bash(xargs:*)",
-      "Bash(perl:*)",
       "Bash(jq:*)",
       "Bash(curl:*)",
-      "Bash(timeout:*)",
-      "Bash(env:*)",
       "Bash(file:*)",
       "Bash(readlink:*)",
-      "Bash(command:*)",
       "Bash(test:*)",
       "Bash(echo:*)",
-      "Bash(bash:*)",
-      "Bash(source:*)",
       "Bash(eza:*)",
       "Bash(bat:*)",
       "Bash(fd:*)",
@@ -117,9 +107,18 @@
       "Edit(~/.ssh/**)",
       "Edit(~/.aws/credentials)",
       "Bash(git push --force:*)",
+      "Bash(git push* -f*)",
+      "Bash(git push* --force*)",
+      "Bash(git push* +*)",
       "Bash(git reset --hard:*)",
       "Bash(rm -rf ~:*)",
       "Bash(rm -rf /:*)",
+      "Bash(rm -fr ~:*)",
+      "Bash(rm -fr /:*)",
+      "Bash(rm -Rf ~:*)",
+      "Bash(rm -Rf /:*)",
+      "Bash(rm -r -f ~:*)",
+      "Bash(rm -r -f /:*)",
       "Bash(sudo rm:*)"
     ],
     "defaultMode": "auto"
@@ -132,20 +131,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '🎯 Claude Code session started in $(pwd)'",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "echo '📝 Writing file...'",
-            "timeout": 2
+            "command": "bash \"$HOME/.claude/hooks/herdr-agent-state.sh\" session",
+            "timeout": 10
           }
         ]
       }
