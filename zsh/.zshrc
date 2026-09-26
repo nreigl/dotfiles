@@ -150,6 +150,9 @@ zcompdump="$ZDOTDIR/.zcompdump"
     compinit -C -d "$zcompdump"
   fi
 }
+# zoxide registers its completion for z only if compdef exists, and zoxide
+# init runs before compinit. Register it here.
+(( $+functions[__zoxide_z_complete] )) && compdef __zoxide_z_complete z
 
 # Completion styling
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
