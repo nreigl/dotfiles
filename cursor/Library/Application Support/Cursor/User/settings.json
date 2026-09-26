@@ -32,7 +32,7 @@
     },
     "python.languageServer": "Jedi",
     "telemetry.enableCrashReporter": false,
-    "telemetry.enableTelemetry": false,
+    "telemetry.telemetryLevel": "off",
     "terminal.external.osxExec": "Ghostty.app",
     "typescript.updateImportsOnFileMove.enabled": "always",
     "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
@@ -41,7 +41,7 @@
     "workbench.statusBar.visible": true,
     "workbench.activityBar.location": "default",
     "r.lsp.enabled": true,
-    "r.lsp.path": "/usr/local/bin/R",
+    "r.rpath.mac": "/usr/local/bin/R",
     "r.rterm.mac": "/usr/local/bin/R",
     "r.bracketedPaste": true,
     "r.plot.useHttpgd": true,
@@ -54,8 +54,9 @@
         "editor.defaultFormatter": "REditorSupport.r",
         "editor.tabSize": 2
     },
-    "matlab.mlintpath": "/Applications/MATLAB_R2024b.app/bin/maca64/mlint",
-    "matlab.matlabpath": "/Applications/MATLAB_R2024b.app/bin/matlab",
+    "MATLAB.installPath": "/Applications/MATLAB_R2024b.app",
+    "MATLAB.indexWorkspace": true,
+    "MATLAB.telemetry": false,
     "[matlab]": {
         "files.encoding": "utf8",
         "editor.tabSize": 4
@@ -66,7 +67,6 @@
     ],
     "chatgpt.openOnStartup": true,
     "workbench.activityBar.orientation": "vertical",
-    "claudeCode.selectedModel": "claude-opus-4-5-20251101",
     "workbench.sideBar.location": "right",
     "claudeCode.preferredLocation": "panel",
     "go.toolsManagement.autoUpdate": true,
