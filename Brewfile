@@ -40,8 +40,6 @@ brew "deno"
 brew "diffutils"
 # Load/unload environment variables based on $PWD
 brew "direnv"
-# Pack, ship and run any application as a lightweight container
-brew "docker", link: false
 # More intuitive version of du in rust
 brew "btop"
 brew "duf"
