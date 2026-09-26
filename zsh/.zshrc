@@ -62,28 +62,10 @@ fi
 source "${ZINIT_HOME}/zinit.zsh"
 
 # === Fast Plugin Loading ===
-# Pre-declare FZF custom widgets to prevent zsh-syntax-highlighting errors
-# These widgets are fully defined in $XDG_CONFIG_HOME/zsh/fzf-functions.zsh (loaded later)
-# but must be declared here before syntax highlighting plugin loads
-zle -N fzf-git-files
-zle -N fzf-git-branch
-zle -N fzf-file-preview
-zle -N fzf-my-cd-widget
-
-# Load essential plugins first
-zinit light zsh-users/zsh-autosuggestions
+# zsh-completions adds to fpath, so it loads before compinit.
+# fzf-tab, autosuggestions and syntax highlighting load in turbo mode after
+# compinit (see the Completion System section).
 zinit light zsh-users/zsh-completions
-zinit light zsh-users/zsh-history-substring-search
-
-# Load alias-tips to show available aliases
-zinit light djui/alias-tips
-
-# Load syntax highlighting last (requires widgets to be declared first)
-zinit light zdharma-continuum/fast-syntax-highlighting
-
-# Set key bindings for history-substring-search
-bindkey '^[[A' history-substring-search-up
-bindkey '^[[B' history-substring-search-down
 
 # Additional useful plugins (loaded async)
 zinit wait lucid for \
@@ -105,11 +87,16 @@ command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
 
 # Zoxide (smart cd)
 command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
+# zinit defines `alias zi=zinit`, which hides the zi function of zoxide.
+unalias zi 2>/dev/null
 
 # === FZF Configuration ===
 # Set before key-bindings.zsh loads, so the widgets see it.
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+# FZF_ALT_C_* drive fzf's own fzf-cd-widget only. In the emacs keymap, Alt-C
+# runs fzf-my-cd-widget (fzf-functions.zsh), which ignores them. The vi
+# keymaps keep the fzf widget.
 export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
 # Previews for fzf's own Ctrl-T and Alt-C widgets
 export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always --line-range :500 {} 2>/dev/null || sed -n \"1,200p\" {}'"
@@ -125,7 +112,10 @@ fi
 [[ -f "$XDG_CONFIG_HOME/fzf/fzf.zsh" ]] && source "$XDG_CONFIG_HOME/fzf/fzf.zsh"
 
 # Atuin (smart, syncable shell history + Ctrl-R UI)
-# Init after FZF so Atuin's Ctrl-R takes precedence
+# Init after FZF so Atuin's Ctrl-R takes precedence.
+# Atuin puts its own strategy in front of this list. Autosuggestions loads
+# later (turbo mode), so set the history fallback here.
+ZSH_AUTOSUGGEST_STRATEGY=(history)
 command -v atuin >/dev/null 2>&1 && eval "$(atuin init zsh)"
 
 # === LaTeX Configuration ===
@@ -139,11 +129,27 @@ if [[ -d "/usr/local/texlive" ]]; then
 fi
 
 # === Completion System ===
+# Docker completions must be on fpath before compinit runs.
+if [[ -d "$HOME/.docker/completions" ]]; then
+  fpath=($HOME/.docker/completions $fpath)
+fi
+
 autoload -Uz compinit
 # Ensure ZDOTDIR fallback and use a stable dump path
 ZDOTDIR=${ZDOTDIR:-$HOME}
 zcompdump="$ZDOTDIR/.zcompdump"
-compinit -d "$zcompdump"
+# Do the full check (compaudit and a new dump) once per day only. On other
+# starts, -C reads the dump as it is. If you add a completion file to fpath,
+# delete the dump to see it before the next full check.
+() {
+  setopt local_options extended_glob
+  if [[ -n $zcompdump(#qN.mh+24) ]]; then
+    compinit -d "$zcompdump"
+    touch "$zcompdump"
+  else
+    compinit -C -d "$zcompdump"
+  fi
+}
 
 # Completion styling
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
@@ -152,8 +158,15 @@ zstyle ':completion:*' menu select
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*:descriptions' format '%F{green}-- %d --%f'
 
-# fzf-tab: FZF-powered completion UI (load after compinit)
-zinit light Aloxaf/fzf-tab
+# Interactive plugins in turbo mode. They load in this order after the first
+# prompt. fzf-tab needs compinit, and it must load before the plugins that
+# wrap widgets. Syntax highlighting loads last, after all widgets exist.
+# atload starts autosuggestions, because its precmd hook has already run.
+zinit wait lucid for \
+    Aloxaf/fzf-tab \
+  atload'_zsh_autosuggest_start' \
+    zsh-users/zsh-autosuggestions \
+    zdharma-continuum/fast-syntax-highlighting
 # Minimal but useful fzf-tab styles
 zstyle ':fzf-tab:*' use-fzf-default-opts yes
 zstyle ':fzf-tab:*' extended-search yes
@@ -210,11 +223,6 @@ bindkey '^[[F' end-of-line
 # fill it in. Never commit the filled-in file.
 [[ -f "$HOME/.zsh_secrets" ]] && source "$HOME/.zsh_secrets"
 
-# === Docker Completions ===
-if [[ -d "$HOME/.docker/completions" ]]; then
-  fpath=($HOME/.docker/completions $fpath)
-fi
-
 # === GitHub Copilot CLI ===
 # New `gh copilot` is an agentic assistant; it no longer exposes `alias`.
 # Wrap `-p` (one-shot prompt) to reproduce the old ghcs/ghce UX.
@@ -254,8 +262,14 @@ z() {
           --preview 'eza --tree --level=2 --icons=always {2..}' \
           --bind 'enter:become:echo {2..}')
     [[ -n "$dir" ]] && cd "$dir"
+  elif [[ $# -eq 1 && ( "$1" == - || -d "$1" ) ]]; then
+    # `z -`, `z ..` and `z /path` change directory without a zoxide query.
+    cd -- "$1"
   else
-    cd "$(zoxide query "$@")"
+    local dir
+    dir=$(zoxide query -- "$@") || return
+    [[ -n "$dir" ]] || return 1
+    cd -- "$dir"
   fi
 }
 

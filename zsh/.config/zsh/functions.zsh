@@ -58,8 +58,9 @@ backup() {
     echo "Usage: backup <file>"
     return 1
   fi
-  cp "$1" "$1.bak.$(date +%Y%m%d_%H%M%S)"
-  echo "Backed up to: $1.bak.$(date +%Y%m%d_%H%M%S)"
+  local dest="$1.bak.$(date +%Y%m%d_%H%M%S)"
+  cp "$1" "$dest"
+  echo "Backed up to: $dest"
 }
 
 # Find and replace a literal string in files. Both arguments are treated as

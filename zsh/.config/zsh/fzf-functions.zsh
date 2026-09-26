@@ -22,7 +22,7 @@ fzf-git-branch() {
   zle && zle reset-prompt
 }
 
-# Ctrl-H: Search git commit history
+# Search git commit history (alias: fgh)
 fzf-git-history() {
   git log --graph --color=always \
     --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
@@ -54,8 +54,8 @@ fzf-file-preview() {
 # the parent folder of that file. Use `z` for a folder outside this tree.
 # Named fzf-my-cd-widget so it does not shadow fzf's own fzf-cd-widget.
 fzf-my-cd-widget() {
-  local sel preview
-  # fzf runs the preview through sh, so the folder test lives in the string.
+  local sel preview target
+  # fzf runs the preview through $SHELL, so the folder test lives in the string.
   preview='if [ -d {} ]; then
              command -v eza >/dev/null 2>&1 && eza --tree --level=2 --icons=always {} || ls -lah {}
            else
@@ -65,19 +65,29 @@ fzf-my-cd-widget() {
     command find . \( -type d -o -type f \) -not -path '*/.git/*' 2>/dev/null) | \
     fzf --preview "$preview" \
         --header 'Enter: cd to the folder, or to the parent folder of the file')
-  # ${sel:h} is the zsh head modifier. It returns the parent path.
-  # Keep the branches separate. An `&& ... || ...` chain would fall through to
-  # the parent folder when cd into an unreadable folder fails.
-  if [[ -d "$sel" ]]; then
-    cd "$sel"
-  elif [[ -n "$sel" ]]; then
-    cd "${sel:h}"
+  if [[ -z "$sel" ]]; then
+    zle reset-prompt
+    return 0
   fi
-  zle && zle reset-prompt
+  # ${sel:h} is the zsh head modifier. It returns the parent path.
+  if [[ -d "$sel" ]]; then
+    target=$sel
+  else
+    target=${sel:h}
+  fi
+  # Run cd as a command line, the same as fzf's own widget. Output from chpwd
+  # hooks (direnv) then does not overwrite the editor, and the cd goes into
+  # history. push-line saves the current line, and the next prompt restores it.
+  zle push-line
+  BUFFER="builtin cd -- ${(q)target:a}"
+  zle accept-line
+  local ret=$?
+  zle reset-prompt
+  return $ret
 }
 
 # === Process Management ===
-# Ctrl-P: Kill process
+# Kill processes (alias: fkill)
 fzf-kill-process() {
   local pid
   pid=$(ps -ef | sed 1d | \
@@ -101,14 +111,14 @@ fzf-docker() {
         --preview-window 'right:60%' \
         --header 'WARNING: Enter removes the selected containers' | \
     awk '{print $1}')
-  [[ -n "$container" ]] && docker rm $container
+  [[ -n "$container" ]] && docker rm ${(f)container}
 }
 
 # === Homebrew Integration ===
 # Search and install Homebrew packages
 fzf-brew-install() {
   local inst=$(brew formulae | fzf --multi --preview 'brew info {}')
-  [[ -n "$inst" ]] && brew install $inst
+  [[ -n "$inst" ]] && brew install ${(f)inst}
 }
 
 # === Keybindings ===
@@ -166,7 +176,7 @@ fe() {
   local files
   files=$( ( (command -v fd >/dev/null 2>&1 && fd "${1:-.}" --type f --hidden --follow --exclude .git) || \
     rg --files --hidden --follow -g '!*.git/*') | fzf --multi --preview 'command -v bat >/dev/null 2>&1 && bat --style=numbers --color=always {} || sed -n "1,200p" {}')
-  [[ -n "$files" ]] && ${EDITOR:-nvim} $files
+  [[ -n "$files" ]] && ${EDITOR:-nvim} ${(f)files}
 }
 
 # === Enhanced History Search ===
@@ -187,7 +197,7 @@ fnpm() {
   if [[ -f package.json ]]; then
     local script
     script=$(jq -r '.scripts | keys[]' package.json 2>/dev/null | \
-      fzf --preview "cat package.json | jq -r '.scripts.\\"{}\\"'" \
+      fzf --preview "jq -r --arg s {} '.scripts[\$s]' package.json" \
           --preview-window=up:3:wrap \
           --header='Select npm script to run')
     [[ -n "$script" ]] && npm run "$script"
@@ -200,13 +210,12 @@ fnpm() {
 # Quick SSH into hosts from ~/.ssh/config
 fssh() {
   local host
-  # `command` bypasses the grep=rg alias. rg rejects "*" as a regex.
   host=$(command grep "^Host " ~/.ssh/config 2>/dev/null | \
     cut -d" " -f2- | \
     tr ' ' '\n' | \
     command grep -v '[*?]' | \
     sort -u | \
-    fzf --preview 'grep -A 5 "^Host {}" ~/.ssh/config' \
+    fzf --preview 'grep -A 5 "^Host "{} ~/.ssh/config' \
         --preview-window=up:10:wrap)
   [[ -n "$host" ]] && ssh "$host"
 }

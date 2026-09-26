@@ -5,7 +5,7 @@ if command -v eza &>/dev/null; then
   alias ls='eza --icons --group-directories-first'
   alias ll='eza -la --icons --group-directories-first'
   alias la='eza -la --icons --group-directories-first'
-  alias lt='eza --tree --level=2 --icons=auto'
+  alias lt='eza --tree --level=2 --icons'
   alias l='eza -l --icons --group-directories-first'
 else
   alias ll='ls -la'
