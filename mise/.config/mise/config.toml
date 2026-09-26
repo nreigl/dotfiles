@@ -10,6 +10,9 @@ bun = "latest"
 
 [settings]
 experimental = true
-legacy_version_file = true  # Support .nvmrc, .ruby-version, etc.
+# Read idiomatic version files (.nvmrc and .node-version, .ruby-version,
+# .go-version) for these tools. It replaces the deprecated legacy_version_file.
+# The default list is empty, and then mise reads no idiomatic file.
+idiomatic_version_file_enable_tools = ["node", "ruby", "go"]
 always_keep_download = false
 jobs = 4

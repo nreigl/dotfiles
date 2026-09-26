@@ -134,16 +134,17 @@ defaults write NSGlobalDomain KeyRepeat -int 2
 defaults write NSGlobalDomain InitialKeyRepeat -int 15
 
 # Set language and text formats
-defaults write NSGlobalDomain AppleLanguages -array "en"
-defaults write NSGlobalDomain AppleLocale -string "en_US@currency=USD"
-defaults write NSGlobalDomain AppleMeasurementUnits -string "Inches"
-defaults write NSGlobalDomain AppleMetricUnits -bool false
+# These values match this machine: English, Estonian region formats, metric.
+defaults write NSGlobalDomain AppleLanguages -array "en-EE"
+defaults write NSGlobalDomain AppleLocale -string "en_EE"
+defaults write NSGlobalDomain AppleMeasurementUnits -string "Centimeters"
+defaults write NSGlobalDomain AppleMetricUnits -bool true
 
 # Show language menu in the top right corner of the boot screen
 sudo defaults write /Library/Preferences/com.apple.loginwindow showInputMenu -bool true
 
-# Set the timezone; see `sudo systemsetup -listtimezones` for other values
-sudo systemsetup -settimezone "America/New_York" > /dev/null
+# The time zone is not set here. macOS sets it from the location
+# (System Settings > General > Date & Time > Set time zone automatically).
 
 ###############################################################################
 # Energy saving                                                               #
@@ -170,14 +171,10 @@ sudo pmset -b sleep 5
 # Set standby delay to 24 hours (default is 1 hour)
 sudo pmset -a standbydelay 86400
 
-# Never go into computer sleep mode
-sudo systemsetup -setcomputersleep Off > /dev/null
-
-# Hibernation mode
-# 0: Disable hibernation (speeds up entering sleep mode)
-# 3: Copy RAM to disk so the system state can still be restored in case of a
-#    power failure.
-sudo pmset -a hibernatemode 0
+# No `systemsetup -setcomputersleep Off` here: it sets sleep to never for all
+# power sources and overrides the 5-minute battery sleep above.
+# No `pmset -a hibernatemode` here: keep the macOS default (3 on laptops), which
+# copies RAM to disk so the state survives a power failure.
 
 ###############################################################################
 # Screen                                                                      #
@@ -187,7 +184,9 @@ sudo pmset -a hibernatemode 0
 defaults write com.apple.screensaver askForPassword -int 1
 defaults write com.apple.screensaver askForPasswordDelay -int 0
 
-# Save screenshots to the desktop
+# Save screenshots to ~/Desktop/screenshots. screencapture does not create the
+# folder, and it falls back to the Desktop if the folder is missing.
+mkdir -p "${HOME}/Desktop/screenshots"
 defaults write com.apple.screencapture location -string "${HOME}/Desktop/screenshots"
 
 # Save screenshots in PNG format (other options: BMP, GIF, JPG, PDF, TIFF)
@@ -586,11 +585,11 @@ defaults write com.twitter.twitter-mac HideInBackground -bool true
 # Kill affected applications                                                  #
 ###############################################################################
 
+# Google Chrome and Messages are not in this list. Their settings above apply
+# at the next launch, and a forced quit can lose open work.
 for app in "Activity Monitor" \
 	"Dock" \
 	"Finder" \
-	"Google Chrome" \
-	"Messages" \
 	"SystemUIServer" \
 	"Transmission" \
     "Twitter"; do

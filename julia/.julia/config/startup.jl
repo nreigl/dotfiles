@@ -7,8 +7,8 @@ if isfile("Project.toml") && isfile("Manifest.toml")
     Pkg.activate(".")
 end
 
-# Set number of threads
-ENV["JULIA_NUM_THREADS"] = "auto"
+# Do not set JULIA_NUM_THREADS here. Julia reads it before startup.jl runs,
+# so a value set here has no effect. Export it in the shell environment.
 
 # Better error messages
 ENV["JULIA_STACKTRACE_MINIMAL"] = false

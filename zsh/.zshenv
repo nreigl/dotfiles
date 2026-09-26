@@ -9,6 +9,8 @@ export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/config"
+# Julia reads this before startup.jl runs, so it must be set here.
+export JULIA_NUM_THREADS="${JULIA_NUM_THREADS:-auto}"
 
 # Editors and pager
 export EDITOR="nvim"
