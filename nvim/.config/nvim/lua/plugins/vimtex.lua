@@ -162,6 +162,16 @@ return {
               -- chktex is off on both events by default, so it never runs.
               -- Run it on open and save, but not on every keystroke.
               chktex = { onOpenAndSave = true, onEdit = false },
+              -- :LspTexlabBuild is the only path that uses these args. The
+              -- texlab default starts with "-pdf", which forces pdflatex over
+              -- $pdf_mode = 4. Give no engine flag, so latexmk reads the engine
+              -- and $out_dir from ~/.latexmkrc. onSave and forwardSearchAfter
+              -- stay false, so VimTeX remains the only automatic compiler.
+              build = {
+                args = { "-interaction=nonstopmode", "-synctex=1", "%f" },
+                onSave = false,
+                forwardSearchAfter = false,
+              },
             },
           },
         },

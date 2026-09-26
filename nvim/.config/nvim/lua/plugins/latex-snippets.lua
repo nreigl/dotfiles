@@ -39,12 +39,25 @@ return {
         return not in_mathzone()
       end
 
+      -- not_escaped() wraps a condition. It rejects a trigger that follows an
+      -- unescaped backslash. wordTrig treats "\" as a word boundary, so
+      -- without this test "\sum" becomes "\\sum_{i=1}^{N}" and "\;d" becomes
+      -- "\\delta". An even run of backslashes is a line break ("\\"), so the
+      -- trigger still fires after it.
+      local function not_escaped(cond)
+        return function(line_to_cursor, matched_trigger, captures)
+          local before = line_to_cursor:sub(1, #line_to_cursor - #matched_trigger)
+          local run = #before:match("\\*$")
+          return run % 2 == 0 and cond(line_to_cursor, matched_trigger, captures)
+        end
+      end
+
       -- Shorthands ----------------------------------------------------------
       -- auto() marks a snippet as an autosnippet and attaches a condition.
       -- wordTrig stays on for word-like triggers, so that "stuff" does not turn
       -- into "stu\frac{}{}".
       local function auto(trig, nodes, cond)
-        return s({ trig = trig, snippetType = "autosnippet", condition = cond }, nodes)
+        return s({ trig = trig, snippetType = "autosnippet", condition = not_escaped(cond) }, nodes)
       end
 
       -- post() is for triggers that attach to the symbol in front of them:
@@ -55,7 +68,7 @@ return {
           trig = trig,
           wordTrig = false,
           snippetType = "autosnippet",
-          condition = cond,
+          condition = not_escaped(cond),
         }, nodes)
       end
 
@@ -150,8 +163,13 @@ return {
         -- Use td and type -1.
 
         -- Subscript a digit that follows a letter or a closing bracket:
-        -- x1 becomes x_{1}, \beta2 becomes \beta_{2}.
-        re("([%a%)%]%}])(%d)", fmt("<>_{<>}", { cap(1), cap(2) }, d), in_mathzone),
+        -- x1 becomes x_{1}, \beta2 becomes \beta_{2}. "}" is not in the class.
+        -- If it were, the second digit of x10 would open a second subscript
+        -- and give x_{1}_{0}.
+        re("([%a%)%]])(%d)", fmt("<>_{<>}", { cap(1), cap(2) }, d), in_mathzone),
+        -- A digit typed directly after a numeric subscript extends it:
+        -- x_{1} then 0 gives x_{10}.
+        re("_{(%d+)}(%d)", fmt("_{<><>}", { cap(1), cap(2) }, d), in_mathzone),
 
         -- Postfix accents: xbar becomes \bar{x}.
         -- Group 1 is the character in front of the name and is re-emitted
