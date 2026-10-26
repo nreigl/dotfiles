@@ -163,3 +163,6 @@ sf() {
 #   ghostty +validate-config                 check a config before reloading
 #   ghostty +show-config --default --docs    every setting with its default
 alias ghostty="/Applications/Ghostty.app/Contents/MacOS/ghostty"
+# A second Ghostty instance with the light, high-contrast teaching overlay.
+# cheat: ghostty-teach   Ghostty: open a light window for teaching
+alias ghostty-teach='open -na Ghostty.app --args --config-file="$HOME/.config/ghostty/teaching"'
