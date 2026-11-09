@@ -11,7 +11,7 @@ My personal dotfiles for macOS with state-of-the-art tooling and performance opt
 - **Shell**: ZSH with [Zinit](https://github.com/zdharma-continuum/zinit) plugin manager
 - **Prompt**: [Starship](https://starship.rs/) - blazing fast, customizable prompt
 - **Editor**: [Neovim](https://neovim.io/) with [LazyVim](https://www.lazyvim.org/) distribution
-- **Multiplexer**: [herdr](https://github.com/herdr-dev/herdr) for coding agents; tmux via the `tm` alias
+- **Multiplexer**: [herdr](https://github.com/herdr-dev/herdr) for coding agents; tmux via the `tm` alias; [tuios](https://tuios.dev/) on trial
 - **File manager**: [yazi](https://yazi-rs.github.io/) (`y`); [superfile](https://superfile.dev/) on trial (`sf`)
 - **Launcher**: [Raycast](https://raycast.com/) (not stowed - settings live in an encrypted database)
 - **Screenshots**: [Shottr](https://shottr.cc/)
@@ -112,6 +112,7 @@ dotfiles/
 ├── texmf/            # LaTeX beamer theme
 ├── tmux/             # Terminal multiplexer
 ├── tuicr/            # Code review TUI (writes the review)
+├── tuios/            # Multiplexer and window manager (on trial)
 ├── vscode/           # VS Code settings
 ├── yazi/             # Terminal file manager
 └── zsh/              # ZSH shell configuration

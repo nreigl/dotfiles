@@ -134,6 +134,7 @@ Each directory at the root level is a "stow package" containing configs:
 - `herdr/` - Terminal multiplexer for coding agents (→ `~/.config/herdr/`)
 - `hunk/` - Diff viewer for agent-authored changesets (→ `~/.config/hunk/`). Read-only: hunk has no export path. `theme` is the only theme key it reads
 - `tuicr/` - Code review TUI (→ `~/.config/tuicr/`). The write half that hunk lacks: comment on lines, then copy the review with `y` or `:clip`
+- `tuios/` - Terminal multiplexer and window manager, on trial (→ `~/.config/tuios/`). Only `config.toml` is stowed. tuios writes `themes/` next to it, so `~/.config/tuios/` must be a real directory before stow runs. `install.sh` creates it. Settings-page and `tuios set-config` writes go through the symlink into the repo file. The leader is Ctrl+A with `preset = "tmux"`, the same keys as tmux and herdr. Do not run tuios inside herdr or tmux, because the outer one takes Ctrl+A first. Keep `option_glyphs = "type"`: on the Austrian layout `|` and `[` need Option, and without it tuios runs the Alt binding (Option+7 switches to workspace 7). zsh completion comes with the Homebrew formula
 - `yazi/` - Terminal file manager (→ `~/.config/yazi/`). Keep `yazi.toml` minimal: yazi merges it over built-in presets, and copying the full default config breaks on every release
 - `superfile/` - Second terminal file manager, on trial (→ `~/.config/superfile/`). Only `config.toml` is stowed. Keep it minimal and keep `ignore_missing_fields = true`, which silences the warning about absent fields. `hotkeys.toml` and `theme/` stay unstowed because superfile rewrites them on upgrade
 - `nvim/` - Neovim/LazyVim config (→ `~/.config/nvim/`)
@@ -149,7 +150,7 @@ Each directory at the root level is a "stow package" containing configs:
 - `Brewfile` - Homebrew package manifest (formulae, casks, Mac App Store apps, and VS Code extensions)
 - `scripts/install.sh` - Main installer
 - `scripts/update.sh` - Update all tools
-- `scripts/stow-all.sh` - Links 28 stow packages (the `PACKAGES` array). `scripts/stow-remove.sh` holds an identical list — update both together. `scripts/doctor.sh` fails if the two lists drift apart or if a listed package is missing
+- `scripts/stow-all.sh` - Links 29 stow packages (the `PACKAGES` array). `scripts/stow-remove.sh` holds an identical list — update both together. `scripts/doctor.sh` fails if the two lists drift apart or if a listed package is missing
 - `mise/.config/mise/config.toml` - Language versions (Node v22, Ruby, Go, Rust, Bun). This is the only mise config; the former root `mise.toml` duplicated the Node pin and was removed on 2026-08-18
 
 ### Tool Stack
@@ -157,7 +158,7 @@ Each directory at the root level is a "stow package" containing configs:
 - **Shell**: ZSH + Zinit + Starship prompt
 - **Editor**: Neovim with LazyVim distribution
 - **Terminal**: Ghostty (WezTerm removed 2026-08-14 — it drops Caps Lock→Escape key events on macOS)
-- **Multiplexer**: herdr (agent multiplexer, tmux-parity keys); tmux still available via the `tm` alias
+- **Multiplexer**: herdr (agent multiplexer, tmux-parity keys); tmux still available via the `tm` alias; tuios on trial (leader Ctrl+A, tmux preset)
 - **File manager**: yazi (`y` wrapper); superfile on trial (`sf` wrapper). Both cd the shell to the last directory on exit
 - **Launcher**: Raycast (Alfred removed 2026-08-14 — the Powerpack came from a patched build, and a Homebrew update replaced it with the official one). Raycast free covers clipboard history, snippets, quicklinks, and script commands. It does not sync settings between machines
 - **Screenshots**: Shottr (free for personal use, includes OCR and scrolling capture)

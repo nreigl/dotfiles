@@ -45,6 +45,7 @@ PACKAGES=(
   "texmf"
   "tmux"
   "tuicr"
+  "tuios"
   "vscode"
   "yazi"
   "zsh"

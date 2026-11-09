@@ -1,0 +1,37 @@
+# tuios: terminal multiplexer and window manager. https://tuios.dev/
+#
+# Write only the keys that differ from the defaults. tuios watches this file
+# and applies a save at once. `tuios list-options` prints every key with its
+# default. That command needs a running daemon: `tuios start-server`.
+#
+# The settings page (leader then ',') and `tuios set-config` write into this
+# file. Only the stowed config.toml is in the repo. themes/ and config.d/
+# stay as real files in ~/.config/tuios/.
+
+[appearance]
+# Same theme pair as Ghostty: theme = dark:Ayu Mirage,light:Ayu Light
+theme = "ayu_mirage"
+theme_light = "ayu_light"
+
+# tuios wrote these two on first run: tiling on, and sessions kept by the
+# background daemon across detach.
+[startup]
+tiled = true
+daemon = true
+
+# Same leader and keys as tmux (set -g prefix C-a) and herdr (prefix =
+# "ctrl+a"). tuios keeps Ctrl+A from the pane, so zsh loses start-of-line.
+# Press Ctrl+A twice to send it to the pane.
+# Do not run tuios inside herdr or tmux: the outer one takes Ctrl+A first,
+# and tuios never gets its leader. herdr also takes Alt+1..9 (tab switch)
+# before tuios sees it (workspace switch).
+[keybindings]
+leader_key = "ctrl+a"
+preset = "tmux"
+# Austrian layout: | [ ] { } \ ~ @ need Option. Ghostty composes them with
+# the left Option key and also reports Alt, so by default tuios ran the Alt
+# binding (Option+7 for | switched to workspace 7). "type" makes the character
+# its own key: Ctrl+A | splits and Ctrl+A [ opens copy mode. The right Option
+# key is plain Alt (Ghostty macos-option-as-alt = right), so right Option+1..9
+# still switches workspace.
+option_glyphs = "type"

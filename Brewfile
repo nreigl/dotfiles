@@ -220,6 +220,9 @@ brew "tree"
 # Code review TUI with vim keybindings; writes comments back as markdown
 # (pairs with hunk, which is npm-managed: npm i -g hunkdiff)
 brew "tuicr"
+# Terminal multiplexer and window manager with tiling, workspaces, and a
+# session daemon. Leader Ctrl+A with the tmux preset, the same keys as tmux/herdr
+brew "tuios"
 # Maintained ctags implementation
 brew "universal-ctags"
 # Vi 'workalike' with many additional features

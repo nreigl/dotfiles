@@ -179,6 +179,10 @@ create_directories() {
   # it, and without it every connection warns and runs without multiplexing.
   mkdir -p "$HOME/.ssh/sockets"
   chmod 700 "$HOME/.ssh" "$HOME/.ssh/sockets"
+  # A real directory makes stow link only tuios/config.toml. If the directory
+  # is missing, stow links the whole directory, and the themes/ that tuios
+  # writes land in the repo.
+  mkdir -p "$HOME/.config/tuios"
 
   echo -e "${GREEN}✓ Directories created${NC}"
 }
