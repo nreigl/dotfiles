@@ -68,7 +68,7 @@ For this research project:
 - Citation keys follow `[auth:lower][year]` format (e.g., `stefani2025`)
 - Locate bibliography files via the preamble's `\addbibresource{...}`, not by assuming a path: some projects use a shared `bib/` directory (`master.bib`, `core_papers.bib`), others a per-paper `references.bib`
 - Presentations use Beamer with authoryear-comp style
-- Prefer lualatex for Unicode support
+- Papers build with pdflatex (`latexmk -pdf`), because journals compile with it; Beamer slides build with lualatex (plain `latexmk`, through `~/.latexmkrc`)
 - Engine is always biblatex + biber with `natbib=true`. Use `\citet{}` for textual citations and `\citep{}` for parenthetical citations
 
 ## Quality Standards

@@ -87,8 +87,10 @@ precedence.
   subsection when it extends beyond about a page or carries its own exhibits.
 - Keep one manuscript file per paper. Tables may be input from generated files;
   prose should not be split across a `sections/` tree.
-- Build with `latexmk` (the global `~/.latexmkrc` runs lualatex and biber). Do
-  not pass `-pdf`, because it forces pdflatex. Then check undefined
+- Build a paper with pdflatex, because journals compile with it: use
+  `latexmk -pdf`, or the project's build script if it has one. Keep the
+  `inputenc`/`fontenc`/`lmodern` preamble. Slides and briefs use lualatex
+  (plain `latexmk`, through the global `~/.latexmkrc`). Then check undefined
   references, citations, overfull boxes, pagination, and table overflow.
 - Fix generated-table text in the renderer, not in the rendered `.tex` file.
 

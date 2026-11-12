@@ -45,6 +45,8 @@ project/
 
 ## Compilation
 
-Compile with `latexmk manuscript.tex`. Do not add `-pdf`. The flag forces
-pdflatex, but the global `~/.latexmkrc` selects lualatex (`$pdf_mode = 4`) and
-the `build/` output directory. latexmk runs biber when it is necessary.
+The engine depends on the document type. Compile a paper with
+`latexmk -pdf manuscript.tex`, because journals compile with pdflatex. Compile
+slides and briefs with plain `latexmk <file>.tex`: the global `~/.latexmkrc`
+selects lualatex (`$pdf_mode = 4`) and the `build/` output directory. In both
+cases latexmk runs biber when it is necessary.
