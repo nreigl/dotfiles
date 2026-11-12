@@ -11,7 +11,7 @@ Build conference/seminar/job-market slides. Infer the paper's content from the r
 
 - Compile with **lualatex** via latexmk (`\ll` in Neovim/VimTeX); verified working with this theme
 - Default theme: **jambro** ([JambroBeamerTheme](https://github.com/ambropo/JambroBeamerTheme), Cesa-Bianchi), preferred over metropolis for academic and policy talks
-- Citations: biblatex/biber, `\citet`/`\citep` (see the academic-paper-writer skill); the theme also provides `\citej{ref}` for a citation in the theme's main color
+- Citations: biblatex/biber, `\citet`/`\citep` (see the latex-bibliography skill); the theme also provides `\citej{ref}` for a citation in the theme's main color
 
 The theme ships with the dotfiles as the `texmf` stow package, symlinked into `TEXMFHOME` at `~/Library/texmf/tex/latex/jambro/`, so `\usetheme{jambro}` resolves from any directory and no per-deck copy is needed. Do not add `beamerthemejambro.sty` to a project unless the deck must build on a machine without the dotfiles, in which case say so. It loads its own dependencies (Fira Sans, TikZ, tcolorbox, tabularx, the Augie handwriting font) and needs TeX Live 2022 or newer. Slides that draw arrows to named nodes need **two compiler passes**, which latexmk handles.
 

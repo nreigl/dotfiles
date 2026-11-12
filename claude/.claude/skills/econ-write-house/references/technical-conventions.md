@@ -25,7 +25,9 @@ precedence.
 
 ## Citations
 
-- Use the paper-local Zotero-managed `references.bib`.
+- Use the Zotero-managed bibliography files that the preamble loads with
+  `\addbibresource{}`. Some projects keep them in a shared `bib/` folder
+  (`master.bib`, `core_papers.bib`), others in a paper-local `references.bib`.
 - Where the bibliography is generated from a reference manager, treat it as
   machine-owned. Do not hand-add entries. Record the import request wherever the
   project keeps its reading list, and park the citation behind a visible `% TODO`
@@ -85,7 +87,8 @@ precedence.
   subsection when it extends beyond about a page or carries its own exhibits.
 - Keep one manuscript file per paper. Tables may be input from generated files;
   prose should not be split across a `sections/` tree.
-- Build with `pdflatex`, `biber`, `pdflatex`, `pdflatex`, then check undefined
+- Build with `latexmk` (the global `~/.latexmkrc` runs lualatex and biber). Do
+  not pass `-pdf`, because it forces pdflatex. Then check undefined
   references, citations, overfull boxes, pagination, and table overflow.
 - Fix generated-table text in the renderer, not in the rendered `.tex` file.
 

@@ -72,12 +72,12 @@ You are a copy editor at a top economics journal. Read all .tex files in the fol
    - "very unique", "absolutely essential", "completely eliminate" — tautologies
    - "significant" used to mean large or important (reserve "significant" for statistical significance)
    - "This paper contributes to the literature by..." — show, don't tell
-   - Passive voice where active is natural ("it is shown that" → "we show that")
+   - Passive voice where active is natural ("it is shown that" → "we show that", or "I show that" in a sole-authored paper)
    - Inconsistent first person ("we find" in some places, "the paper argues" in others)
 
 5. **Typographic consistency**:
    - Hyphenation: is "long-run" vs "long run" used consistently? Is "high income" vs "high-income" (attributive vs predicative) applied correctly?
-   - Em-dash vs en-dash vs hyphen used correctly
+   - Em dashes or a spaced ` -- ` used as sentence separators (house style bans both; `--` stays for ranges and compound names); en-dash vs hyphen used correctly
    - Spacing around punctuation
 
 6. **Number formatting**: Are numbers below 10 spelled out in prose? Are percentages consistent (15% vs 15 percent)?
@@ -356,7 +356,7 @@ In all cases: you have read thousands of papers and have extremely high standard
 
 Read all .tex files completely and thoroughly.
 
-**Your evaluation has 7 parts:**
+**Your evaluation has 6 parts:**
 
 **Part 1 — The Central Contribution**
 

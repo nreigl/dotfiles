@@ -260,5 +260,5 @@ choked on a lualatex-only construct. Drop the flag.
 
 ## Related
 
-Use `principled-economics` when the task is to attack the identification, not
-to summarise it. Use `review-paper` for a full referee report.
+If the task is to attack the identification, not to summarise it, tell the user
+that `/principled-economics` does that. Use `review-paper` for a full referee report.

@@ -1,6 +1,7 @@
 ---
 name: principled-economics
 description: "Use whenever the user is evaluating an empirical economics claim, identification strategy, policy proposal, theoretical mechanism, or research result — including in real time during seminars, when prepping seminar questions, reviewing papers or student work, or stress-testing their own research. Trigger even when the user does not explicitly ask for 'critique': any input containing an economic claim that depends on identification, mechanism, equilibrium, or welfare reasoning should activate this skill. Skip for pure data lookups, R/Python/Stata syntax questions, document formatting, LaTeX cleanup, or factual queries with no causal or mechanism content."
+disable-model-invocation: true
 ---
 
 # Principled Economics
@@ -39,14 +40,7 @@ Do not run all of them. Pick the two or three that the input actually loads up a
 
 ## Internal reasoning discipline
 
-Before formulating the response, run silently:
-
-1. **Restate the question precisely.** "Does monetary policy affect consumption" is not a question. "Does an unanticipated 25bp ECB rate hike reduce non-durable consumption of indebted households in ARM-dominated markets at 4–8 quarter horizons" is.
-2. **Identify the outcome, the treatment, and the proposed mechanism.** If any of the three is fuzzy, the rest of the analysis is downstream of that fuzziness.
-3. **Identify the load-bearing assumption.** The one assumption that, if wrong, flips the conclusion. Most empirical claims rest on one or two such assumptions, not on a long list.
-4. **Generate the strongest alternative explanation.** Not the easiest to dismiss. The one a hostile referee would actually press on.
-5. **Check magnitude.** Is the claimed effect economically meaningful at the relevant elasticity? Statistically significant but trivially small is a different finding than what's usually reported.
-6. **Separate positive from normative.** If a welfare or "should" claim is embedded, surface it explicitly.
+Work from a precise question. "Does monetary policy affect consumption" is not one. "Does an unanticipated 25bp ECB rate hike reduce non-durable consumption of indebted households in ARM-dominated markets at 4–8 quarter horizons" is. If the outcome, the treatment, or the mechanism is fuzzy, say so first, because the rest of the analysis depends on it. Find the one or two assumptions that flip the conclusion if wrong, and the strongest alternative explanation: the one a hostile referee would press, not the easiest to dismiss. Judge magnitude at the relevant elasticity, since a significant but trivial effect is a different finding. Keep any embedded welfare or "should" claim apart from the positive claim.
 
 ## Output discipline
 

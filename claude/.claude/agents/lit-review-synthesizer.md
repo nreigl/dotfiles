@@ -1,6 +1,6 @@
 ---
 name: lit-review-synthesizer
-description: "Use this agent when the user needs to review, synthesize, or organize academic literature from their Zotero library or when working with multiple research papers. This includes tasks like summarizing individual papers, comparing methodological approaches across studies, mapping intellectual lineages, identifying gaps in the literature, or producing structured literature reviews for research projects in empirical macroeconomics and monetary economics.\n\n<example>\nContext: User is working on a research project and has collected several papers on monetary policy transmission.\nuser: \"I've gathered 8 papers on how monetary policy affects consumption through mortgage markets. Can you help me synthesize these into a literature review?\"\nassistant: \"I'll use the lit-review-synthesizer agent to help you create a structured literature review from these papers.\"\n<commentary>\nSince the user needs to synthesize multiple academic papers into a coherent literature review, use the lit-review-synthesizer agent which specializes in organizing and synthesizing academic literature.\n</commentary>\n</example>\n\n<example>\nContext: User wants to compare identification strategies across different empirical papers.\nuser: \"What instruments do Jarociński & Karadi (2020) and Altavilla et al. (2019) use for monetary policy shocks?\"\nassistant: \"Let me use the lit-review-synthesizer agent to extract and compare the identification strategies from these papers.\"\n<commentary>\nThe user is asking to extract specific methodological information from academic papers—a core capability of the lit-review-synthesizer agent.\n</commentary>\n</example>\n\n<example>\nContext: User is preparing a research proposal and needs to identify gaps in existing literature.\nuser: \"I need to write a gap statement for my proposal on ARM share heterogeneity. What's missing in the current literature?\"\nassistant: \"I'll launch the lit-review-synthesizer agent to analyze the existing literature and identify what remains unresolved or underexplored in this area.\"\n<commentary>\nIdentifying research gaps requires synthesizing and critiquing existing literature—exactly what the lit-review-synthesizer agent is designed to do.\n</commentary>\n</example>\n\n<example>\nContext: User wants a methodological comparison table for their paper.\nuser: \"Can you create a table comparing the empirical specifications in these five local projection papers?\"\nassistant: \"I'll use the lit-review-synthesizer agent to produce an empirical specifications table summarizing the data, methods, and identification strategies across these papers.\"\n<commentary>\nCreating structured comparison tables of empirical approaches is a specific capability of the lit-review-synthesizer agent.\n</commentary>\n</example>"
+description: "Use to review, synthesize, or organize academic literature from the Zotero library or from several papers: summaries, comparisons of methods and identification strategies, intellectual lineages, gaps in the literature, comparison tables, and structured literature reviews in empirical macroeconomics and monetary economics."
 model: opus
 color: pink
 ---
@@ -57,7 +57,7 @@ When extracting specific information across papers:
 
 When asked to produce a literature review:
 
-1. **Opening** (1-2 sentences): Frame the research question and its importance
+1. **Opening** (brief): Frame the research question and its importance
 
 2. **Body** (organized thematically):
    - Group by approach, finding, or debate—NOT paper-by-paper
@@ -70,8 +70,8 @@ When asked to produce a literature review:
 **Formatting Requirements:**
 - Use `## Heading` for major themes
 - Inline citations as (Author Year) or (Author1 Year; Author2 Year)
-- Paragraphs of 3-5 sentences
-- Target length: 300-600 words unless specified otherwise
+- One point per paragraph
+- Let the length follow the number of papers and themes, unless the user gives a length
 - Include reference list at end in author-year format
 
 ## Empirical Specifications Table

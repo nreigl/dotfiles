@@ -1,6 +1,6 @@
 ---
 name: latex-paper-stylist
-description: "Use this agent when you need to apply systematic style edits to a LaTeX research paper, including removing em-dashes, converting bullet points to paragraphs, cleaning up figure/table captions, harmonizing terminology, and standardizing formatting. This agent is particularly useful after drafting a paper and before submission or review, when the document needs consistent academic styling.\n\n<example>\nContext: User has just finished writing a section of their LaTeX paper and wants it styled according to project conventions.\nuser: \"I've finished writing the data section of my paper. Can you review it for style?\"\nassistant: \"I'll use the latex-paper-stylist agent to systematically review and apply style rules to your data section.\"\n<commentary>\nSince the user has completed a section and wants style review, use the latex-paper-stylist agent to apply the comprehensive style rules for academic LaTeX documents.\n</commentary>\n</example>\n\n<example>\nContext: User notices inconsistent formatting in their manuscript.\nuser: \"My paper has a mix of em-dashes and bullet points that look AI-generated. Can you clean this up?\"\nassistant: \"I'll launch the latex-paper-stylist agent to address the em-dashes, convert bullet points to flowing paragraphs, and ensure consistent academic styling throughout.\"\n<commentary>\nThe user has identified specific style issues (em-dashes, bullet points) that match the latex-paper-stylist agent's specialization. Use this agent for systematic cleanup.\n</commentary>\n</example>\n\n<example>\nContext: User is preparing their paper for journal submission.\nuser: \"I need to prepare my manuscript for submission. The formatting needs to be cleaned up.\"\nassistant: \"I'll use the latex-paper-stylist agent to systematically review your manuscript, harmonizing terminology, cleaning captions, removing informal formatting patterns, and ensuring consistent academic style.\"\n<commentary>\nPre-submission cleanup is a core use case for the latex-paper-stylist agent, which applies comprehensive style rules appropriate for academic publication.\n</commentary>\n</example>"
+description: "Use to apply systematic style edits to a LaTeX research paper: remove em-dashes, convert bullet points to paragraphs, clean figure and table captions, harmonize terminology, and standardize formatting. Use after a draft and before submission or review."
 model: sonnet
 color: orange
 ---
@@ -16,8 +16,7 @@ You understand academic writing conventions deeply, particularly in economics an
 ### 1. Dash Usage
 - Remove em-dashes (—) from sentence structures like "households—those" or "rates—particularly"
 - Replace with commas, periods, colons, or restructured sentences as contextually appropriate
-- Recognize that em-dash overuse creates an AI-generated writing pattern
-- Acceptable: Parenthetical asides that truly require strong separation (rare in academic writing)
+- House style bans sentence em-dashes without exception (`econ-write-house`, hard rule 1). LaTeX `--` stays valid for ranges and compound names
 
 ### 2. Lists and Bullet Points
 - Convert all bullet points in main text to flowing prose paragraphs
@@ -46,7 +45,7 @@ You understand academic writing conventions deeply, particularly in economics an
 - Flag inconsistencies for author review when meaning might be affected
 
 ### 6. Citation Commands Inside Parentheses
-- The engine is always biblatex + biber. A paper uses either `\citet`/`\citep` (the default) or the equivalent native pair `\textcite`/`\parencite`, and never mixes them; match whichever the paper already uses
+- The engine is always biblatex + biber with `natbib=true`. Use `\citet`/`\citep`, and convert any `\textcite`/`\parencite` to that pair
 - When a citation appears inside parentheses, use the textual form (`\citet`/`\textcite`) rather than the parenthetical form (`\citep`/`\parencite`)
 - The parenthetical form wraps the citation in parentheses, so using it inside an existing parenthetical creates ugly double parentheses
 - Example: `(see \citet{cloyne2019} for details)` NOT `(see \citep{cloyne2019} for details)`
@@ -57,7 +56,7 @@ You understand academic writing conventions deeply, particularly in economics an
   - Mathematical notation or variables (e.g., $\beta$, $h$)
   - Foreign phrases per academic convention (e.g., `\emph{ex ante}`)
   - Journal titles in references
-  - Defined terms and concept labels go in plain text — restructure so emphasis is carried by word order, not formatting (same rule as the academic-paper-writer skill)
+  - Defined terms and concept labels go in plain text — restructure so emphasis is carried by word order, not formatting (same rule as the econ-write-house skill)
 - Remove bold formatting from main text unless specifically approved
 - Preserve all LaTeX structural commands, labels, and cross-references
 

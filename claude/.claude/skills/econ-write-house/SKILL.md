@@ -19,9 +19,8 @@ first.
 This file is the author's layer on top. It overrides `econ-write` where the two
 conflict, and it adds the rules `econ-write` does not carry. **Where they
 disagree, this file wins**, without exception and regardless of how well-sourced
-the upstream advice is. It also overrides generic academic-writing guidance. The former
-`academic-paper-writer` skill was removed on 2026-08-23: everything it carried
-now lives here, and its mechanical lint block is section 13 of
+the upstream advice is. It also overrides generic academic-writing guidance. The
+mechanical lint block is section 13 of
 [references/self-check.md](references/self-check.md).
 
 Load the references selectively but completely:
