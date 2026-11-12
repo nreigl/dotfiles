@@ -167,5 +167,45 @@
         "key": "space r p",
         "command": "quarto.preview",
         "when": "editorTextFocus && neovim.mode == 'normal' && editorLangId == 'quarto'"
+    },
+
+    // ── RStudio / Positron run keys ───────────────────────────────────────
+    // Cmd+Enter for R, R Markdown and Quarto comes from the R and Quarto
+    // extensions. These entries fill the gaps for the other languages.
+    //
+    // The R extension binds Cmd+Shift+Enter twice in .R files (run chunk and
+    // source with echo). Pin it to "source file", as in Positron.
+    {
+        "key": "cmd+shift+enter",
+        "command": "r.runSource",
+        "when": "editorTextFocus && editorLangId == 'r'"
+    },
+    {
+        "key": "cmd+enter",
+        "command": "python.execSelectionInTerminal",
+        "when": "editorTextFocus && editorLangId == 'python' && !notebookEditorFocused && !jupyter.ownsSelection && !findInputFocussed && !replaceInputFocussed"
+    },
+    {
+        "key": "cmd+enter",
+        "command": "language-julia.executeCodeBlockOrSelection",
+        "when": "editorTextFocus && activeEditor != workbench.editor.notebook && editorLangId in julia.supportedLanguageIds"
+    },
+    {
+        "key": "cmd+shift+c",
+        "command": "editor.action.commentLine",
+        "when": "editorTextFocus && !editorReadonly"
+    },
+    // Insert mode only: in normal mode vscode-neovim reads typed text as keys.
+    {
+        "key": "cmd+shift+m",
+        "command": "type",
+        "args": { "text": " |> " },
+        "when": "editorTextFocus && neovim.mode == 'insert' && editorLangId =~ /^(r|rmd|quarto)$/"
+    },
+    {
+        "key": "alt+-",
+        "command": "type",
+        "args": { "text": " <- " },
+        "when": "editorTextFocus && neovim.mode == 'insert' && editorLangId =~ /^(r|rmd|quarto)$/"
     }
 ]

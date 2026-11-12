@@ -1,8 +1,8 @@
 {
   // ── Editor ────────────────────────────────────────────────────────────
   "editor.cursorSmoothCaretAnimation": "on",
-  "editor.fontSize": 13,
-  "editor.fontFamily": "Hack Nerd Font",
+  "editor.fontSize": 14,
+  "editor.fontFamily": "JetBrains Mono, Menlo, monospace",
   "editor.fontLigatures": true,
   "editor.formatOnSave": true,
   "editor.minimap.enabled": false,
@@ -16,32 +16,27 @@
   "editor.stickyScroll.enabled": true,
   "editor.linkedEditing": true,
   "editor.inlayHints.enabled": "onUnlessPressed",
-  "editor.lineHeight": 2.0,
   "editor.detectIndentation": false,
   "diffEditor.ignoreTrimWhitespace": false,
 
-  // ── Minimalist chrome (igorbabko/vscode-setup, moderate variant) ───────
-  "editor.renderWhitespace": "none",
-  "editor.renderLineHighlight": "none",
-  "editor.guides.indentation": false,
-  "editor.showFoldingControls": "never",
-  "editor.scrollbar.horizontal": "hidden",
-  "editor.scrollbar.vertical": "hidden",
-  "editor.overviewRulerBorder": false,
-  "editor.cursorBlinking": "solid",
-  "breadcrumbs.enabled": false,
-  "git.decorations.enabled": false,
-  "scm.diffDecorations": "none",
-  "workbench.tree.renderIndentGuides": "none",
-  "workbench.layoutControl.enabled": false,
+  // ── Positron-style chrome (mirrors ~/Library/.../Positron/User/settings.json)
+  // Scrollbars, breadcrumbs, line highlight, indent guides, gutter git
+  // decorations and the layout control stay at their VS Code defaults.
+  "editor.renderWhitespace": "trailing",
+  "editor.renderFinalNewline": "dimmed",
+  "editor.showFoldingControls": "always",
+  "editor.snippetSuggestions": "top",
+  "workbench.editor.highlightModifiedTabs": true,
   "workbench.startupEditor": "none",
   "workbench.tips.enabled": false,
   "explorer.compactFolders": false,
-  "terminal.integrated.tabs.enabled": false,
-  "terminal.integrated.lineHeight": 1.5,
 
   // ── Files ─────────────────────────────────────────────────────────────
-  "files.autoSave": "onFocusChange",
+  // autoSave off: same as Positron. If Claude Code edits a file on disk,
+  // VS Code offers compare/revert instead of a silent overwrite.
+  "files.autoSave": "off",
+  "files.hotExit": "onExit",
+  "workbench.editor.closeOnFileDelete": false,
   "files.trimTrailingWhitespace": true,
   "files.insertFinalNewline": true,
   "files.trimFinalNewlines": true,
@@ -75,25 +70,38 @@
     "*.Rmd": "rmd",
     "Brewfile": "ruby",
   },
-
   // ── Workbench / window ────────────────────────────────────────────────
-  "workbench.colorTheme": "Aura Dracula Spirit (Soft)",
-  "workbench.iconTheme": "vscode-icons",
+  // Same theme as Positron. Keep this key: without it, VS Code falls back
+  // to its default dark theme.
+  "workbench.colorTheme": "Cobalt2",
+  "workbench.productIconTheme": "fluent-icons",
+  "workbench.iconTheme": "material-icon-theme",
   "workbench.colorCustomizations": {
-    "editorSuggestWidget.selectedBackground": "#231739",
-    "sideBar.background": "#191521",
-    "list.activeSelectionBackground": "#231739",
-    "list.inactiveSelectionBackground": "#231739",
-    "list.focusBackground": "#231739",
-    "list.hoverBackground": "#231739",
-    "terminalCursor.foreground": "#C45DFF",
+    "[Cobalt2]": {
+      "tab.activeBackground": "#193549",
+      "tab.inactiveBackground": "#122738",
+      "tab.activeBorder": "#ffc600",
+      "tab.border": "#15232D",
+      "editorGroupHeader.tabsBackground": "#122738",
+      "editorGroupHeader.noTabsBackground": "#193549",
+      "editor.background": "#193549",
+      "sideBar.background": "#15232D",
+      "activityBar.background": "#122738",
+      "titleBar.activeBackground": "#15232D",
+      "statusBar.background": "#15232D",
+      "panel.background": "#122738",
+    },
   },
   "workbench.statusBar.visible": true,
-  "workbench.activityBar.location": "hidden",
+  "workbench.activityBar.location": "default",
+  // Positron layout: secondary side bar open on the right for the session
+  // views (R Workspace, R Help, Jupyter Variables). VS Code stores view
+  // placement in its state database, so move those views there once by hand.
+  "workbench.secondarySideBar.defaultVisibility": "visibleInWorkspace",
   "workbench.editor.limit.enabled": true,
   "workbench.editor.limit.value": 12,
   "workbench.editor.limit.perEditorGroup": true,
-  "window.title": "${rootName}${separator}${activeEditorMedium}",
+  "window.title": "${activeEditorFull}${separator}${rootName}",
   "window.restoreWindows": "all",
   "zenMode.centerLayout": false,
   "zenMode.fullScreen": false,
@@ -101,8 +109,9 @@
 
   // ── Terminal ──────────────────────────────────────────────────────────
   "terminal.external.osxExec": "Ghostty.app",
-  "terminal.integrated.fontFamily": "Hack Nerd Font",
-  "terminal.integrated.fontSize": 13,
+  // Nerd Font variant: the Starship prompt needs its glyphs.
+  "terminal.integrated.fontFamily": "JetBrainsMono Nerd Font Mono",
+  "terminal.integrated.fontSize": 14,
   "terminal.integrated.scrollback": 20000,
   "terminal.integrated.defaultProfile.osx": "zsh",
 
@@ -129,6 +138,10 @@
   "python.analysis.typeCheckingMode": "basic",
   "python.terminal.activateEnvironment": true,
   "python.testing.pytestEnabled": true,
+  // Native REPL: a console with history and a Variables view, the closest
+  // VS Code match to the Positron Python console.
+  "python.REPL.sendToNativeREPL": true,
+  "python.REPL.provideVariables": true,
   "ruff.nativeServer": "on",
   "notebook.formatOnSave.enabled": true,
   "notebook.codeActionsOnSave": {
@@ -141,9 +154,21 @@
   "r.rterm.mac": "/usr/local/bin/R",
   "r.rpath.mac": "/usr/local/bin/R",
   "r.bracketedPaste": true,
-  "r.plot.useHttpgd": true,
-  "r.alwaysUseActiveTerminal": true,
+  // auto: jgd, then httpgd, then the static viewer. Plots open in column Two,
+  // to the right of the editor, like the Positron Plots pane.
+  "r.plot.backend": "auto",
+  // false: Cmd+Enter goes to a dedicated R console (created on first use),
+  // not to whatever zsh terminal has focus. This is the Positron console.
+  "r.alwaysUseActiveTerminal": false,
+  "r.rterm.option": ["--no-save", "--no-restore", "--quiet"],
   "r.sessionWatcher": true,
+  "r.session.viewers.viewColumn": {
+    "plot": "Two",
+    "browser": "Active",
+    "viewer": "Two",
+    "pageViewer": "Active",
+    "help": "Two",
+  },
   "[r]": {
     "editor.defaultFormatter": "Posit.air-vscode",
     "editor.formatOnSave": true,
@@ -235,8 +260,6 @@
     "editor.tabSize": 4,
     "editor.formatOnSave": true,
   },
-
-  // ── MATLAB (official MathWorks LSP extension) ─────────────────────────
   "MATLAB.installPath": "/Applications/MATLAB_R2024b.app",
   "MATLAB.indexWorkspace": true,
   "MATLAB.telemetry": false,
@@ -295,4 +318,22 @@
   "update.showReleaseNotes": false,
   "extensions.ignoreRecommendations": true,
   "claudeCode.preferredLocation": "panel",
+  "terminal.integrated.commandsToSkipShell": [
+    "language-julia.interrupt",
+    "matlab.interrupt",
+  ],
+  "julia.enableCrashReporter": true,
+  "gitlens.views.scm.grouped.views": {
+    "commits": true,
+    "branches": true,
+    "remotes": true,
+    "stashes": true,
+    "tags": true,
+    "worktrees": true,
+    "contributors": true,
+    "fileHistory": false,
+    "repositories": true,
+    "searchAndCompare": false,
+    "launchpad": true,
+  },
 }
