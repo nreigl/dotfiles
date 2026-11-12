@@ -1,0 +1,23 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "opencode/flint-40b-free",
+  "autoupdate": false,
+  "share": "disabled",
+  "providers": {
+    "ollama": {
+      "name": "Ollama (local)",
+      "settings": {
+        "baseURL": "http://localhost:11434/v1"
+      },
+      "models": {
+        "qwen3.8:27b-mlx": {
+          "name": "Qwen 3.8 27B (local)",
+          "limit": {
+            "context": 32768,
+            "output": 8192
+          }
+        }
+      }
+    }
+  }
+}

@@ -143,6 +143,8 @@ brew "navi"
 brew "ncdu"
 # Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
+# Run LLMs locally. The server runs from ~/Library/LaunchAgents/local.ollama.plist, not `brew services`
+brew "ollama"
 # Pandoc filter for numbering and cross-referencing
 brew "pandoc-crossref"
 # Render and include figures in Pandoc documents using many plotting toolkits
