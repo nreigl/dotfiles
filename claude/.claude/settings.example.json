@@ -144,27 +144,15 @@
     "code-simplifier@claude-plugins-official": true,
     "pyright-lsp@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true,
-    "codex@openai-codex": true,
-    "financial-analysis@claude-for-financial-services": true,
-    "pitch-agent@claude-for-financial-services": true,
-    "gl-reconciler@claude-for-financial-services": true,
-    "market-researcher@claude-for-financial-services": true,
-    "investment-banking@claude-for-financial-services": true,
-    "equity-research@claude-for-financial-services": true
-  },
-  "extraKnownMarketplaces": {
-    "openai-codex": {
-      "source": {
-        "source": "github",
-        "repo": "openai/codex-plugin-cc"
-      }
-    },
-    "claude-for-financial-services": {
-      "source": {
-        "source": "git",
-        "url": "https://github.com/anthropics/financial-services-plugins.git"
-      }
-    }
+    "data@synced": false,
+    "earnings-reviewer@synced": false,
+    "equity-research@synced": false,
+    "financial-analysis@synced": false,
+    "fund-admin@synced": false,
+    "investment-banking@synced": false,
+    "market-researcher@synced": false,
+    "productivity@synced": false,
+    "wealth-management@synced": false
   },
   "alwaysThinkingEnabled": true,
   "effortLevel": "medium",
