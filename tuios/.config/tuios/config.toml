@@ -28,10 +28,15 @@ daemon = true
 [keybindings]
 leader_key = "ctrl+a"
 preset = "tmux"
-# Austrian layout: | [ ] { } \ ~ @ need Option. Ghostty composes them with
-# the left Option key and also reports Alt, so by default tuios ran the Alt
-# binding (Option+7 for | switched to workspace 7). "type" makes the character
-# its own key: Ctrl+A | splits and Ctrl+A [ opens copy mode. The right Option
-# key is plain Alt (Ghostty macos-option-as-alt = right), so right Option+1..9
-# still switches workspace.
-option_glyphs = "type"
+
+# Austrian layout: | is Option+7, \ is Option+Shift+7, [ is Option+5, and
+# ] is Option+6. After the leader, Ghostty sends these as "alt+7 with the
+# text |". tuios 0.12.1 drops the text and looks up only alt+7, so Ctrl+A |
+# did nothing. The alt+N keys below bind the chords to the same actions.
+# Upstream fixed this after 0.12.1 (commit d6cd422, discussion #850). Remove
+# the alt+N keys when `tuios --version` is newer than 0.12.1.
+# Ctrl+A % splits left and right with no Option key at all.
+[keybindings.prefix_mode]
+prefix_split_vertical = ["%", "|", "\\", "alt+7", "alt+shift+7"]
+prefix_selection = ["[", "alt+5"]
+paste_buffer = ["]", "alt+6"]
