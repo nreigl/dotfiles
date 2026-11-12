@@ -35,6 +35,7 @@ PACKAGES=(
   "macos"
   "mise"
   "nvim"
+  "opencode"
   "pi"
   "python"
   "ripgrep"
