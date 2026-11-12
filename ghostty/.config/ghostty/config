@@ -79,6 +79,7 @@ keybind = shift+ctrl+right_bracket=next_tab
 keybind = shift+ctrl+,=move_tab:-1
 keybind = shift+ctrl+.=move_tab:+1
 # Flip between configured transparency and fully opaque
+# cheat: Cmd+Shift+O   Ghostty: switch between transparent and opaque
 keybind = cmd+shift+o=toggle_background_opacity
 # WezTerm parity (was CTRL|CMD+f there). Matches the macOS system shortcut.
 keybind = ctrl+cmd+f=toggle_fullscreen
@@ -87,4 +88,10 @@ keybind = ctrl+cmd+f=toggle_fullscreen
 # vendored from https://github.com/hackr-sh/ghostty-shaders (see shaders/)
 # options: shaders/cursor_blaze.glsl, shaders/cursor_lightning.glsl
 # custom-shader = ~/.config/ghostty/shaders/cursor_blaze.glsl
+
+# Teaching overlay switch. raycast/scripts/ghostty-teaching.sh creates or
+# removes teaching-active (a symlink to ./teaching, outside the repo) and
+# reloads. The ? skips the file when it is missing. The path is relative to
+# ~/.config/ghostty/, not to the repo, although this file is a symlink.
+config-file = ?teaching-active
 

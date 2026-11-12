@@ -1,7 +1,12 @@
 # Teaching overlay for projectors and screen sharing.
-# Loads on top of ./config, so only the keys below change. Open with:
-#   ghostty-teach   (alias in zsh/.config/zsh/aliases.zsh)
-# That starts a separate Ghostty instance. Normal windows keep their look.
+# Loads on top of ./config, so only the keys below change. Two ways to use it:
+#   Raycast "Ghostty Teaching Mode" (raycast/scripts/ghostty-teaching.sh)
+#     switches every open window. It links ./teaching-active to this file,
+#     which ./config includes, and reloads the config.
+#   ghostty-teach (alias in zsh/.config/zsh/aliases.zsh)
+#     opens a separate light instance. Normal windows keep their look.
+# Keep only keys that a config reload applies. The alias passes opacity and
+# the quick-terminal unbind on the command line instead.
 
 # Fixed light theme. No dark/light split, so macOS appearance does not matter.
 # Ayu Light has pale comments and ANSI colors that wash out on a projector.
@@ -9,17 +14,12 @@ theme = GitHub Light High Contrast
 # Darken any text color that sits too close to the background.
 minimum-contrast = 3
 
-# Transparency lets the desktop show through and kills contrast on a beamer.
-background-opacity = 1
-background-blur-radius = 0
-
 # Readable from the back of a room. Cmd+= / Cmd+- still adjust it live.
+# A reload skips tabs whose size was already changed by hand.
 font-size = 20
 # The daily weight (wght=300) is too thin for a projector.
 font-variation = wght=450
 
+# A reload applies padding to new tabs only.
 window-padding-x = 12
 window-padding-y = 8
-
-# The main instance owns the global quick-terminal hotkey.
-keybind = global:ctrl+cmd+equal=unbind

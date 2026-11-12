@@ -26,6 +26,7 @@ interface.
 | --- | --- | --- |
 | Wind Convert | `18 kn`, `9 m/s`, `35 km/h`, `5 bft` | all units plus Beaufort |
 | Windguru | spot name, spot id, or empty | opens the forecast |
+| Ghostty Teaching Mode | none | switches Ghostty to the light teaching overlay, or back |
 
 `Wind Convert` assumes knots when you give no unit.
 
@@ -38,6 +39,14 @@ id the script opens a Windguru search instead.
 sells API access as a Pro feature, so no extension can show the numbers inside
 Raycast. `comoser/surfs-up` is on trial as the alternative. It reads a free
 source and shows wind and wave conditions in Raycast directly.
+
+`Ghostty Teaching Mode` creates or removes `~/.config/ghostty/teaching-active`,
+a symlink to the `teaching` overlay. Then it reloads Ghostty through
+AppleScript. To use it from a hotkey, open the command in Raycast settings and
+record a hotkey. On the first run, macOS asks if Raycast can control Ghostty.
+Allow it. Opacity does not change on a reload, so press Cmd+Shift+O for an
+opaque window. If two Ghostty instances run, AppleScript reloads only one of
+them. Quit the `ghostty-teach` instance before you use this command.
 
 ## AI assistants
 
