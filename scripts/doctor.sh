@@ -363,6 +363,7 @@ check_shell_duplicates() {
     "$DOTFILES_DIR/zsh/.config/zsh/aliases.zsh"
     "$DOTFILES_DIR/zsh/.config/zsh/functions.zsh"
     "$DOTFILES_DIR/zsh/.config/zsh/fzf-functions.zsh"
+    "$DOTFILES_DIR/zsh/.config/zsh/cheat.zsh"
   )
 
   local found=0 name

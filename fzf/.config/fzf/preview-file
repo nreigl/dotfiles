@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# Preview one file for fzf or tv.
+# Images go to chafa. All other files go to bat.
+#
+# In fzf under Ghostty (directly or through herdr), images use the kitty
+# graphics protocol and show real pixels. tv can only show text, so there
+# chafa draws the image with colored block characters.
+# Set PREVIEW_IMAGE_FORMAT=symbols to force block characters everywhere.
+
+file=${1:-}
+if [[ ! -f "$file" ]]; then
+  printf 'Not a file: %s\n' "$file"
+  exit 0
+fi
+
+lower=$(printf '%s' "$file" | tr '[:upper:]' '[:lower:]')
+
+case "$lower" in
+  *.png|*.jpg|*.jpeg|*.gif|*.webp|*.bmp|*.tif|*.tiff)
+    if ! command -v chafa >/dev/null 2>&1; then
+      file -b -- "$file"
+      exit 0
+    fi
+    if [[ -n "${FZF_PREVIEW_COLUMNS:-}" ]]; then
+      dim="${FZF_PREVIEW_COLUMNS}x${FZF_PREVIEW_LINES}"
+      format=symbols
+      case "${TERM_PROGRAM:-}" in
+        ghostty|herdr) format=kitty ;;
+      esac
+      format=${PREVIEW_IMAGE_FORMAT:-$format}
+    else
+      dim=80x40
+      format=symbols
+    fi
+    polite=off
+    [[ "$format" == symbols ]] && polite=on
+    chafa -f "$format" --polite "$polite" -s "$dim" --animate=off -- "$file"
+    # A final newline lets fzf show more than one image in a session.
+    echo
+    ;;
+  *)
+    if command -v bat >/dev/null 2>&1; then
+      bat --style=numbers --color=always --line-range :500 -- "$file"
+    else
+      sed -n '1,200p' "$file"
+    fi
+    ;;
+esac

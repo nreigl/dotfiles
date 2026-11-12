@@ -3,10 +3,11 @@
 
 # === Git Integration ===
 # Ctrl-G: Search git files
+# cheat: Ctrl+G   fzf: pick git files and open them in nvim
 fzf-git-files() {
   local files
   files=$(git ls-files --others --exclude-standard --cached 2>/dev/null | \
-    fzf --multi --preview 'command -v bat >/dev/null 2>&1 && bat --style=numbers --color=always --line-range :500 {} || sed -n "1,200p" {}')
+    fzf --multi --preview "$XDG_CONFIG_HOME/fzf/preview-file {}")
   [[ -n "$files" ]] && ${EDITOR:-nvim} ${(f)files}
   zle && zle reset-prompt
 }
@@ -39,11 +40,12 @@ FZF-EOF"
 
 # === File Search with Preview ===
 # Ctrl-O: Find file with preview, open in the editor
+# cheat: Ctrl+O   fzf: pick a file and open it in nvim
 fzf-file-preview() {
   local file
   file=$( (command -v fd >/dev/null 2>&1 && fd --type f --hidden --follow --exclude .git || \
     rg --files --hidden --follow -g '!*.git/*') |
-    fzf --preview 'command -v bat >/dev/null 2>&1 && bat --style=numbers --color=always --line-range :500 {} || sed -n "1,200p" {}')
+    fzf --preview "$XDG_CONFIG_HOME/fzf/preview-file {}")
   [[ -n "$file" ]] && ${EDITOR:-nvim} "$file"
   zle && zle reset-prompt
 }
@@ -53,6 +55,7 @@ fzf-file-preview() {
 # A folder selection changes into that folder. A file selection changes into
 # the parent folder of that file. Use `z` for a folder outside this tree.
 # Named fzf-my-cd-widget so it does not shadow fzf's own fzf-cd-widget.
+# cheat: Alt+C   fzf: cd into a folder below here (a file: its folder)
 fzf-my-cd-widget() {
   local sel preview target
   # fzf runs the preview through $SHELL, so the folder test lives in the string.
@@ -126,7 +129,9 @@ if [[ $- == *i* ]]; then
 fi
 
 # === Aliases ===
+# cheat: fgh   fzf: browse git commits with a diff preview
 alias fgh='fzf-git-history'  # Changed from fh to avoid conflict
+# cheat: fkill   fzf: pick processes and kill them
 alias fkill='fzf-kill-process'
 alias fbrew='fzf-brew-install'
 
@@ -136,6 +141,7 @@ alias fbrew='fzf-brew-install'
 # ripgrep re-runs on every keystroke, so fzf never holds the whole tree.
 # Select one hit to open it. Select several with Tab to open them as a
 # Neovim quickfix list. Follows the upstream ripgrep-integration recipe.
+# cheat: frg   search file contents live, open the hit in nvim
 frg() (
   local editor=${EDITOR:-nvim}
   local RELOAD='reload:rg --column --color=always --smart-case {q} || :'
@@ -161,7 +167,7 @@ frg() (
 fe() {
   local files
   files=$( ( (command -v fd >/dev/null 2>&1 && fd "${1:-.}" --type f --hidden --follow --exclude .git) || \
-    rg --files --hidden --follow -g '!*.git/*') | fzf --multi --preview 'command -v bat >/dev/null 2>&1 && bat --style=numbers --color=always {} || sed -n "1,200p" {}')
+    rg --files --hidden --follow -g '!*.git/*') | fzf --multi --preview "$XDG_CONFIG_HOME/fzf/preview-file {}")
   [[ -n "$files" ]] && ${EDITOR:-nvim} ${(f)files}
 }
 
@@ -221,6 +227,7 @@ fstash() {
 
 # === Git Diff Explorer ===
 # Browse changed files with diff preview
+# cheat: fgd   fzf: changed files with diff preview (Ctrl+S stages)
 fgd() {
   local file
   file=$(git diff --name-only | \
@@ -248,6 +255,7 @@ fport() {
 
 # === Open in Default Application ===
 # Find file with fzf and open in default macOS application
+# cheat: fo   fzf: pick a file and open it in the default app
 fo() {
   local file
   file=$( (command -v fd >/dev/null 2>&1 && fd --type f --hidden --follow --exclude .git || \
@@ -255,6 +263,10 @@ fo() {
     fzf --preview 'command -v bat >/dev/null 2>&1 && bat --style=numbers --color=always --line-range :500 {} || file {}')
   [[ -n "$file" ]] && open "$file"
 }
+
+# === Markdown Viewer ===
+# leaf has its own fuzzy Markdown picker, so there is no fzf wrapper here.
+# cheat: leaf --fuzzy   leaf: pick a Markdown file and read it
 
 # === Zoxide Integration ===
 # Enhanced directory jumping with fzf

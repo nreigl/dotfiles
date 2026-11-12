@@ -68,6 +68,7 @@ source "${ZINIT_HOME}/zinit.zsh"
 zinit light zsh-users/zsh-completions
 
 # Additional useful plugins (loaded async)
+# cheat: Esc Esc   put sudo in front of the current command
 zinit wait lucid for \
   OMZP::sudo \
   OMZP::command-not-found
@@ -99,12 +100,13 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 # keymaps keep the fzf widget.
 export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
 # Previews for fzf's own Ctrl-T and Alt-C widgets
-export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always --line-range :500 {} 2>/dev/null || sed -n \"1,200p\" {}'"
+export FZF_CTRL_T_OPTS="--preview '$XDG_CONFIG_HOME/fzf/preview-file {}'"
 export FZF_ALT_C_OPTS="--preview 'eza --tree --level=2 --icons=always {} 2>/dev/null || ls -lah {}'"
 # Options live in the fzf stow package, not inline here.
 export FZF_DEFAULT_OPTS_FILE="$XDG_CONFIG_HOME/fzf/fzfrc"
 
 # Use fzf key-bindings only; skip fzf's completion (fzf-tab handles completion)
+# cheat: Ctrl+T   fzf: pick a file and insert its path at the cursor
 if [[ -f /opt/homebrew/opt/fzf/shell/key-bindings.zsh ]]; then
   source /opt/homebrew/opt/fzf/shell/key-bindings.zsh
 fi
@@ -116,6 +118,7 @@ fi
 # Atuin puts its own strategy in front of this list. Autosuggestions loads
 # later (turbo mode), so set the history fallback here.
 ZSH_AUTOSUGGEST_STRATEGY=(history)
+# cheat: Ctrl+R   Atuin: search shell history
 command -v atuin >/dev/null 2>&1 && eval "$(atuin init zsh)"
 
 # === LaTeX Configuration ===
@@ -160,9 +163,11 @@ zstyle ':completion:*:descriptions' format '%F{green}-- %d --%f'
 # prompt. fzf-tab needs compinit, and it must load before the plugins that
 # wrap widgets. Syntax highlighting loads last, after all widgets exist.
 # atload starts autosuggestions, because its precmd hook has already run.
+# nocd keeps atload in $PWD. The plugin repo holds a .ruby-version (2.5.3),
+# and a prompt redraw inside it makes mise and starship ask for that Ruby.
 zinit wait lucid for \
     Aloxaf/fzf-tab \
-  atload'_zsh_autosuggest_start' \
+  atload'_zsh_autosuggest_start' nocd \
     zsh-users/zsh-autosuggestions \
     zdharma-continuum/fast-syntax-highlighting
 # Minimal but useful fzf-tab styles
@@ -240,11 +245,18 @@ fi
 # Source FZF functions
 [[ -f "$XDG_CONFIG_HOME/zsh/fzf-functions.zsh" ]] && source "$XDG_CONFIG_HOME/zsh/fzf-functions.zsh"
 
+# Shortcut reminder popup. It must load after `atuin init`, which binds ?.
+# cheat: ?   show this list (on an empty line)
+# cheat: Ctrl+/   show this list (anywhere)
+# cheat: Alt+A   Atuin AI: describe a task, get a command (on an empty line)
+[[ -f "$XDG_CONFIG_HOME/zsh/cheat.zsh" ]] && source "$XDG_CONFIG_HOME/zsh/cheat.zsh"
+
 # === Final Setup ===
 # Ensure XDG directories exist
 mkdir -p "$XDG_CONFIG_HOME" "$XDG_DATA_HOME" "$XDG_CACHE_HOME" "$XDG_STATE_HOME/zsh"
 
 # Define z once (built on zoxide) for consistent navigation
+# cheat: z   zoxide: jump to a frequent folder (no args: pick one in fzf)
 unfunction z 2>/dev/null || true
 z() {
   if [[ $# -eq 0 ]]; then
@@ -278,22 +290,15 @@ z() {
 #   herdr -> agent workspace manager
 alias tm='/opt/homebrew/bin/tmux new-session -A -s main'
 
-# GitHub MCP server needs GITHUB_PERSONAL_ACCESS_TOKEN in Claude Code's process
-# environment (the plugin's .mcp.json interpolates ${GITHUB_PERSONAL_ACCESS_TOKEN}
-# into its Bearer auth header). Rather than globally exporting the gh token into
-# every shell and every child process, scope it to the `claude` process only:
-# `gh auth token` runs just when Claude Code launches, and no other process sees it.
-#
-# The same wrapper also drops CLAUDE_CODE_CHILD_SESSION. Claude Code sets that
+# This wrapper drops CLAUDE_CODE_CHILD_SESSION. Claude Code sets that
 # marker on processes it spawns so nested sessions skip writing their own
 # transcript. A `claude` launched by hand from a Claude-spawned terminal
 # inherits it, silently loses its transcript, and cannot be --resume'd.
 # Launching from an interactive shell always means a real top-level session.
+#
+# The wrapper no longer exports GITHUB_PERSONAL_ACCESS_TOKEN. Only the GitHub
+# MCP plugin read it, and that plugin is disabled since 2026-11-07. If you
+# enable the plugin again, add the `gh auth token` export back here.
 claude() {
-  local -a env_cmd
-  env_cmd=(env -u CLAUDE_CODE_CHILD_SESSION)
-  if command -v gh &>/dev/null; then
-    env_cmd+=("GITHUB_PERSONAL_ACCESS_TOKEN=$(gh auth token 2>/dev/null)")
-  fi
-  "${env_cmd[@]}" claude "$@"
+  env -u CLAUDE_CODE_CHILD_SESSION claude "$@"
 }

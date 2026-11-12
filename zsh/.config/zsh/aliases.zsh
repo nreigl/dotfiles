@@ -60,6 +60,7 @@ alias gf='git fetch'
 alias hd='hunk diff'          # working tree, untracked files included
 alias hds='hunk diff --staged'
 alias hs='hunk show'          # last commit; `hs HEAD~1` for an earlier one
+# cheat: cr   tuicr: comment on AI changes, copy the review out
 alias cr='tuicr -w'           # review the working tree
 alias crs='tuicr -w --stdout' # same, but print the review instead of copying it
 
@@ -127,6 +128,7 @@ alias twsync='tw_gtasks_sync -l "Taskwarrior" --all'
 
 # === File managers ===
 # yazi, with cd-on-quit.
+# cheat: y   yazi file manager, cd to the last folder on exit
 y() {
     local tmp cwd
     tmp="$(mktemp -t yazi-cwd.XXXXXX)"
@@ -164,5 +166,8 @@ sf() {
 #   ghostty +show-config --default --docs    every setting with its default
 alias ghostty="/Applications/Ghostty.app/Contents/MacOS/ghostty"
 # A second Ghostty instance with the light, high-contrast teaching overlay.
+# Opacity is read only at startup on macOS, so it goes here and not in the
+# overlay. The main instance keeps the global quick-terminal hotkey.
+# To switch the open windows instead, use Raycast "Ghostty Teaching Mode".
 # cheat: ghostty-teach   Ghostty: open a light window for teaching
-alias ghostty-teach='open -na Ghostty.app --args --config-file="$HOME/.config/ghostty/teaching"'
+alias ghostty-teach='open -na Ghostty.app --args --config-file="$HOME/.config/ghostty/teaching" --background-opacity=1 --background-blur-radius=0 --keybind=global:ctrl+cmd+equal=unbind'

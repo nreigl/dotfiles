@@ -29,6 +29,10 @@ channel = "stable"
 # switch this back to "ctrl+b" in that case.
 prefix = "ctrl+a"
 
+# goto stays on the herdr default, prefix+g. The tag is here for the zsh
+# shortcut popup (zsh/.config/zsh/cheat.zsh).
+# cheat: Ctrl+A G   herdr: search agents and tabs, jump to one
+
 # Splits like tmux | and -
 # herdr's split_vertical stacks DOWN, split_horizontal goes RIGHT.
 # v = side-by-side (tmux |), minus = stacked (tmux -). Not backslash: on this
@@ -81,6 +85,7 @@ description = "review working tree (hunk)"
 width = "90%"
 height = "90%"
 
+# cheat: Ctrl+A Alt+R   herdr: tuicr review popup for the working tree
 [[keys.command]]
 key = "prefix+alt+r"
 type = "popup"

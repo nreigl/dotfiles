@@ -28,6 +28,7 @@ My personal dotfiles for macOS with state-of-the-art tooling and performance opt
 - Most configs live under `~/.config/...` (fzf, ripgrep, starship, ghostty, nvim, etc.).
 - FZF custom config: `~/.config/fzf/fzf.zsh`
 - FZF/ZLE functions: `~/.config/zsh/fzf-functions.zsh`
+- Shortcut popup (`?` on an empty line): `~/.config/zsh/cheat.zsh`
 
 ### Development
 - **Python**: [UV](https://docs.astral.sh/uv/) - Ultra-fast Python package manager (replaces pip, pipx, poetry, pyenv)
@@ -101,6 +102,7 @@ dotfiles/
 ├── macos/            # macOS defaults script
 ├── mise/             # Version manager config
 ├── nvim/             # Neovim/LazyVim configuration
+├── opencode/         # Opencode agent config and global instructions
 ├── pi/               # Pi agent settings, extensions, and prompts
 ├── python/           # Python/UV/Ruff configuration
 ├── raycast/          # Raycast scripts (NOT stowed)
@@ -207,6 +209,21 @@ export OPENAI_API_KEY="your-key"
 
 ### Aliases
 Aliases live in `~/.config/zsh/aliases.zsh` and only activate when the underlying tool is installed. Shell functions live in `~/.config/zsh/functions.zsh` and `~/.config/zsh/fzf-functions.zsh`. `.zshrc` sources these three files. Add your own aliases and functions to them.
+
+### Shortcut popup
+Press `?` on an empty command line, or Ctrl+/ anywhere, to see your shortcuts in fzf. In the list:
+
+- Enter puts a command on the command line. It does not run. On a key combo, Enter only closes the list.
+- Alt+Enter runs a command. On a zsh key combo, it runs what the key does, for example Ctrl+O opens the file picker. Ghostty and herdr keys only close the list, because zsh never sees those keys.
+- Esc closes the list. Atuin AI moved from `?` to Alt+A. The code is in `~/.config/zsh/cheat.zsh`.
+
+To add an entry, put a comment above the code in any sourced zsh file, the Ghostty config, or the herdr config. Use two or more spaces between the key or command and the description:
+
+```zsh
+# cheat: fo   fzf: pick a file and open it in the default app
+```
+
+A new shell shows the entry.
 
 The legacy `~/.aliases` file was removed on 2026-08-14. Nothing sourced it, and an `ENABLE_LEGACY_GNU_ALIASES` guard disabled most of it anyway. Run `git show 9694c2508fb8^:zsh/.aliases` to read the old contents.
 
