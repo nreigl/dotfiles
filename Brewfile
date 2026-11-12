@@ -1,6 +1,7 @@
 tap "bramstein/webfonttools"
 tap "dart-lang/dart"
 tap "epk/epk"
+tap "hamed-elfayome/claude-usage"
 tap "jesseduffield/lazygit"
 tap "mgmeyers/pdfannots2json"
 tap "nikitabobko/tap"
@@ -30,6 +31,10 @@ brew "bison"
 brew "brew-gem"
 # Like cat but displays content with syntax highlighting
 brew "ccat"
+# Show images as terminal graphics or block characters (fzf and tv previews)
+brew "chafa"
+# Read Hacker News in the terminal (command: clx)
+brew "circumflex"
 # GNU File, Shell, and Text utilities
 brew "coreutils"
 # Get, unpack, build, and install modules from CPAN
@@ -126,6 +131,9 @@ brew "perl"
 brew "latexindent"
 # Simple terminal UI for git commands
 brew "lazygit"
+# Terminal Markdown previewer (installs the `leaf` binary). Do not install
+# the formula "leaf": it is an unrelated file watcher with the same binary name
+brew "leaf-markdown-viewer"
 # Portable Foreign Function Interface library
 brew "libffi"
 # Clone of ls with colorful output (using eza instead of lsd)
@@ -145,6 +153,8 @@ brew "ncdu"
 brew "neovim"
 # Run LLMs locally. The server runs from ~/Library/LaunchAgents/local.ollama.plist, not `brew services`
 brew "ollama"
+# AI coding agent, built for the terminal (config in the opencode/ stow package)
+brew "opencode"
 # Pandoc filter for numbering and cross-referencing
 brew "pandoc-crossref"
 # Render and include figures in Pandoc documents using many plotting toolkits
@@ -269,10 +279,10 @@ cask "1password", args: { appdir: "/Applications" }
 # AdoptOpenJDK OpenJDK (Java) Development Kit
 # AeroSpace is an i3-like tiling window manager for macOS
 cask "aerospace"
-# Status bar app to overcome time-constrained WiFi networks
-cask "airpass", args: { appdir: "/Applications" }
 # Tools for building Android applications
 cask "android-studio", args: { appdir: "/Applications" }
+# Menu bar app for monitoring Claude usage limits
+cask "hamed-elfayome/claude-usage/claude-usage-tracker"
 # App to build and share containerised applications and microservices
 # Web browser
 cask "firefox", args: { appdir: "/Applications" }
@@ -348,8 +358,6 @@ cask "gimp"
 # Primary terminal emulator. Replaced WezTerm 2026-08-14: WezTerm drops
 # Caps Lock -> Escape key events on macOS, on stable and on nightly alike.
 cask "ghostty"
-# Performance software for cyclists, runners and triathletes
-cask "goldencheetah"
 # Web browser
 cask "google-chrome", args: { appdir: "/Applications" }
 # Desktop automation application
@@ -409,8 +417,6 @@ cask "zennotes"
 cask "zoom", args: { appdir: "/Applications" }
 # Collect, organise, cite, and share research sources
 cask "zotero"
-# Desktop client for the Zulip team chat platform
-cask "zulip"
 # mas entries fail if the App Store is not signed in. install.sh treats a
 # failed `brew bundle` as a warning, so the rest of the install still runs.
 # Sign in to the App Store, then run `brew bundle install` again.
@@ -427,10 +433,10 @@ vscode "esbenp.prettier-vscode"
 vscode "grapecity.gc-excelviewer"
 vscode "gruntfuggly.todo-tree"
 vscode "james-yu.latex-workshop"
-vscode "josemurilloc.aura-spirit-dracula"
 vscode "julialang.language-julia"
 vscode "kylebarron.stata-enhanced"
 vscode "mathworks.language-matlab"
+vscode "miguelsolorio.fluent-icons"
 vscode "ms-azuretools.vscode-containers"
 vscode "ms-python.debugpy"
 vscode "ms-python.python"
@@ -445,11 +451,12 @@ vscode "ms-vscode-remote.remote-ssh"
 vscode "ms-vscode-remote.remote-ssh-edit"
 vscode "ms-vscode.remote-explorer"
 vscode "openai.chatgpt"
+vscode "pkief.material-icon-theme"
 vscode "posit.air-vscode"
 vscode "quarto.quarto"
 vscode "reditorsupport.r"
 vscode "reditorsupport.r-syntax"
 vscode "sumneko.lua"
-vscode "vscode-icons-team.vscode-icons"
+vscode "wesbos.theme-cobalt2"
 vscode "yeaoh.statarun"
 vscode "yzhang.markdown-all-in-one"
