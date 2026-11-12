@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Open each selected entry in its default application.
+# Text files (and empty files) go to $EDITOR in one session.
+# Binary files (PDF, images, Office documents) go to macOS `open`.
+
+set -u
+
+text_files=()
+other_files=()
+
+for path in "$@"; do
+  if [[ ! -s "$path" ]] || [[ "$(file -b --mime-encoding -- "$path")" != "binary" ]]; then
+    text_files+=("$path")
+  else
+    other_files+=("$path")
+  fi
+done
+
+if [[ ${#other_files[@]} -gt 0 ]]; then
+  open -- "${other_files[@]}"
+fi
+
+if [[ ${#text_files[@]} -gt 0 ]]; then
+  exec ${EDITOR:-nvim} -- "${text_files[@]}"
+fi

@@ -33,7 +33,7 @@ case "$lower_path" in
     ;;
   *.png|*.jpg|*.jpeg)
     if command -v chafa >/dev/null 2>&1; then
-      chafa -s 80x40 "$file_path" 2>/dev/null
+      chafa -f symbols --polite on -s 80x40 "$file_path" 2>/dev/null
     else
       file "$file_path"
       command -v sips >/dev/null 2>&1 && sips -g pixelWidth -g pixelHeight "$file_path" 2>/dev/null

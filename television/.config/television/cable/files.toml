@@ -1,0 +1,41 @@
+# Overrides the built-in `files` channel. Only the keybindings, the actions,
+# and the preview differ: Enter opens the selection instead of printing the
+# path, and images get a preview.
+
+[metadata]
+name = "files"
+description = "A channel to select files and directories"
+requirements = ["fd", "bat"]
+
+[source]
+command = [
+  { name = "Default", run = "fd -t f" },
+  { name = "Hidden",  run = "fd -t f -H" },
+]
+
+# Images show as block characters. Other files show through bat.
+[preview]
+command = "${XDG_CONFIG_HOME:-$HOME/.config}/fzf/preview-file '{}'"
+env = { BAT_THEME = "ansi" }
+
+[keybindings]
+shortcut = "f1"
+enter = "actions:open"
+f12 = "actions:reveal"
+ctrl-up = "actions:goto_parent_dir"
+
+[actions.open]
+description = "Open text files in $EDITOR and other files in the default macOS application"
+command = "${XDG_CONFIG_HOME:-$HOME/.config}/television/scripts/open-file {}"
+shell = "bash"
+mode = "execute"
+
+[actions.reveal]
+description = "Reveal the file in Finder"
+command = "open -R '{}'"
+mode = "fork"
+
+[actions.goto_parent_dir]
+description = "Re-opens tv in the parent directory"
+command = "tv files .."
+mode = "execute"
