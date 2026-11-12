@@ -25,7 +25,7 @@ Always pass `--username`. Without it your comments are stamped `user` and the
 user cannot tell them from their own.
 
 ```bash
---username "Claude Opus 5"
+--username "Claude"
 ```
 
 ## Find the session
@@ -61,13 +61,13 @@ line 30.
 # One line
 tuicr review add --session "<path>" \
   --target-file paper.tex --line 42 \
-  --type question --username "Claude Opus 5" \
+  --type question --username "Claude" \
   "Which standard errors support this significance claim?"
 
 # A range
 tuicr review add --session "<path>" \
   --target-file R/04_estimate.R --line 120 --end-line 134 \
-  --type bug --username "Claude Opus 5" "..."
+  --type bug --username "Claude" "..."
 
 # The whole file: omit --line
 tuicr review add --session "<path>" --target-file paper.tex --type todo ...
@@ -111,6 +111,6 @@ Do not comment on LaTeX style, spacing, or macro choice unless the user asks.
 
 ## Related
 
-`hunk-review` is the other half. hunk shows a changeset and cannot export.
-tuicr comments on it and can. If the user wants to read a diff, point them at
+The hunk diff viewer is the other half. It shows a changeset and cannot
+export. tuicr comments on it and can. If the user wants to read a diff, point them at
 hunk. If they want to leave or receive comments, use this skill.

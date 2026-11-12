@@ -30,7 +30,7 @@ menu_bar = true
 # leave hunk open next to the agent and watch the changeset grow.
 watch = true
 
-# Show inline agent notes by default. The hunk-review skill writes them through
+# Show inline agent notes by default. An agent writes them through
 # `hunk session comment add`.
 agent_notes = true
 
