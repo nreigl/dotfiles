@@ -10,9 +10,13 @@ bun = "latest"
 
 [settings]
 experimental = true
-# Read idiomatic version files (.nvmrc and .node-version, .ruby-version,
-# .go-version) for these tools. It replaces the deprecated legacy_version_file.
-# The default list is empty, and then mise reads no idiomatic file.
-idiomatic_version_file_enable_tools = ["node", "ruby", "go"]
+# Read idiomatic version files (.nvmrc and .node-version, .ruby-version) for
+# these tools. It replaces the deprecated legacy_version_file. The default list
+# is empty, and then mise reads no idiomatic file.
+# Go is not in the list. For go, mise also reads the `go` directive in go.mod,
+# which is only a minimum version: in every Go project it pinned an old Go and
+# printed a deprecation warning (removed in mise 2026.11.0). Pin Go per project
+# in mise.toml instead.
+idiomatic_version_file_enable_tools = ["node", "ruby"]
 always_keep_download = false
 jobs = 4
